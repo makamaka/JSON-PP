@@ -13,7 +13,7 @@ This distribution is for the preparation.
 
     * release this module as JSON::PPdev.
 
-    * release other PP::* modules as JSON::PPdev::Comoat*.
+    * release other PP::* modules as JSON::PPdev::Compat*.
 
     * JSON distribution will inculde yet another JSON::PP modules.
       They are JSNO::BP::PP and JSON::BP::PP::* (BP means 'back port')
