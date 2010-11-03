@@ -5,7 +5,7 @@ BEGIN { plan tests => 6 };
 
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
-use JSON::PP;
+use JSON::PPdev;
 
 eval q| require Math::BigInt |;
 
@@ -20,7 +20,7 @@ my $fix =  !$v       ? '+'
           : '';
 
 
-my $json = new JSON::PP;
+my $json = new JSON::PPdev;
 
 $json->allow_nonref->allow_bignum(1);
 $json->convert_blessed->allow_blessed;

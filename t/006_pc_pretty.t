@@ -1,7 +1,7 @@
 #! perl
 
-# copied over from JSON::PP::PC and modified to use JSON::PP
-# copied over from JSON::PP::XS and modified to use JSON::PP
+# copied over from JSON::PPdev::PC and modified to use JSON::PPdev
+# copied over from JSON::PPdev::XS and modified to use JSON::PPdev
 
 use strict;
 use Test::More;
@@ -9,10 +9,10 @@ BEGIN { plan tests => 9 };
 
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
-use JSON::PP;
+use JSON::PPdev;
 
 my ($js,$obj,$json);
-my $pc = new JSON::PP;
+my $pc = new JSON::PPdev;
 
 $obj = {foo => "bar"};
 $js = $pc->encode($obj);

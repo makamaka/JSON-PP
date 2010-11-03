@@ -1,4 +1,4 @@
-# copied over from JSON::PP::XS and modified to use JSON::PP
+# copied over from JSON::PPdev::XS and modified to use JSON::PPdev
 
 use Test::More;
 use strict;
@@ -13,10 +13,10 @@ BEGIN {
 }
 
 use utf8;
-use JSON::PP;
+use JSON::PPdev;
 
 
-my $json = JSON::PP->new->relaxed;
+my $json = JSON::PPdev->new->relaxed;
 
 ok ('[1,2,3]' eq encode_json $json->decode (' [1,2, 3]'));
 ok ('[1,2,4]' eq encode_json $json->decode ('[1,2, 4 , ]'));

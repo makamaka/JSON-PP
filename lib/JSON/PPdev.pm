@@ -1,4 +1,4 @@
-package JSON::PP;
+package JSON::PPdev;
 
 # JSON-2.0
 
@@ -11,9 +11,9 @@ use Carp ();
 use B ();
 #use Devel::Peek;
 
-$JSON::PP::VERSION = '2.27008';
+$JSON::PPdev::VERSION = '2.27008';
 
-@JSON::PP::EXPORT = qw(encode_json decode_json from_json to_json);
+@JSON::PPdev::EXPORT = qw(encode_json decode_json from_json to_json);
 
 # instead of hash-access, i tried index-access for speed.
 # but this method is not faster than what i expected. so it will be changed.
@@ -54,14 +54,11 @@ BEGIN {
 
     # Perl version check, Unicode handling is enable?
     # Helper module sets @JSON::PP::_properties.
-
-    my $helper = $] >= 5.008 ? 'JSON::PP58'
-               : $] >= 5.006 ? 'JSON::PP56'
-               :               'JSON::PP5005'
-               ;
-
-    eval qq| require $helper |;
-    if ($@) { Carp::croak $@; }
+    if ($] < 5.008 ) {
+        my $helper = $] >= 5.006 ? 'JSON::PP::Compat5006' : 'JSON::PP::Compat5005';
+        eval qq| require $helper |;
+        if ($@) { Carp::croak $@; }
+    }
 
     for my $name (@xs_compati_bit_properties, @pp_bit_properties) {
         my $flag_name = 'P_' . uc($name);
@@ -1269,8 +1266,64 @@ sub _decode_unicode {
     return $un;
 }
 
+#
+# Setup for various Perl versions (the code from JSON::PP58)
+#
+
+BEGIN {
+
+    unless ( defined &utf8::is_utf8 ) {
+       require Encode;
+       *utf8::is_utf8 = *Encode::is_utf8;
+    }
+
+    *JSON::PPdev::JSON_PP_encode_ascii      = \&JSON::PPdev::_encode_ascii;
+    *JSON::PPdev::JSON_PP_encode_latin1     = \&JSON::PPdev::_encode_latin1;
+    *JSON::PPdev::JSON_PP_decode_surrogates = \&JSON::PPdev::_decode_surrogates;
+    *JSON::PPdev::JSON_PP_decode_unicode    = \&JSON::PPdev::_decode_unicode;
+
+    if ($] >= 5.008 and $] < 5.008003) { # join() in 5.8.0 - 5.8.2 is broken.
+        package JSON::PPdev;
+        require subs;
+        subs->import('join');
+        eval q|
+            sub join {
+                return '' if (@_ < 2);
+                my $j   = shift;
+                my $str = shift;
+                for (@_) { $str .= $j . $_; }
+                return $str;
+            }
+        |;
+    }
+
+}
 
 
+sub JSON::PPdev::incr_parse {
+    local $Carp::CarpLevel = 1;
+    ( $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new )->incr_parse( @_ );
+}
+
+
+sub JSON::PPdev::incr_text : lvalue {
+    $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new;
+
+    if ( $_[0]->{_incr_parser}->{incr_parsing} ) {
+        Carp::croak("incr_text can not be called when the incremental parser already started parsing");
+    }
+    $_[0]->{_incr_parser}->{incr_text};
+}
+
+
+sub JSON::PPdev::incr_skip {
+    ( $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new )->incr_skip;
+}
+
+
+sub JSON::PPdev::incr_reset {
+    ( $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new )->incr_reset;
+}
 
 
 ###############################
@@ -1280,13 +1333,13 @@ sub _decode_unicode {
 BEGIN {
     eval 'require Scalar::Util';
     unless($@){
-        *JSON::PP::blessed = \&Scalar::Util::blessed;
-        *JSON::PP::reftype = \&Scalar::Util::reftype;
+        *JSON::PPdev::blessed = \&Scalar::Util::blessed;
+        *JSON::PPdev::reftype = \&Scalar::Util::reftype;
     }
     else{ # This code is from Sclar::Util.
         # warn $@;
         eval 'sub UNIVERSAL::a_sub_not_likely_to_be_here { ref($_[0]) }';
-        *JSON::PP::blessed = sub {
+        *JSON::PPdev::blessed = sub {
             local($@, $SIG{__DIE__}, $SIG{__WARN__});
             ref($_[0]) ? eval { $_[0]->a_sub_not_likely_to_be_here } : undef;
         };
@@ -1299,7 +1352,7 @@ BEGIN {
             B::GV     GLOB
             B::REGEXP REGEXP
         );
-        *JSON::PP::reftype = sub {
+        *JSON::PPdev::reftype = sub {
             my $r = shift;
 
             return undef unless length(ref($r));
@@ -1523,9 +1576,11 @@ __END__
 
 =head1 NAME
 
-JSON::PP - JSON::XS compatible pure-Perl module.
+JSON::PPdev - JSON::XS compatible pure-Perl module.
 
 =head1 SYNOPSIS
+
+ # Here, the word 'JSON::PP' mean 'JSON::PPdev'
 
  use JSON::PP;
 

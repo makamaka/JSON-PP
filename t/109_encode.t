@@ -8,7 +8,7 @@ BEGIN { plan tests => 7 };
 
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
-use JSON::PP;
+use JSON::PPdev;
 
 BEGIN {
     use lib qw(t);
@@ -17,7 +17,7 @@ BEGIN {
 
 no utf8;
 
-my $json = JSON::PP->new->allow_nonref;
+my $json = JSON::PPdev->new->allow_nonref;
 
 is($json->encode("ü"),                   q|"ü"|); # as is
 

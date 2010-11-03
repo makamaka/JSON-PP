@@ -7,9 +7,9 @@ BEGIN {
     $ENV{ PERL_JSON_BACKEND } = 0;
 }
 
-use JSON::PP;
+use JSON::PPdev;
 
-my $json = JSON::PP->new;
+my $json = JSON::PPdev->new;
 
 my $complete_text = qq/{"foo":"bar"}/;
 my $garbaged_text  = qq/{"foo":"bar"}\n/;

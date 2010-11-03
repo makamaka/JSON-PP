@@ -7,13 +7,13 @@ BEGIN {
     $ENV{ PERL_JSON_BACKEND } = 0;
 }
 
-use JSON::PP;
+use JSON::PPdev;
 
 my $obj = OverloadedObject->new( 'foo' );
 
 ok( $obj eq 'foo' );
 
-my $json = JSON::PP->new->convert_blessed;
+my $json = JSON::PPdev->new->convert_blessed;
 
 is( $json->encode( [ $obj ] ), q{["foo"]} );
 

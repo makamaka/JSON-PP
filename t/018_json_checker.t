@@ -1,9 +1,9 @@
 #! perl
 
-# use the testsuite from http://www.json.org/JSON::PP_checker/
+# use the testsuite from http://www.json.org/JSON::PPdev_checker/
 # except for fail18.json, as we do not support a depth of 20 (but 16 and 32).
 
-# copied over from JSON::PP::XS and modified to use JSON::PP
+# copied over from JSON::PPdev::XS and modified to use JSON::PPdev
 
 use strict;
 #no warnings;
@@ -12,9 +12,9 @@ use Test::More;
 BEGIN { plan tests => 39 };
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
-use JSON::PP;
+use JSON::PPdev;
 
-my $json = JSON::PP->new->utf8->max_depth(32)->canonical;
+my $json = JSON::PPdev->new->utf8->max_depth(32)->canonical;
 
 binmode DATA;
 my $num = 1;
@@ -36,7 +36,7 @@ for (;;) {
 }
 
 __DATA__
-"A JSON::PP payload should be an object or array, not a string."
+"A JSON::PPdev payload should be an object or array, not a string."
 # fail1.json
 {"Extra value after close": true} "misplaced quoted value"
 # fail10.json
@@ -105,7 +105,7 @@ break"]
 {"Extra comma": true,}
 # fail9.json
 [
-    "JSON::PP Test Pattern pass1",
+    "JSON::PPdev Test Pattern pass1",
     {"object with 1 member":["array with 1 element"]},
     {},
     [],
@@ -138,7 +138,7 @@ break"]
         "array":[  ],
         "object":{  },
         "address": "50 St. James Street",
-        "url": "http://www.JSON::PP.org/",
+        "url": "http://www.JSON::PPdev.org/",
         "comment": "// /* <!-- --",
         "# -- --> */": " ",
         " s p a c e d " :[1,2 , 3
@@ -166,7 +166,7 @@ break"]
 [[[[[[[[[[[[[[[[[[["Not too deep"]]]]]]]]]]]]]]]]]]]
 # pass2.json
 {
-    "JSON::PP Test Pattern pass3": {
+    "JSON::PPdev Test Pattern pass3": {
         "The outermost value": "must be an object or array.",
         "In this test": "It is an object."
     }

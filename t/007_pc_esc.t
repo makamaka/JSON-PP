@@ -2,8 +2,8 @@
 # このファイルのエンコーディングはUTF-8
 #
 
-# copied over from JSON::PP::PC and modified to use JSON::PP
-# copied over from JSON::PP::XS and modified to use JSON::PP
+# copied over from JSON::PPdev::PC and modified to use JSON::PPdev
+# copied over from JSON::PPdev::XS and modified to use JSON::PPdev
 
 use Test::More;
 use strict;
@@ -19,12 +19,12 @@ BEGIN {
 
 
 use utf8;
-use JSON::PP;
+use JSON::PPdev;
 
 #########################
 my ($js,$obj,$str);
 
-my $pc = new JSON::PP;
+my $pc = new JSON::PPdev;
 
 $obj = {test => qq|abc"def|};
 $str = $pc->encode($obj);
