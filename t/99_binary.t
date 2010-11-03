@@ -1,4 +1,4 @@
-# copied over from JSON::XS and modified to use JSON
+# copied over from JSON::PP::XS and modified to use JSON::PP
 
 use Test::More;
 use strict;
@@ -11,33 +11,33 @@ BEGIN {
     use _unicode_handling;
 }
 
-use JSON;
+use JSON::PP;
 
 SKIP: {
-    skip "UNICODE handling is disabale.", 2432 unless $JSON::can_handle_UTF16_and_utf8;
+    skip "UNICODE handling is disabale.", 2432 unless $JSON::PP::can_handle_UTF16_and_utf8;
 
 sub test($) {
    my $js;
 
-   $js = JSON->new->allow_nonref(0)->utf8->ascii->shrink->encode ([$_[0]]);
+   $js = JSON::PP->new->allow_nonref(0)->utf8->ascii->shrink->encode ([$_[0]]);
    ok ($_[0] eq ((decode_json $js)->[0]));
-   $js = JSON->new->allow_nonref(0)->utf8->ascii->encode ([$_[0]]);
-   ok ($_[0] eq (JSON->new->utf8->shrink->decode($js))->[0]);
+   $js = JSON::PP->new->allow_nonref(0)->utf8->ascii->encode ([$_[0]]);
+   ok ($_[0] eq (JSON::PP->new->utf8->shrink->decode($js))->[0]);
 
-   $js = JSON->new->allow_nonref(0)->utf8->shrink->encode ([$_[0]]);
+   $js = JSON::PP->new->allow_nonref(0)->utf8->shrink->encode ([$_[0]]);
    ok ($_[0] eq ((decode_json $js)->[0]));
-   $js = JSON->new->allow_nonref(1)->utf8->encode ([$_[0]]);
-   ok ($_[0] eq (JSON->new->utf8->shrink->decode($js))->[0]);
+   $js = JSON::PP->new->allow_nonref(1)->utf8->encode ([$_[0]]);
+   ok ($_[0] eq (JSON::PP->new->utf8->shrink->decode($js))->[0]);
 
-   $js = JSON->new->allow_nonref(1)->ascii->encode ([$_[0]]);
-   ok ($_[0] eq JSON->new->decode ($js)->[0]);
-   $js = JSON->new->allow_nonref(0)->ascii->encode ([$_[0]]);
-   ok ($_[0] eq JSON->new->shrink->decode ($js)->[0]);
+   $js = JSON::PP->new->allow_nonref(1)->ascii->encode ([$_[0]]);
+   ok ($_[0] eq JSON::PP->new->decode ($js)->[0]);
+   $js = JSON::PP->new->allow_nonref(0)->ascii->encode ([$_[0]]);
+   ok ($_[0] eq JSON::PP->new->shrink->decode ($js)->[0]);
 
-   $js = JSON->new->allow_nonref(1)->shrink->encode ([$_[0]]);
-   ok ($_[0] eq JSON->new->decode ($js)->[0]);
-   $js = JSON->new->allow_nonref(0)->encode ([$_[0]]);
-   ok ($_[0] eq JSON->new->shrink->decode ($js)->[0]);
+   $js = JSON::PP->new->allow_nonref(1)->shrink->encode ([$_[0]]);
+   ok ($_[0] eq JSON::PP->new->decode ($js)->[0]);
+   $js = JSON::PP->new->allow_nonref(0)->encode ([$_[0]]);
+   ok ($_[0] eq JSON::PP->new->shrink->decode ($js)->[0]);
 }
 
 srand 0; # doesn't help too much, but its at leats more deterministic

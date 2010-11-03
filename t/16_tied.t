@@ -1,4 +1,4 @@
-# copied over from JSON::XS and modified to use JSON
+# copied over from JSON::PP::XS and modified to use JSON::PP
 
 use strict;
 use Test::More;
@@ -6,11 +6,11 @@ BEGIN { plan tests => 2 };
 
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
-use JSON;
+use JSON::PP;
 use Tie::Hash;
 use Tie::Array;
 
-my $js = JSON->new;
+my $js = JSON::PP->new;
 
 tie my %h, 'Tie::StdHash';
 %h = (a => 1);

@@ -8,9 +8,9 @@ BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
 
 use strict;
-use JSON;
+use JSON::PP;
 
-my $json = JSON->new;
+my $json = JSON::PP->new;
 
 eval q| $json->encode( [ sub {} ] ) |;
 ok( $@ =~ /encountered CODE/, $@ );

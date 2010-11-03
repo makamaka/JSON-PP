@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# copied over from JSON::XS and modified to use JSON
+# copied over from JSON::PP::XS and modified to use JSON::PP
 
 use strict;
 
@@ -9,7 +9,7 @@ BEGIN { plan tests => 697 };
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
 
-use JSON;
+use JSON::PP;
 
 if ( $] >= 5.006 ) {
 
@@ -34,16 +34,16 @@ sub splitter {
 
 
 
-splitter +JSON->new              , '  ["x\\"","\\u1000\\\\n\\nx",1,{"\\\\" :5 , "": "x"}]';
-splitter +JSON->new              , '[ "x\\"","\\u1000\\\\n\\nx" , 1,{"\\\\ " :5 , "": " x"} ] ';
-splitter +JSON->new->allow_nonref, '"test"';
-splitter +JSON->new->allow_nonref, ' "5" ';
+splitter +JSON::PP->new              , '  ["x\\"","\\u1000\\\\n\\nx",1,{"\\\\" :5 , "": "x"}]';
+splitter +JSON::PP->new              , '[ "x\\"","\\u1000\\\\n\\nx" , 1,{"\\\\ " :5 , "": " x"} ] ';
+splitter +JSON::PP->new->allow_nonref, '"test"';
+splitter +JSON::PP->new->allow_nonref, ' "5" ';
 
 
 
 {
    my $text = '[5],{"":1} , [ 1,2, 3], {"3":null}';
-   my $coder = new JSON;
+   my $coder = new JSON::PP;
    for (0 .. length $text) {
       my $a = substr $text, 0, $_;
       my $b = substr $text, $_;
@@ -67,7 +67,7 @@ splitter +JSON->new->allow_nonref, ' "5" ';
 
 {
    my $text = '[x][5]';
-   my $coder = new JSON;
+   my $coder = new JSON::PP;
    $coder->incr_parse ($text);
    ok (!eval { $coder->incr_parse }, "sparse1");
    ok (!eval { $coder->incr_parse }, "sparse2");
@@ -105,15 +105,15 @@ sub splitter {
    }
 }
 
-splitter +JSON->new              , '  ["x\\"","\\u1000\\\\n\\nx",1,{"\\\\" :5 , "": "x"}]';
-splitter +JSON->new              , '[ "x\\"","\\u1000\\\\n\\nx" , 1,{"\\\\ " :5 , "": " x"} ] ';
-splitter +JSON->new->allow_nonref, '"test"';
-splitter +JSON->new->allow_nonref, ' "5" ';
+splitter +JSON::PP->new              , '  ["x\\"","\\u1000\\\\n\\nx",1,{"\\\\" :5 , "": "x"}]';
+splitter +JSON::PP->new              , '[ "x\\"","\\u1000\\\\n\\nx" , 1,{"\\\\ " :5 , "": " x"} ] ';
+splitter +JSON::PP->new->allow_nonref, '"test"';
+splitter +JSON::PP->new->allow_nonref, ' "5" ';
 
 
 {
    my $text = '[5],{"":1} , [ 1,2, 3], {"3":null}';
-   my $coder = new JSON;
+   my $coder = new JSON::PP;
    for (0 .. length $text) {
       my $a = substr $text, 0, $_;
       my $b = substr $text, $_;
@@ -137,7 +137,7 @@ splitter +JSON->new->allow_nonref, ' "5" ';
 
 {
    my $text = '[x][5]';
-   my $coder = new JSON;
+   my $coder = new JSON::PP;
    $coder->incr_parse ($text);
    ok (!eval { $coder->incr_parse }, "sparse1");
    ok (!eval { $coder->incr_parse }, "sparse2");
@@ -156,19 +156,19 @@ print $@;
 
 
 {
-   my $coder = JSON->new->max_size (5);
+   my $coder = JSON::PP->new->max_size (5);
    ok (!$coder->incr_parse ("[    "), "incsize1");
    eval q{ !$coder->incr_parse ("]  ") }; ok ($@ =~ /6 bytes/, "incsize2 $@");
 }
 
 {
-   my $coder = JSON->new->max_depth (3);
+   my $coder = JSON::PP->new->max_depth (3);
    ok (!$coder->incr_parse ("[[["), "incdepth1");
    eval q{ !$coder->incr_parse (" [] ") }; ok ($@ =~ /maximum nesting/, "incdepth2 $@");
 }
 
 {
-   my $coder = JSON->new;
+   my $coder = JSON::PP->new;
 
    my $res = eval { $coder->incr_parse("]") };
    my $e = $@; # test more clobbers $@, we need it twice

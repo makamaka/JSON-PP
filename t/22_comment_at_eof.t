@@ -6,14 +6,14 @@ use Test::More tests => 13;
 
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
-use JSON;
+use JSON::PP;
 
 use Data::Dumper qw( Dumper );
 
 sub decoder {
    my ($str) = @_;
 
-   my $json = JSON->new->relaxed;
+   my $json = JSON::PP->new->relaxed;
 
    $json->incr_parse($_[0]);
 

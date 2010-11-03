@@ -5,7 +5,7 @@ BEGIN { plan tests => 2 };
 
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
-use JSON;
+use JSON::PP;
 
 # from https://rt.cpan.org/Ticket/Display.html?id=25162
 
@@ -25,10 +25,12 @@ SKIP: {
     5 => 'e',
     );
 
-    my $js = to_json(\%columns);
+    my $json = JSON::PP->new;
+
+    my $js = $json->encode(\%columns);
     is( $js, q/{"id":"int","1":"a","2":"b","3":"c","4":"d","5":"e"}/ );
 
-    $js = to_json(\%columns, {pretty => 1});
+    $js = $json->pretty->encode(\%columns);
     is( $js, <<'STR' );
 {
    "id" : "int",

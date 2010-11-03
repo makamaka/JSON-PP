@@ -1,4 +1,4 @@
-# copied over from JSON::XS and modified to use JSON
+# copied over from JSON::PP::XS and modified to use JSON::PP
 
 use strict;
 use Test::More;
@@ -6,7 +6,7 @@ BEGIN { plan tests => 16 };
 
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
-use JSON;
+use JSON::PP;
 
 
 my $o1 = bless { a => 3 }, "XX";
@@ -16,7 +16,7 @@ sub XX::TO_JSON {
    {'__',""}
 }
 
-my $js = JSON->new;
+my $js = JSON::PP->new;
 
 eval { $js->encode ($o1) }; ok ($@ =~ /allow_blessed/);
 eval { $js->encode ($o2) }; ok ($@ =~ /allow_blessed/);

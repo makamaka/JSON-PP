@@ -3,10 +3,10 @@ use Test::More;
 use strict;
 BEGIN { plan tests => 2 };
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
-use JSON;
+use JSON::PP;
 #########################
 
-my $json = JSON->new->allow_nonref;
+my $json = JSON::PP->new->allow_nonref;
 
 eval q| $json->decode('{foo:"bar"}') |;
 

@@ -11,10 +11,10 @@ package _unicode_handling;
             sub utf8::unimport {  }
         |;
 
-        $JSON::can_handle_UTF16_and_utf8 = 0;
+        $JSON::PP::can_handle_UTF16_and_utf8 = 0;
     }
     else {
-        $JSON::can_handle_UTF16_and_utf8 = 1;
+        $JSON::PP::can_handle_UTF16_and_utf8 = 1;
 
         if ($] > 5.007 and $] < 5.008003) {
 #            $JSON::can_handle_UTF16_and_utf8 = 0;
