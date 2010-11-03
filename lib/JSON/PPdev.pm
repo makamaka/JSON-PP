@@ -1277,10 +1277,12 @@ BEGIN {
        *utf8::is_utf8 = *Encode::is_utf8;
     }
 
-    *JSON::PPdev::JSON_PP_encode_ascii      = \&JSON::PPdev::_encode_ascii;
-    *JSON::PPdev::JSON_PP_encode_latin1     = \&JSON::PPdev::_encode_latin1;
-    *JSON::PPdev::JSON_PP_decode_surrogates = \&JSON::PPdev::_decode_surrogates;
-    *JSON::PPdev::JSON_PP_decode_unicode    = \&JSON::PPdev::_decode_unicode;
+    if ( $] >= 5.008 ) {
+        *JSON::PPdev::JSON_PP_encode_ascii      = \&JSON::PPdev::_encode_ascii;
+        *JSON::PPdev::JSON_PP_encode_latin1     = \&JSON::PPdev::_encode_latin1;
+        *JSON::PPdev::JSON_PP_decode_surrogates = \&JSON::PPdev::_decode_surrogates;
+        *JSON::PPdev::JSON_PP_decode_unicode    = \&JSON::PPdev::_decode_unicode;
+    }
 
     if ($] >= 5.008 and $] < 5.008003) { # join() in 5.8.0 - 5.8.2 is broken.
         package JSON::PPdev;
@@ -1297,33 +1299,34 @@ BEGIN {
         |;
     }
 
-}
 
-
-sub JSON::PPdev::incr_parse {
-    local $Carp::CarpLevel = 1;
-    ( $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new )->incr_parse( @_ );
-}
-
-
-sub JSON::PPdev::incr_text : lvalue {
-    $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new;
-
-    if ( $_[0]->{_incr_parser}->{incr_parsing} ) {
-        Carp::croak("incr_text can not be called when the incremental parser already started parsing");
+    sub JSON::PPdev::incr_parse {
+        local $Carp::CarpLevel = 1;
+        ( $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new )->incr_parse( @_ );
     }
-    $_[0]->{_incr_parser}->{incr_text};
-}
 
 
-sub JSON::PPdev::incr_skip {
-    ( $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new )->incr_skip;
-}
+    sub JSON::PPdev::incr_skip {
+        ( $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new )->incr_skip;
+    }
 
 
-sub JSON::PPdev::incr_reset {
-    ( $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new )->incr_reset;
-}
+    sub JSON::PPdev::incr_reset {
+        ( $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new )->incr_reset;
+    }
+
+    eval q{
+        sub JSON::PPdev::incr_text : lvalue {
+            $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new;
+
+            if ( $_[0]->{_incr_parser}->{incr_parsing} ) {
+                Carp::croak("incr_text can not be called when the incremental parser already started parsing");
+            }
+            $_[0]->{_incr_parser}->{incr_text};
+        }
+    } if ( $] >= 5.006 );
+
+} # Setup for various Perl versions (the code from JSON::PP58)
 
 
 ###############################
@@ -1385,7 +1388,7 @@ package JSON::PPdev::Boolean;
 
 BEGIN { # when renamed into JSON::PP, delete this code.
     # avoid for warning Can't locate package JSON::PP::Boolean for @JSON::PPdev::Boolean::ISA
-    eval { package JSON::PP::Boolean; };
+    eval q{ package JSON::PP::Boolean; };
     @JSON::PPdev::Boolean::ISA = ('JSON::PP::Boolean');
 }
 
