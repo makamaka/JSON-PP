@@ -1,8 +1,8 @@
 Changes
 eg/bench_decode.pl
 eg/bench_encode.pl
-lib/JSON/PP.pm
-lib/JSON/PP/Boolean.pm
+lib/JSON/PPdev.pm
+lib/JSON/PPdev/Boolean.pm
 Makefile.PL
 MANIFEST
 META.yml			Module meta-data (added by MakeMaker)
