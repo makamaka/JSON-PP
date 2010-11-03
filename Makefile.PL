@@ -7,11 +7,18 @@ use lib qw( ./lib );
 $| = 1;
 
 
+my %prereq = $] < 5.006 ? ( 'JSON::PP::Compat5005' => 0 )
+           : $] < 5.008 ? ( 'JSON::PP::Compat5006' => 0 )
+           : ()
+           ;
+
+
 WriteMakefile(
     'NAME'          => 'JSON::PPdev',
     'VERSION_FROM'  => 'lib/JSON/PPdev.pm', # finds $VERSION
     'PREREQ_PM'     => {
               'Test::More'  => 0,
+              %prereq,
     },
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM => 'lib/JSON/PPdev.pm', # retrieve abstract from module
