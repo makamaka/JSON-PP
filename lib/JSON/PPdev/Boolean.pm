@@ -1,6 +1,6 @@
 =head1 NAME
 
-JSON::PP::Boolean - dummy module providing JSON::PP::Boolean
+JSON::PPdev::Boolean - dummy module providing JSON::PP::Boolean
 
 =head1 SYNOPSIS
 
@@ -9,7 +9,7 @@ JSON::PP::Boolean - dummy module providing JSON::PP::Boolean
 =head1 DESCRIPTION
 
 This module exists only to provide overload resolution for Storable and similar modules. See
-L<JSON::PP> for more info about this class.
+L<JSON::PPdev> for more info about this class.
 
 =cut
 

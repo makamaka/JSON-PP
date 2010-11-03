@@ -1370,10 +1370,10 @@ BEGIN {
 
 # shamely copied and modified from JSON::XS code.
 
-$JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::PP::Boolean" };
-$JSON::PP::false = do { bless \(my $dummy = 0), "JSON::PP::Boolean" };
+$JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::PPdev::Boolean" };
+$JSON::PP::false = do { bless \(my $dummy = 0), "JSON::PPdev::Boolean" };
 
-sub is_bool { defined $_[0] and UNIVERSAL::isa($_[0], "JSON::PP::Boolean"); }
+sub is_bool { defined $_[0] and UNIVERSAL::isa($_[0], "JSON::PPdev::Boolean"); }
 
 sub true  { $JSON::PP::true  }
 sub false { $JSON::PP::false }
@@ -1381,7 +1381,13 @@ sub null  { undef; }
 
 ###############################
 
-package JSON::PP::Boolean;
+package JSON::PPdev::Boolean;
+
+BEGIN { # when renamed into JSON::PP, delete this code.
+    # avoid for warning Can't locate package JSON::PP::Boolean for @JSON::PPdev::Boolean::ISA
+    eval { package JSON::PP::Boolean; };
+    @JSON::PPdev::Boolean::ISA = ('JSON::PP::Boolean');
+}
 
 
 use overload (
