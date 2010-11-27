@@ -1,6 +1,4 @@
 Changes
-eg/bench_decode.pl
-eg/bench_encode.pl
 lib/JSON/PPdev.pm
 lib/JSON/PPdev/Boolean.pm
 Makefile.PL

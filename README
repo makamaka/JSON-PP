@@ -1,23 +1,19 @@
 JSON::PPdev -- independent JSON::PP
 =================
 
-[MY PLAN]
-
 JSON::PP was inculded in JSON distribution (CPAN module).
 It comes to be a perl core module in Perl 5.14.
 
 This distribution is for the preparation.
 
-
-[STEPS]
+    [STEPS]
 
     * release this module as JSON::PPdev.
 
-    * release other PP::* modules as JSON::PPdev::Compat*.
+    * release other PP::* modules as JSON::PP::Compat*.
 
     * JSON distribution will inculde yet another JSON::PP modules.
-      They are JSNO::BP::PP and JSON::BP::PP::* (BP means 'back port')
-      So JSON.pm should work as it did at all!
+      They are JSNO::backportPP. So JSON.pm should work as it did at all!
 
     * remove JSON::PP and JSON::PP::* modules from JSON distribution
        and release it as developer version.
@@ -26,8 +22,7 @@ This distribution is for the preparation.
 
     * release JSON distribution as stable version.
 
-    * rename JSON::PPdev and PPdev::* modules into JSON::PP and PP::Compat*.
-
+    * rename JSON::PPdev into JSON::PP and release on CPAN.
 
 =================
 
