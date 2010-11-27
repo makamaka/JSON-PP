@@ -1,4 +1,10 @@
 package JSON::PPdev;
+$JSON::PPdev::VERSION = '2.27100';
+use base qw(Exporter);
+sub import { JSON::PP->export_to_level(1, @_); }
+
+package
+    JSON::PP;
 
 # JSON-2.0
 
@@ -11,9 +17,9 @@ use Carp ();
 use B ();
 #use Devel::Peek;
 
-$JSON::PPdev::VERSION = '2.27008';
+$JSON::PP::VERSION = '2.27100';
 
-@JSON::PPdev::EXPORT = qw(encode_json decode_json from_json to_json);
+@JSON::PP::EXPORT = qw(encode_json decode_json from_json to_json);
 
 # instead of hash-access, i tried index-access for speed.
 # but this method is not faster than what i expected. so it will be changed.
@@ -1278,14 +1284,14 @@ BEGIN {
     }
 
     if ( $] >= 5.008 ) {
-        *JSON::PPdev::JSON_PP_encode_ascii      = \&JSON::PPdev::_encode_ascii;
-        *JSON::PPdev::JSON_PP_encode_latin1     = \&JSON::PPdev::_encode_latin1;
-        *JSON::PPdev::JSON_PP_decode_surrogates = \&JSON::PPdev::_decode_surrogates;
-        *JSON::PPdev::JSON_PP_decode_unicode    = \&JSON::PPdev::_decode_unicode;
+        *JSON::PP::JSON_PP_encode_ascii      = \&_encode_ascii;
+        *JSON::PP::JSON_PP_encode_latin1     = \&_encode_latin1;
+        *JSON::PP::JSON_PP_decode_surrogates = \&_decode_surrogates;
+        *JSON::PP::JSON_PP_decode_unicode    = \&_decode_unicode;
     }
 
     if ($] >= 5.008 and $] < 5.008003) { # join() in 5.8.0 - 5.8.2 is broken.
-        package JSON::PPdev;
+        package JSON::PP;
         require subs;
         subs->import('join');
         eval q|
@@ -1300,23 +1306,23 @@ BEGIN {
     }
 
 
-    sub JSON::PPdev::incr_parse {
+    sub JSON::PP::incr_parse {
         local $Carp::CarpLevel = 1;
         ( $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new )->incr_parse( @_ );
     }
 
 
-    sub JSON::PPdev::incr_skip {
+    sub JSON::PP::incr_skip {
         ( $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new )->incr_skip;
     }
 
 
-    sub JSON::PPdev::incr_reset {
+    sub JSON::PP::incr_reset {
         ( $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new )->incr_reset;
     }
 
     eval q{
-        sub JSON::PPdev::incr_text : lvalue {
+        sub JSON::PP::incr_text : lvalue {
             $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new;
 
             if ( $_[0]->{_incr_parser}->{incr_parsing} ) {
@@ -1336,13 +1342,13 @@ BEGIN {
 BEGIN {
     eval 'require Scalar::Util';
     unless($@){
-        *JSON::PPdev::blessed = \&Scalar::Util::blessed;
-        *JSON::PPdev::reftype = \&Scalar::Util::reftype;
+        *JSON::PP::blessed = \&Scalar::Util::blessed;
+        *JSON::PP::reftype = \&Scalar::Util::reftype;
     }
     else{ # This code is from Sclar::Util.
         # warn $@;
         eval 'sub UNIVERSAL::a_sub_not_likely_to_be_here { ref($_[0]) }';
-        *JSON::PPdev::blessed = sub {
+        *JSON::PP::blessed = sub {
             local($@, $SIG{__DIE__}, $SIG{__WARN__});
             ref($_[0]) ? eval { $_[0]->a_sub_not_likely_to_be_here } : undef;
         };
@@ -1355,7 +1361,7 @@ BEGIN {
             B::GV     GLOB
             B::REGEXP REGEXP
         );
-        *JSON::PPdev::reftype = sub {
+        *JSON::PP::reftype = sub {
             my $r = shift;
 
             return undef unless length(ref($r));
@@ -1376,7 +1382,7 @@ BEGIN {
 $JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::PPdev::Boolean" };
 $JSON::PP::false = do { bless \(my $dummy = 0), "JSON::PPdev::Boolean" };
 
-sub is_bool { defined $_[0] and UNIVERSAL::isa($_[0], "JSON::PPdev::Boolean"); }
+sub is_bool { defined $_[0] and UNIVERSAL::isa($_[0], "JSON::PP::Boolean"); }
 
 sub true  { $JSON::PP::true  }
 sub false { $JSON::PP::false }
@@ -1392,7 +1398,7 @@ BEGIN { # when renamed into JSON::PP, delete this code.
     @JSON::PPdev::Boolean::ISA = ('JSON::PP::Boolean');
 }
 
-
+# @JSON::PPdev::Boolean::ISA = ('JSON::PP::Boolean');
 use overload (
    "0+"     => sub { ${$_[0]} },
    "++"     => sub { $_[0] = ${$_[0]} + 1 },
@@ -1609,6 +1615,31 @@ JSON::PPdev - JSON::XS compatible pure-Perl module.
  # JSON::XS or JSON::PP, so you should be able to just:
  
  use JSON;
+
+=head1 NOTE
+
+JSON::PP was inculded in JSON distribution (CPAN module).
+It comes to be a perl core module in Perl 5.14.
+
+This distribution is for the preparation.
+
+    [STEPS]
+
+    * release this module as JSON::PPdev.
+
+    * release other PP::* modules as JSON::PP::Compat*.
+
+    * JSON distribution will inculde yet another JSON::PP modules.
+      They are JSNO::backportPP. So JSON.pm should work as it did at all!
+
+    * remove JSON::PP and JSON::PP::* modules from JSON distribution
+       and release it as developer version.
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    * release JSON distribution as stable version.
+
+    * rename JSON::PPdev into JSON::PP and release on CPAN.
 
 =head1 DESCRIPTION
 
