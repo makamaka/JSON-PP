@@ -12,7 +12,7 @@ use JSON::PPdev;
 
 #########################
 my ($js,$obj);
-my $pc = new JSON::PPdev;
+my $pc = new JSON::PP;
 
 $js  = '{"foo":0}';
 $obj = $pc->decode($js);

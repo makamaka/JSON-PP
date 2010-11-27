@@ -19,25 +19,25 @@ SKIP: {
 sub test($) {
    my $js;
 
-   $js = JSON::PPdev->new->allow_nonref(0)->utf8->ascii->shrink->encode ([$_[0]]);
+   $js = JSON::PP->new->allow_nonref(0)->utf8->ascii->shrink->encode ([$_[0]]);
    ok ($_[0] eq ((decode_json $js)->[0]));
-   $js = JSON::PPdev->new->allow_nonref(0)->utf8->ascii->encode ([$_[0]]);
-   ok ($_[0] eq (JSON::PPdev->new->utf8->shrink->decode($js))->[0]);
+   $js = JSON::PP->new->allow_nonref(0)->utf8->ascii->encode ([$_[0]]);
+   ok ($_[0] eq (JSON::PP->new->utf8->shrink->decode($js))->[0]);
 
-   $js = JSON::PPdev->new->allow_nonref(0)->utf8->shrink->encode ([$_[0]]);
+   $js = JSON::PP->new->allow_nonref(0)->utf8->shrink->encode ([$_[0]]);
    ok ($_[0] eq ((decode_json $js)->[0]));
-   $js = JSON::PPdev->new->allow_nonref(1)->utf8->encode ([$_[0]]);
-   ok ($_[0] eq (JSON::PPdev->new->utf8->shrink->decode($js))->[0]);
+   $js = JSON::PP->new->allow_nonref(1)->utf8->encode ([$_[0]]);
+   ok ($_[0] eq (JSON::PP->new->utf8->shrink->decode($js))->[0]);
 
-   $js = JSON::PPdev->new->allow_nonref(1)->ascii->encode ([$_[0]]);
-   ok ($_[0] eq JSON::PPdev->new->decode ($js)->[0]);
-   $js = JSON::PPdev->new->allow_nonref(0)->ascii->encode ([$_[0]]);
-   ok ($_[0] eq JSON::PPdev->new->shrink->decode ($js)->[0]);
+   $js = JSON::PP->new->allow_nonref(1)->ascii->encode ([$_[0]]);
+   ok ($_[0] eq JSON::PP->new->decode ($js)->[0]);
+   $js = JSON::PP->new->allow_nonref(0)->ascii->encode ([$_[0]]);
+   ok ($_[0] eq JSON::PP->new->shrink->decode ($js)->[0]);
 
-   $js = JSON::PPdev->new->allow_nonref(1)->shrink->encode ([$_[0]]);
-   ok ($_[0] eq JSON::PPdev->new->decode ($js)->[0]);
-   $js = JSON::PPdev->new->allow_nonref(0)->encode ([$_[0]]);
-   ok ($_[0] eq JSON::PPdev->new->shrink->decode ($js)->[0]);
+   $js = JSON::PP->new->allow_nonref(1)->shrink->encode ([$_[0]]);
+   ok ($_[0] eq JSON::PP->new->decode ($js)->[0]);
+   $js = JSON::PP->new->allow_nonref(0)->encode ([$_[0]]);
+   ok ($_[0] eq JSON::PP->new->shrink->decode ($js)->[0]);
 }
 
 srand 0; # doesn't help too much, but its at leats more deterministic

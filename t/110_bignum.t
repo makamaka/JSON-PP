@@ -20,7 +20,7 @@ my $fix =  !$v       ? '+'
           : '';
 
 
-my $json = new JSON::PPdev;
+my $json = new JSON::PP;
 
 $json->allow_nonref->allow_bignum(1);
 $json->convert_blessed->allow_blessed;

@@ -14,7 +14,7 @@ BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
 use JSON::PPdev;
 
-my $json = JSON::PPdev->new->utf8->max_depth(32)->canonical;
+my $json = JSON::PP->new->utf8->max_depth(32)->canonical;
 
 binmode DATA;
 my $num = 1;

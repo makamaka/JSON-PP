@@ -11,7 +11,7 @@ use JSON::PPdev;
 
 #########################
 my ($js,$obj);
-my $pc = new JSON::PPdev;
+my $pc = new JSON::PP;
 
 $js  = q|[-12.34]|;
 $obj = $pc->decode($js);

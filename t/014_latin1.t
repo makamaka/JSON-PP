@@ -16,7 +16,7 @@ use JSON::PPdev;
 SKIP: {
     skip "UNICODE handling is disabale.", 4 unless $JSON::PPdev::can_handle_UTF16_and_utf8;
 
-my $xs = JSON::PPdev->new->latin1->allow_nonref;
+my $xs = JSON::PP->new->latin1->allow_nonref;
 
 ok $xs->encode ("\x{12}\x{89}       ") eq "\"\\u0012\x{89}       \"";
 ok $xs->encode ("\x{12}\x{89}\x{abc}") eq "\"\\u0012\x{89}\\u0abc\"";

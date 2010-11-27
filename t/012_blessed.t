@@ -16,7 +16,7 @@ sub XX::TO_JSON {
    {'__',""}
 }
 
-my $js = JSON::PPdev->new;
+my $js = JSON::PP->new;
 
 eval { $js->encode ($o1) }; ok ($@ =~ /allow_blessed/);
 eval { $js->encode ($o2) }; ok ($@ =~ /allow_blessed/);

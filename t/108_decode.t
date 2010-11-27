@@ -17,7 +17,7 @@ BEGIN {
 
 no utf8;
 
-my $json = JSON::PPdev->new->allow_nonref;
+my $json = JSON::PP->new->allow_nonref;
 
 
 is($json->decode(q|"ü"|),                   "ü"); # utf8

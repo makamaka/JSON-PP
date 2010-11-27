@@ -10,7 +10,7 @@ use JSON::PPdev;
 
 my $def = 512;
 
-my $js = JSON::PPdev->new;
+my $js = JSON::PP->new;
 
 {
     local $^W = undef; # avoid for warning 'Deep recursion on subroutin'

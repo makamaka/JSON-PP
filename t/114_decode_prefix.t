@@ -9,7 +9,7 @@ BEGIN {
 
 use JSON::PPdev;
 
-my $json = JSON::PPdev->new;
+my $json = JSON::PP->new;
 
 my $complete_text = qq/{"foo":"bar"}/;
 my $garbaged_text  = qq/{"foo":"bar"}\n/;

@@ -6,7 +6,7 @@ BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 use JSON::PPdev;
 #########################
 
-my $json = JSON::PPdev->new->allow_nonref;
+my $json = JSON::PP->new->allow_nonref;
 
 eval q| $json->decode("{'foo':'bar'}") |;
 

@@ -24,7 +24,7 @@ use JSON::PPdev;
 #########################
 my ($js,$obj,$str);
 
-my $pc = new JSON::PPdev;
+my $pc = new JSON::PP;
 
 $obj = {test => qq|abc"def|};
 $str = $pc->encode($obj);

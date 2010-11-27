@@ -25,7 +25,7 @@ SKIP: {
     5 => 'e',
     );
 
-    my $json = JSON::PPdev->new;
+    my $json = JSON::PP->new;
 
     my $js = $json->encode(\%columns);
     is( $js, q/{"id":"int","1":"a","2":"b","3":"c","4":"d","5":"e"}/ );

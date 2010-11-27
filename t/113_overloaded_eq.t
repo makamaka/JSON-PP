@@ -13,7 +13,7 @@ my $obj = OverloadedObject->new( 'foo' );
 
 ok( $obj eq 'foo' );
 
-my $json = JSON::PPdev->new->convert_blessed;
+my $json = JSON::PP->new->convert_blessed;
 
 is( $json->encode( [ $obj ] ), q{["foo"]} );
 

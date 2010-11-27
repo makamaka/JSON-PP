@@ -9,39 +9,39 @@ BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 use JSON::PPdev;
 
 
-ok (!defined JSON::PPdev->new->allow_nonref (1)->decode ('null'));
-ok (JSON::PPdev->new->allow_nonref (1)->decode ('true') == 1);
-ok (JSON::PPdev->new->allow_nonref (1)->decode ('false') == 0);
+ok (!defined JSON::PP->new->allow_nonref (1)->decode ('null'));
+ok (JSON::PP->new->allow_nonref (1)->decode ('true') == 1);
+ok (JSON::PP->new->allow_nonref (1)->decode ('false') == 0);
 
-my $true  = JSON::PPdev->new->allow_nonref (1)->decode ('true');
+my $true  = JSON::PP->new->allow_nonref (1)->decode ('true');
 ok ($true eq 1);
-ok (JSON::PPdev::is_bool $true);
-my $false = JSON::PPdev->new->allow_nonref (1)->decode ('false');
+ok (JSON::PP::is_bool $true);
+my $false = JSON::PP->new->allow_nonref (1)->decode ('false');
 ok ($false == !$true);
-ok (JSON::PPdev::is_bool $false);
+ok (JSON::PP::is_bool $false);
 ok (++$false == 1);
-ok (!JSON::PPdev::is_bool $false);
+ok (!JSON::PP::is_bool $false);
 
-ok (JSON::PPdev->new->allow_nonref (1)->decode ('5') == 5);
-ok (JSON::PPdev->new->allow_nonref (1)->decode ('-5') == -5);
-ok (JSON::PPdev->new->allow_nonref (1)->decode ('5e1') == 50);
-ok (JSON::PPdev->new->allow_nonref (1)->decode ('-333e+0') == -333);
-ok (JSON::PPdev->new->allow_nonref (1)->decode ('2.5') == 2.5);
+ok (JSON::PP->new->allow_nonref (1)->decode ('5') == 5);
+ok (JSON::PP->new->allow_nonref (1)->decode ('-5') == -5);
+ok (JSON::PP->new->allow_nonref (1)->decode ('5e1') == 50);
+ok (JSON::PP->new->allow_nonref (1)->decode ('-333e+0') == -333);
+ok (JSON::PP->new->allow_nonref (1)->decode ('2.5') == 2.5);
 
-ok (JSON::PPdev->new->allow_nonref (1)->decode ('""') eq "");
+ok (JSON::PP->new->allow_nonref (1)->decode ('""') eq "");
 ok ('[1,2,3,4]' eq encode_json decode_json ('[1,2, 3,4]'));
 ok ('[{},[],[],{}]' eq encode_json decode_json ('[{},[], [ ] ,{ }]'));
 ok ('[{"1":[5]}]' eq encode_json [{1 => [5]}]);
-ok ('{"1":2,"3":4}' eq JSON::PPdev->new->canonical (1)->encode (decode_json '{ "1" : 2, "3" : 4 }'));
-ok ('{"1":2,"3":1.2}' eq JSON::PPdev->new->canonical (1)->encode (decode_json '{ "1" : 2, "3" : 1.2 }'));
+ok ('{"1":2,"3":4}' eq JSON::PP->new->canonical (1)->encode (decode_json '{ "1" : 2, "3" : 4 }'));
+ok ('{"1":2,"3":1.2}' eq JSON::PP->new->canonical (1)->encode (decode_json '{ "1" : 2, "3" : 1.2 }'));
 
-ok ('[true]'  eq encode_json [JSON::PPdev::true]);
-ok ('[false]' eq encode_json [JSON::PPdev::false]);
+ok ('[true]'  eq encode_json [JSON::PP::true]);
+ok ('[false]' eq encode_json [JSON::PP::false]);
 ok ('[true]'  eq encode_json [\1]);
 ok ('[false]' eq encode_json [\0]);
 ok ('[null]'  eq encode_json [undef]);
-ok ('[true]'  eq encode_json [JSON::PPdev::true]);
-ok ('[false]' eq encode_json [JSON::PPdev::false]);
+ok ('[true]'  eq encode_json [JSON::PP::true]);
+ok ('[false]' eq encode_json [JSON::PP::false]);
 
 for my $v (1, 2, 3, 5, -1, -2, -3, -4, 100, 1000, 10000, -999, -88, -7, 7, 88, 999, -1e5, 1e6, 1e7, 1e8) {
    ok ($v == ((decode_json "[$v]")->[0]));

@@ -13,7 +13,7 @@ use Data::Dumper qw( Dumper );
 sub decoder {
    my ($str) = @_;
 
-   my $json = JSON::PPdev->new->relaxed;
+   my $json = JSON::PP->new->relaxed;
 
    $json->incr_parse($_[0]);
 

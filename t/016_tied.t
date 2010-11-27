@@ -10,7 +10,7 @@ use JSON::PPdev;
 use Tie::Hash;
 use Tie::Array;
 
-my $js = JSON::PPdev->new;
+my $js = JSON::PP->new;
 
 tie my %h, 'Tie::StdHash';
 %h = (a => 1);

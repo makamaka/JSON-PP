@@ -12,7 +12,7 @@ BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 use JSON::PPdev;
 
 my ($js,$obj,$json);
-my $pc = new JSON::PPdev;
+my $pc = new JSON::PP;
 
 $obj = {foo => "bar"};
 $js = $pc->encode($obj);

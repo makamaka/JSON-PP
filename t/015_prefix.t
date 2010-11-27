@@ -5,7 +5,7 @@ BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
 use JSON::PPdev;
 
-my $xs = JSON::PPdev->new->allow_nonref;
+my $xs = JSON::PP->new->allow_nonref;
 
 eval { $xs->decode ("[] ") };
 print $@ ? "not " : "", "ok 1\n";

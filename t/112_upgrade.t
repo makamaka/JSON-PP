@@ -12,7 +12,7 @@ BEGIN {
     use _unicode_handling;
 }
 
-my $json = JSON::PPdev->new->allow_nonref->utf8;
+my $json = JSON::PP->new->allow_nonref->utf8;
 my $str  = '\\u00c8';
 
 my $value = $json->decode( '"\\u00c8"' );

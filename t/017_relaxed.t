@@ -16,7 +16,7 @@ use utf8;
 use JSON::PPdev;
 
 
-my $json = JSON::PPdev->new->relaxed;
+my $json = JSON::PP->new->relaxed;
 
 ok ('[1,2,3]' eq encode_json $json->decode (' [1,2, 3]'));
 ok ('[1,2,4]' eq encode_json $json->decode ('[1,2, 4 , ]'));
