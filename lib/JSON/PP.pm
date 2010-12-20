@@ -1621,8 +1621,6 @@ JSON::PP - JSON::XS compatible pure-Perl module.
 JSON::PP was inculded in JSON distribution (CPAN module).
 It comes to be a perl core module in Perl 5.14.
 
-This distribution is for the preparation.
-
     [STEPS]
 
     * release this module as JSON::PPdev.
@@ -1639,7 +1637,7 @@ This distribution is for the preparation.
 
     * release JSON distribution as stable version.
 
-    * rename JSON::PPdev into JSON::PP and release on CPAN.
+    * rename JSON::PPdev into JSON::PP and release on CPAN. <<<< HERE
 
 =head1 DESCRIPTION
 

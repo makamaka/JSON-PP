@@ -1,24 +1,8 @@
-Revision history for Perl extension JSON.
-
-## JSON version 2.xx #####################################################
-
-In this version, JSON was totally rewritten.
-
-  * JSON becomes a wrapper to JSON::XS or JSON::PP!
-  * objToJson() and jsonToObj() are obsoleted!
-  * $JSON::* variables are no longer available!
-  * JSON::Parser and JSON::Converter are deleted from the distribution!
-  * JSONRPC* and Apache::JSONRPC are deleted from the distribution!
-     Please check JSON::RPC (supports JSON-RPC protocol v1.1 and 1.0).
-
-##########################################################################
-
+Revision history for Perl extension JSON::PP.
 --------------------------------------------------------------------------
 
 JSON::PP was inculded in JSON distribution (CPAN module).
 It comes to be a perl core module in Perl 5.14.
-
-This distribution is for the preparation.
 
     [STEPS]
 
@@ -36,16 +20,20 @@ This distribution is for the preparation.
 
     * release JSON distribution as stable version.
 
-    * rename JSON::PPdev into JSON::PP and release on CPAN.
+    * rename JSON::PPdev into JSON::PP and release on CPAN. <<<< HERE
 
 --------------------------------------------------------------------------
 
 2.27101  Mon Dec 20 16:21:03 2010
-	- prepared
+	- renamed JSON::PPdev to JSON::PP
 
 2.27100  Sun Nov 28 02:02:49 2010
-	- split away JSON distribution
+	- split away JSON distribution 2.27 (= JSON::PP 2.27008)
 	- renamed t/* files
+
+--------------------------------------------------------------------------
+ old history
+--------------------------------------------------------------------------
 
 2.27  Sun Oct 31 20:32:46 2010
 	[JSON::PP]
