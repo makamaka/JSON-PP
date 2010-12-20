@@ -5,7 +5,7 @@ BEGIN { plan tests => 11 };
 
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
-use JSON::PPdev;
+use JSON::PP;
 
 
 my $def = 512;

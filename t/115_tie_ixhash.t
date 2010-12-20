@@ -5,7 +5,7 @@ BEGIN { plan tests => 2 };
 
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
-use JSON::PPdev;
+use JSON::PP;
 
 # from https://rt.cpan.org/Ticket/Display.html?id=25162
 

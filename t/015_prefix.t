@@ -1,9 +1,9 @@
-# copied over from JSON::PPdev::XS and modified to use JSON::PPdev
+# copied over from JSON::PP::XS and modified to use JSON::PP
 
 BEGIN { $| = 1; print "1..4\n"; }
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
-use JSON::PPdev;
+use JSON::PP;
 
 my $xs = JSON::PP->new->allow_nonref;
 

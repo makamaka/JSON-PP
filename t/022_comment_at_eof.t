@@ -6,7 +6,7 @@ use Test::More tests => 13;
 
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
-use JSON::PPdev;
+use JSON::PP;
 
 use Data::Dumper qw( Dumper );
 

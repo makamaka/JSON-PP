@@ -11,7 +11,7 @@ BEGIN {
 }
 
 
-use JSON::PPdev;
+use JSON::PP;
 
 
 my $data = ["\x{3042}\x{3044}\x{3046}\x{3048}\x{304a}",

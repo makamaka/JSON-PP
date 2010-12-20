@@ -8,7 +8,7 @@ BEGIN { plan tests => 6 };
 
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
-use JSON::PPdev;
+use JSON::PP;
 
 BEGIN {
     use lib qw(t);

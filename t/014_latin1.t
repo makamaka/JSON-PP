@@ -1,4 +1,4 @@
-# copied over from JSON::PPdev::XS and modified to use JSON::PPdev
+# copied over from JSON::PP::XS and modified to use JSON::PP
 
 use Test::More;
 use strict;
@@ -11,10 +11,10 @@ BEGIN {
     use _unicode_handling;
 }
 
-use JSON::PPdev;
+use JSON::PP;
 
 SKIP: {
-    skip "UNICODE handling is disabale.", 4 unless $JSON::PPdev::can_handle_UTF16_and_utf8;
+    skip "UNICODE handling is disabale.", 4 unless $JSON::PP::can_handle_UTF16_and_utf8;
 
 my $xs = JSON::PP->new->latin1->allow_nonref;
 

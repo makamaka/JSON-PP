@@ -7,7 +7,7 @@ BEGIN {
     $ENV{ PERL_JSON_BACKEND } = 0;
 }
 
-use JSON::PPdev;
+use JSON::PP;
 
 my $obj = OverloadedObject->new( 'foo' );
 

@@ -8,7 +8,7 @@ BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
 
 use strict;
-use JSON::PPdev;
+use JSON::PP;
 
 my $json = JSON::PP->new;
 

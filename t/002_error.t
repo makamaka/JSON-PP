@@ -1,4 +1,4 @@
-# copied over from JSON::PPdev::XS and modified to use JSON::PPdev
+# copied over from JSON::PP::XS and modified to use JSON::PP
 
 use strict;
 use Test::More;
@@ -12,7 +12,7 @@ BEGIN {
 }
 
 use utf8;
-use JSON::PPdev;
+use JSON::PP;
 
 
 eval { JSON::PP->new->encode ([\-1]) }; ok $@ =~ /cannot encode reference/;

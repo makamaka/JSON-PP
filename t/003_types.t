@@ -1,4 +1,4 @@
-# copied over from JSON::PPdev::XS and modified to use JSON::PPdev
+# copied over from JSON::PP::XS and modified to use JSON::PP
 use strict;
 use Test::More;
 
@@ -6,7 +6,7 @@ BEGIN { plan tests => 76 };
 
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
-use JSON::PPdev;
+use JSON::PP;
 
 
 ok (!defined JSON::PP->new->allow_nonref (1)->decode ('null'));
