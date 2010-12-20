@@ -13,7 +13,7 @@ L<JSON::PPdev> for more info about this class.
 
 =cut
 
-use JSON::PPdev ();
+use JSON::PP ();
 use strict;
 
 1;

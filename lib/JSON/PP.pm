@@ -1,10 +1,4 @@
-package JSON::PPdev;
-$JSON::PPdev::VERSION = '2.27100';
-use base qw(Exporter);
-sub import { JSON::PP->export_to_level(1, @_); }
-
-package
-    JSON::PP;
+package JSON::PP;
 
 # JSON-2.0
 
@@ -17,7 +11,7 @@ use Carp ();
 use B ();
 #use Devel::Peek;
 
-$JSON::PP::VERSION = '2.27100';
+$JSON::PP::VERSION = '2.27100_01';
 
 @JSON::PP::EXPORT = qw(encode_json decode_json from_json to_json);
 
@@ -1379,8 +1373,8 @@ BEGIN {
 
 # shamely copied and modified from JSON::XS code.
 
-$JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::PPdev::Boolean" };
-$JSON::PP::false = do { bless \(my $dummy = 0), "JSON::PPdev::Boolean" };
+$JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::PP::Boolean" };
+$JSON::PP::false = do { bless \(my $dummy = 0), "JSON::PP::Boolean" };
 
 sub is_bool { defined $_[0] and UNIVERSAL::isa($_[0], "JSON::PP::Boolean"); }
 
@@ -1390,15 +1384,15 @@ sub null  { undef; }
 
 ###############################
 
-package JSON::PPdev::Boolean;
+package JSON::PP::Boolean;
 
-BEGIN { # when renamed into JSON::PP, delete this code.
-    # avoid for warning Can't locate package JSON::PP::Boolean for @JSON::PPdev::Boolean::ISA
-    eval q{ package JSON::PP::Boolean; };
-    @JSON::PPdev::Boolean::ISA = ('JSON::PP::Boolean');
-}
+#BEGIN { # when renamed into JSON::PP, delete this code.
+#    # avoid for warning Can't locate package JSON::PP::Boolean for @JSON::PP::Boolean::ISA
+#    eval q{ package JSON::PP::Boolean; };
+#    @JSON::PP::Boolean::ISA = ('JSON::PP::Boolean');
+#}
 
-# @JSON::PPdev::Boolean::ISA = ('JSON::PP::Boolean');
+# @JSON::PP::Boolean::ISA = ('JSON::PP::Boolean');
 use overload (
    "0+"     => sub { ${$_[0]} },
    "++"     => sub { $_[0] = ${$_[0]} + 1 },
@@ -1591,11 +1585,9 @@ __END__
 
 =head1 NAME
 
-JSON::PPdev - JSON::XS compatible pure-Perl module.
+JSON::PP - JSON::XS compatible pure-Perl module.
 
 =head1 SYNOPSIS
-
- # Here, the word 'JSON::PP' mean 'JSON::PPdev'
 
  use JSON::PP;
 
