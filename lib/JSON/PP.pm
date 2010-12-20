@@ -2459,16 +2459,6 @@ JSON::PP (as same as JSON::XS) encodes strings without escaping slash.
 
 If C<$enable> is true (or missing), then C<encode> will escape slashes.
 
-=head2 (OBSOLETED)as_nonblessed
-
-    $json = $json->as_nonblessed
-
-(OBSOLETED) If C<$enable> is true (or missing), then C<encode> will convert
-a blessed hash reference or a blessed array reference (contains
-other blessed references) into JSON members and arrays.
-
-This feature is effective only when C<allow_blessed> is enable.
-
 =head2 indent_length
 
     $json = $json->indent_length($length)
