@@ -40,6 +40,9 @@ This distribution is for the preparation.
 
 --------------------------------------------------------------------------
 
+2.27101  Mon Dec 20 16:21:03 2010
+	- prepared
+
 2.27100  Sun Nov 28 02:02:49 2010
 	- split away JSON distribution
 	- renamed t/* files
