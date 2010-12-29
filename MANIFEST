@@ -1,6 +1,7 @@
 Changes
 lib/JSON/PP.pm
 lib/JSON/PP/Boolean.pm
+bin/json_pp
 Makefile.PL
 MANIFEST
 META.yml			Module meta-data (added by MakeMaker)

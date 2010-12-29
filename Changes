@@ -24,7 +24,10 @@ It comes to be a perl core module in Perl 5.14.
 
 --------------------------------------------------------------------------
 
-2.27102  on Dec 20 20:29:39 2010
+2.27103  Wed Dec 29 15:32:38 2010
+	- added bin/json_pp
+
+2.27102  Mon Dec 20 20:29:39 2010
 	- modified JSON::PP::Boolean pod
 
 2.27101  Mon Dec 20 16:21:03 2010
