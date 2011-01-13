@@ -624,11 +624,18 @@ BEGIN {
     my $cb_sk_object;
 
     my $F_HOOK;
+    my $OBJECT_CONSTRUCTOR;
 
     my $allow_bigint;   # using Math::BigInt
     my $singlequote;    # loosely quoting
     my $loose;          # 
     my $allow_barekey;  # bareKey
+
+
+    sub object_constructor {
+        $OBJECT_CONSTRUCTOR = $_[1];
+        $_[0];
+    }
 
     # $opt flag
     # 0x00000001 .... decode_prefix
@@ -939,7 +946,7 @@ BEGIN {
 
 
     sub object {
-        my $o = {};
+        my $o = $OBJECT_CONSTRUCTOR ? &$OBJECT_CONSTRUCTOR() : {};
         my $k;
 
         decode_error('json text or perl structure exceeds maximum nesting level (max_depth set too low?)')
