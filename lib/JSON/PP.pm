@@ -322,8 +322,8 @@ sub allow_bigint {
 
                 if ( $convert_blessed and $obj->can('TO_JSON') ) {
                     my $result = $obj->TO_JSON();
-                    if ( defined $result and overload::Overloaded( $obj ) ) {
-                        if ( overload::StrVal( $obj ) eq $result ) {
+                    if ( defined $result and ref( $result ) ) {
+                        if ( refaddr( $obj ) eq refaddr( $result ) ) {
                             encode_error( sprintf(
                                 "%s::TO_JSON method returned same object as was passed instead of a new one",
                                 ref $obj
@@ -1338,6 +1338,7 @@ BEGIN {
     unless($@){
         *JSON::PP::blessed = \&Scalar::Util::blessed;
         *JSON::PP::reftype = \&Scalar::Util::reftype;
+        *JSON::PP::refaddr = \&Scalar::Util::refaddr;
     }
     else{ # This code is from Sclar::Util.
         # warn $@;
@@ -1367,6 +1368,23 @@ BEGIN {
               : length(ref($$r)) ? 'REF'
               :                    'SCALAR';
         };
+        *JSON::PP::refaddr = sub {
+          return undef unless length(ref($_[0]));
+
+          my $addr;
+          if(defined(my $pkg = blessed($_[0]))) {
+            $addr .= bless $_[0], 'Scalar::Util::Fake';
+            bless $_[0], $pkg;
+          }
+          else {
+            $addr .= $_[0]
+          }
+
+          $addr =~ /0x(\w+)/;
+          local $^W;
+          no warnings 'portable';
+          hex($1);
+        }
     }
 }
 
