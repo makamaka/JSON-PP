@@ -1382,7 +1382,7 @@ BEGIN {
 
           $addr =~ /0x(\w+)/;
           local $^W;
-          no warnings 'portable';
+          #no warnings 'portable';
           hex($1);
         }
     }
