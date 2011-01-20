@@ -24,8 +24,12 @@ It comes to be a perl core module in Perl 5.14.
 
 --------------------------------------------------------------------------
 
+2.27104  Thu Jan 20 19:06:25 2011
+	- fixed a problem to convert overloaded objects (pointed by rt#64783)
+	- changed decoding methods object() and array() to pass a object.
+
 2.27103  Wed Dec 29 15:32:38 2010
-	- added bin/json_pp
+	- added bin/json_pp - command line utility
 
 2.27102  Mon Dec 20 20:29:39 2010
 	- modified JSON::PP::Boolean pod
