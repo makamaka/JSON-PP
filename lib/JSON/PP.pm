@@ -889,7 +889,7 @@ BEGIN {
 
 
     sub array {
-        my $a  = [];
+        my $a  = $_[0] || []; # you can use this code to use another array ref object.
 
         decode_error('json text or perl structure exceeds maximum nesting level (max_depth set too low?)')
                                                     if (++$depth > $max_depth);
@@ -939,7 +939,7 @@ BEGIN {
 
 
     sub object {
-        my $o = {};
+        my $o = $_[0] || {}; # you can use this code to use another hash ref object.
         my $k;
 
         decode_error('json text or perl structure exceeds maximum nesting level (max_depth set too low?)')
