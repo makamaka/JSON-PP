@@ -1404,13 +1404,6 @@ sub null  { undef; }
 
 package JSON::PP::Boolean;
 
-#BEGIN { # when renamed into JSON::PP, delete this code.
-#    # avoid for warning Can't locate package JSON::PP::Boolean for @JSON::PP::Boolean::ISA
-#    eval q{ package JSON::PP::Boolean; };
-#    @JSON::PP::Boolean::ISA = ('JSON::PP::Boolean');
-#}
-
-# @JSON::PP::Boolean::ISA = ('JSON::PP::Boolean');
 use overload (
    "0+"     => sub { ${$_[0]} },
    "++"     => sub { $_[0] = ${$_[0]} + 1 },
