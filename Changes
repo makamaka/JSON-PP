@@ -24,6 +24,9 @@ It comes to be a perl core module in Perl 5.14.
 
 --------------------------------------------------------------------------
 
+2.27105  Tue Mar  8 12:38:42 2011
+	- removed t/900_pod.t from package because of author test
+
 2.27104  Thu Jan 20 19:06:25 2011
 	- fixed a problem to convert overloaded objects (pointed by rt#64783)
 	- changed decoding methods object() and array() to pass a object.

@@ -11,7 +11,7 @@ use Carp ();
 use B ();
 #use Devel::Peek;
 
-$JSON::PP::VERSION = '2.27104';
+$JSON::PP::VERSION = '2.27105';
 
 @JSON::PP::EXPORT = qw(encode_json decode_json from_json to_json);
 
