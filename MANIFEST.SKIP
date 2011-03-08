@@ -12,6 +12,7 @@ MANIFEST\.SKIP
 pm_to_blib
 tmp/
 ex/
+xt/
 eg/
 JSON-
 pod\.txt
