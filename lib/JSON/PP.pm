@@ -1625,7 +1625,9 @@ JSON::PP - JSON::XS compatible pure-Perl module.
 
 =head1 VERSION
 
-    2.27103
+    2.27105
+
+L<JSON::XS> 2.27 compatible.
 
 =head1 NOTE
 
