@@ -39,4 +39,5 @@ t/112_upgrade.t
 t/113_overloaded_eq.t
 t/114_decode_prefix.t
 t/115_tie_ixhash.t
+t/116_incr_parse_fixed.t
 t/_unicode_handling.pm
