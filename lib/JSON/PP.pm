@@ -1831,7 +1831,7 @@ Basically, check to L<JSON> or L<JSON::XS>.
 
 =head2 new
 
-    $json = new JSON::PP
+    $json = JSON::PP->new
 
 Rturns a new JSON::PP object that can be used to de/encode JSON
 strings.
