@@ -24,6 +24,8 @@ This distribution is for the preparation.
 
     * rename JSON::PPdev into JSON::PP and release on CPAN.
 
+    * Perl 5.14.0 released. This module is a dual-life module. <<<< HERE
+
 =================
 
 INSTALLATION
