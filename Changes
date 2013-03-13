@@ -6,11 +6,14 @@ It was a perl core module in Perl 5.14.
 
 --------------------------------------------------------------------------
 
+2.27202  Wed Mar 13 15:41:22 2013
+	- license in Makefile.PL was missing
+
 2.27201  Wed Mar 13 13:22:33 2013
-    - occasionally failed in t/019_incr.t in Perl 5.17.6 or more
-        (because of hash iterator randomization)
-        reported and patched by demerphq
-        https://rt.cpan.org/Public/Bug/Display.html?id=83421
+	- occasionally failed in t/019_incr.t in Perl 5.17.6 or more
+          (because of hash iterator randomization)
+          reported and patched by demerphq
+          https://rt.cpan.org/Public/Bug/Display.html?id=83421
 
 2.27200  Sun May 22 12:17:51 2011
 	- fixed incr_parse docodeing string more correctly (rt#68032 by LCONS)
