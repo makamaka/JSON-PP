@@ -4,7 +4,10 @@ package JSON::PP;
 
 use 5.005;
 use strict;
-use base qw(Exporter);
+
+use Exporter ();
+BEGIN { @JSON::PP::ISA = ('Exporter') }
+
 use overload ();
 
 use Carp ();
