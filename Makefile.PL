@@ -13,6 +13,7 @@ my %prereq = $] < 5.006 ? ( 'JSON::PP::Compat5005' => 0 )
 # are removed when installing this; this will warn on old EU::MM but
 # still works
 my $needs_uninst = $] < 5.012
+    && ! $ENV{PERL_NO_HIGHLANDER}
     && ! ( $ENV{PERL_MM_OPT} && $ENV{PERL_MM_OPT} =~ /(?:INSTALL_BASE|PREFIX)/ )
     && ! grep { /INSTALL_BASE/ || /PREFIX/ } @ARGV;
 
