@@ -6,6 +6,11 @@ It was a perl core module in Perl 5.14.
 
 --------------------------------------------------------------------------
 
+2.27203  Thu Oct 17 19:38:55 2013
+	- fixed return/or in _incr_parse
+	  reported and patched by MAUKE, sprout and rjbs
+	  https://rt.cpan.org/Public/Bug/Display.html?id=86948
+
 2.27202  Wed Mar 13 15:41:22 2013
 	- license in Makefile.PL was missing
 
