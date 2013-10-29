@@ -39,13 +39,14 @@ use constant P_ESCAPE_SLASH         => 16;
 use constant P_AS_NONBLESSED        => 17;
 
 use constant P_ALLOW_UNKNOWN        => 18;
+use constant P_ALLOW_TAGS           => 19;
 
 use constant OLD_PERL => $] < 5.008 ? 1 : 0;
 
 BEGIN {
     my @xs_compati_bit_properties = qw(
             latin1 ascii utf8 indent canonical space_before space_after allow_nonref shrink
-            allow_blessed convert_blessed relaxed allow_unknown
+            allow_blessed convert_blessed relaxed allow_unknown allow_tags
     );
     my @pp_bit_properties = qw(
             allow_singlequote allow_bignum loose
@@ -260,6 +261,7 @@ sub allow_bigint {
     my $depth;
     my $indent_count;
     my $keysort;
+    my $allow_tags;
 
 
     sub PP_encode_json {
@@ -272,9 +274,9 @@ sub allow_bigint {
         my $idx = $self->{PROPS};
 
         ($ascii, $latin1, $utf8, $indent, $canonical, $space_before, $space_after, $allow_blessed,
-            $convert_blessed, $escape_slash, $bignum, $as_nonblessed)
+            $convert_blessed, $escape_slash, $bignum, $as_nonblessed, $allow_tags)
          = @{$idx}[P_ASCII .. P_SPACE_AFTER, P_ALLOW_BLESSED, P_CONVERT_BLESSED,
-                    P_ESCAPE_SLASH, P_ALLOW_BIGNUM, P_AS_NONBLESSED];
+                    P_ESCAPE_SLASH, P_ALLOW_BIGNUM, P_AS_NONBLESSED, P_ALLOW_TAGS];
 
         ($max_depth, $indent_length) = @{$self}{qw/max_depth indent_length/};
 
@@ -336,6 +338,11 @@ sub allow_bigint {
 
                 return "$obj" if ( $bignum and _is_bignum($obj) );
                 return $self->blessed_to_json($obj) if ($allow_blessed and $as_nonblessed); # will be removed.
+
+                if ( $allow_tags and ( my $method = $obj->can('FREEZE') ) ) {
+                    my @results = $method->($obj, 'JSON');
+                    return '(' . $self->string_to_json( ref $obj ) . ')' . $self->array_to_json(\@results);
+                }
 
                 encode_error( sprintf("encountered object '%s', but neither allow_blessed "
                     . "nor convert_blessed settings are enabled", $obj)
@@ -629,6 +636,7 @@ BEGIN {
     my $singlequote;    # loosely quoting
     my $loose;          # 
     my $allow_barekey;  # bareKey
+    my $allow_tags;     # JSON::XS 3.x
 
     # $opt flag
     # 0x00000001 .... decode_prefix
@@ -647,8 +655,8 @@ BEGIN {
 
         my $idx = $self->{PROPS};
 
-        ($utf8, $relaxed, $loose, $allow_bigint, $allow_barekey, $singlequote)
-            = @{$idx}[P_UTF8, P_RELAXED, P_LOOSE .. P_ALLOW_SINGLEQUOTE];
+        ($utf8, $relaxed, $loose, $allow_bigint, $allow_barekey, $singlequote, $allow_tags)
+            = @{$idx}[P_UTF8, P_RELAXED, P_LOOSE .. P_ALLOW_SINGLEQUOTE, P_ALLOW_TAGS];
 
         if ( $utf8 ) {
             utf8::downgrade( $text, 1 ) or Carp::croak("Wide character in subroutine entry");
@@ -1034,6 +1042,17 @@ BEGIN {
                 $at++;
                 next_chr;
                 return $JSON::PP::false;
+            }
+        }
+
+        # JSON::XS 3.x allow_tags
+        if ( $allow_tags and substr($text,$at-1,1) eq '(' ) {
+            next_chr;
+            my $classname = string();
+            if ( substr($text,$at-1,1) eq ')' and (my $method = $classname->can('THAW')) ) {
+                next_chr;
+                my $args = array();
+                return $method->( $classname, 'JSON', @$args );
             }
         }
 
