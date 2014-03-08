@@ -655,6 +655,7 @@ BEGIN {
         }
         else {
             utf8::upgrade( $text );
+            utf8::encode( $text );
         }
 
         $len = length $text;
@@ -806,17 +807,12 @@ BEGIN {
                 else{
 
                     if ( ord $ch  > 127 ) {
-                        if ( $utf8 ) {
-                            unless( $ch = is_valid_utf8($ch) ) {
-                                $at -= 1;
-                                decode_error("malformed UTF-8 character in JSON string");
-                            }
-                            else {
-                                $at += $utf8_len - 1;
-                            }
+                        unless( $ch = is_valid_utf8($ch) ) {
+                            $at -= 1;
+                            decode_error("malformed UTF-8 character in JSON string");
                         }
                         else {
-                            utf8::encode( $ch );
+                            $at += $utf8_len - 1;
                         }
 
                         $is_utf8 = 1;
