@@ -405,8 +405,10 @@ sub allow_bigint {
         my $b_obj = B::svref_2object(\$value);  # for round trip problem
         my $flags = $b_obj->FLAGS;
 
-        return $value # as is 
-            if $flags & ( B::SVp_IOK | B::SVp_NOK ) and !( $flags & B::SVp_POK ); # SvTYPE is IV or NV?
+        return $value # as is
+          if $flags & (B::SVp_IOK | B::SVp_NOK)
+          && 0 + $value eq $value
+          && $value * 0 == 0;
 
         my $type = ref($value);
 
@@ -593,7 +595,7 @@ BEGIN {
     }
 }
 
-{ # PARSE 
+{ # PARSE
 
     my %escapes = ( #  by Jeremy Muhlich <jmuhlich [at] bitflood.org>
         b    => "\x8",
@@ -627,7 +629,7 @@ BEGIN {
 
     my $allow_bigint;   # using Math::BigInt
     my $singlequote;    # loosely quoting
-    my $loose;          # 
+    my $loose;          #
     my $allow_barekey;  # bareKey
 
     # $opt flag
@@ -1616,15 +1618,15 @@ JSON::PP - JSON::XS compatible pure-Perl module.
  # OO-interface
 
  $coder = JSON::PP->new->ascii->pretty->allow_nonref;
- 
+
  $json_text   = $json->encode( $perl_scalar );
  $perl_scalar = $json->decode( $json_text );
- 
+
  $pretty_printed = $json->pretty->encode( $perl_scalar ); # pretty-printing
- 
+
  # Note that JSON version 2.0 and above will automatically use
  # JSON::XS or JSON::PP, so you should be able to just:
- 
+
  use JSON;
 
 
@@ -1743,7 +1745,7 @@ with C<utf8> enable. And the decoded result will contain UNICODE characters.
   my $json        = JSON::PP->new->utf8;
   my $json_text   = CGI->new->param( 'json_data' );
   my $perl_scalar = $json->decode( $json_text );
-  
+
   # from file content
   local $/;
   open( my $fh, '<', 'json.data' );
@@ -1757,7 +1759,7 @@ If an outer data is not encoded in UTF-8, firstly you should C<decode> it.
   open( my $fh, '<', 'json.data' );
   my $encoding = 'cp932';
   my $unicode_json_text = decode( $encoding, <$fh> ); # UNICODE
-  
+
   # or you can write the below code.
   #
   # open( my $fh, "<:encoding($encoding)", 'json.data' );
@@ -1829,7 +1831,7 @@ be chained:
 =head2 ascii
 
     $json = $json->ascii([$enable])
-    
+
     $enabled = $json->get_ascii
 
 If $enable is true (or missing), then the encode method will not generate characters outside
@@ -1849,7 +1851,7 @@ required by the JSON syntax or other flags. This results in a faster and more co
 =head2 latin1
 
     $json = $json->latin1([$enable])
-    
+
     $enabled = $json->get_latin1
 
 If $enable is true (or missing), then the encode method will encode the resulting JSON
@@ -1866,7 +1868,7 @@ See to L<UNICODE HANDLING ON PERLS>.
 =head2 utf8
 
     $json = $json->utf8([$enable])
-    
+
     $enabled = $json->get_utf8
 
 If $enable is true (or missing), then the encode method will encode the JSON result
@@ -1910,7 +1912,7 @@ Equivalent to:
 =head2 indent
 
     $json = $json->indent([$enable])
-    
+
     $enabled = $json->get_indent
 
 The default indent space length is three.
@@ -1919,7 +1921,7 @@ You can use C<indent_length> to change the length.
 =head2 space_before
 
     $json = $json->space_before([$enable])
-    
+
     $enabled = $json->get_space_before
 
 If C<$enable> is true (or missing), then the C<encode> method will add an extra
@@ -1937,7 +1939,7 @@ Example, space_before enabled, space_after and indent disabled:
 =head2 space_after
 
     $json = $json->space_after([$enable])
-    
+
     $enabled = $json->get_space_after
 
 If C<$enable> is true (or missing), then the C<encode> method will add an extra
@@ -1957,7 +1959,7 @@ Example, space_before and indent disabled, space_after enabled:
 =head2 relaxed
 
     $json = $json->relaxed([$enable])
-    
+
     $enabled = $json->get_relaxed
 
 If C<$enable> is true (or missing), then C<decode> will accept some
@@ -2006,7 +2008,7 @@ character, after which more white-space and comments are allowed.
 =head2 canonical
 
     $json = $json->canonical([$enable])
-    
+
     $enabled = $json->get_canonical
 
 If C<$enable> is true (or missing), then the C<encode> method will output JSON objects
@@ -2029,7 +2031,7 @@ or a subroutine name to C<sort_by>. See to C<JSON::PP OWN METHODS>.
 =head2 allow_nonref
 
     $json = $json->allow_nonref([$enable])
-    
+
     $enabled = $json->get_allow_nonref
 
 If C<$enable> is true (or missing), then the C<encode> method can convert a
@@ -2048,7 +2050,7 @@ JSON object or array.
 =head2 allow_unknown
 
     $json = $json->allow_unknown ([$enable])
-    
+
     $enabled = $json->get_allow_unknown
 
 If $enable is true (or missing), then "encode" will *not* throw an
@@ -2067,7 +2069,7 @@ partner.
 =head2 allow_blessed
 
     $json = $json->allow_blessed([$enable])
-    
+
     $enabled = $json->get_allow_blessed
 
 If C<$enable> is true (or missing), then the C<encode> method will not
@@ -2083,7 +2085,7 @@ exception when it encounters a blessed object.
 =head2 convert_blessed
 
     $json = $json->convert_blessed([$enable])
-    
+
     $enabled = $json->get_convert_blessed
 
 If C<$enable> is true (or missing), then C<encode>, upon encountering a
@@ -2189,7 +2191,7 @@ into the corresponding C<< $WIDGET{<id>} >> object:
 =head2 shrink
 
     $json = $json->shrink([$enable])
-    
+
     $enabled = $json->get_shrink
 
 In JSON::XS, this flag resizes strings generated by either
@@ -2205,7 +2207,7 @@ See to L<JSON::XS/OBJECT-ORIENTED INTERFACE>
 =head2 max_depth
 
     $json = $json->max_depth([$maximum_nesting_depth])
-    
+
     $max_depth = $json->get_max_depth
 
 Sets the maximum nesting level (default C<512>) accepted while encoding
@@ -2229,7 +2231,7 @@ it may raise a warning 'Deep recursion on subroutin' at the perl runtime phase.
 =head2 max_size
 
     $json = $json->max_size([$maximum_string_size])
-    
+
     $max_size = $json->get_max_size
 
 Set the maximum length a JSON text may have (in bytes) where decoding is
@@ -2303,9 +2305,9 @@ The following methods implement this incremental parser.
 =head2 incr_parse
 
     $json->incr_parse( [$string] ) # void context
-    
+
     $obj_or_undef = $json->incr_parse( [$string] ) # scalar context
-    
+
     @obj_or_empty = $json->incr_parse( [$string] ) # list context
 
 This is the central parsing function. It can both append new text and
@@ -2570,7 +2572,7 @@ represent most decimal fractions exactly, and when converting from and to
 floating point, C<JSON> only guarantees precision up to but not including
 the leats significant bit.
 
-When C<allow_bignum> is enable, the big integers 
+When C<allow_bignum> is enable, the big integers
 and the numeric can be optionally converted into L<Math::BigInt> and
 L<Math::BigFloat> objects.
 
@@ -2695,7 +2697,7 @@ error to pass those in.
 
 =item Big Number
 
-When C<allow_bignum> is enable, 
+When C<allow_bignum> is enable,
 C<encode> converts C<Math::BigInt> objects and C<Math::BigFloat>
 objects into JSON numbers.
 
@@ -2753,7 +2755,7 @@ The returned is a byte sequence C<0xE3 0x81 0x82> for UTF-8 encoded
 japanese character (C<HIRAGANA LETTER A>).
 And if it is represented in Unicode code point, C<U+3042>.
 
-Next, 
+Next,
 
     $json->decode('"\u3042"');
 
@@ -2794,6 +2796,6 @@ Makamaka Hannyaharamitu, E<lt>makamaka[at]cpan.orgE<gt>
 Copyright 2007-2013 by Makamaka Hannyaharamitu
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =cut
