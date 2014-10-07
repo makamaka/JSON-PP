@@ -6,6 +6,10 @@ It was a perl core module in Perl 5.14.
 
 --------------------------------------------------------------------------
 
+2.27300
+	- fixed a problem about substr in perl 5.8.6 and below
+	  many people report this issue and patched by haarg[at]haarg.org
+
 2.27203  Thu Oct 17 19:38:55 2013
 	- fixed return/or in _incr_parse
 	  reported and patched by MAUKE, sprout and rjbs
