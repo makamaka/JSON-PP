@@ -5,7 +5,7 @@
 use strict;
 
 use Test::More;
-BEGIN { plan tests => 697 };
+BEGIN { plan tests => 711 };
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
 
@@ -40,8 +40,6 @@ splitter +JSON::PP->new              , '  ["x\\"","\\u1000\\\\n\\nx",1,{"\\\\" :
 splitter +JSON::PP->new              , '[ "x\\"","\\u1000\\\\n\\nx" , 1,{"\\\\ " :5 , "": " x"} ] ';
 splitter +JSON::PP->new->allow_nonref, '"test"';
 splitter +JSON::PP->new->allow_nonref, ' "5" ';
-
-
 
 {
    my $text = '[5],{"":1} , [ 1,2, 3], {"3":null}';
@@ -151,8 +149,44 @@ TEST
 
 } # for 5.005
 
+{
+   my %pieces = (
+      str   => [ '["1234', '5678"]'              ],
+      array => [ '[', '"1",', '"2",', '"3"', ']' ],
+      hash  => [ '{', '"x"', ':', '1234', '}'    ],
+   );
 
+   my $coder = new JSON::PP;
 
+   foreach my $type (keys %pieces) {
+      my @pieces = @{$pieces{$type}};
+
+      for ( 0..$#pieces ) {
+         my $data = $coder->incr_parse ($pieces[$_]);
+
+         if ($_ == $#pieces) {
+            ok($data, "last piece for $type");
+         }
+         else {
+            ok(!defined($data), "piece $_ for $type undefined");
+         }
+      }
+   }
+}
+
+{
+   my $coder = JSON::PP->new;
+
+   my $begin = '["one","two"]["three","four"]["fiv';
+   my $end   = 'e","six"]';
+
+   my @obj1 = $coder->incr_parse($begin);
+
+   ok(@obj1 == 2, 'incr_parse in list context, incomplete item');
+
+   my @obj2 = $coder->incr_parse($end);
+   ok(@obj2 == 1, 'incr_parse in list context, final item');
+}
 
 {
    my $coder = JSON::PP->new->max_size (5);

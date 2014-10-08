@@ -686,10 +686,11 @@ BEGIN {
 
         my $valid_start = defined $ch; # Is there a first character for JSON structure?
 
-        my $result = value();
+        my $result = eval { value() };
 
-        return undef if ( !$result && ( $opt & 0x10000000 ) ); # for incr_parse
+        return (undef, undef, $@) if ( !$result && ( $opt & 0x10000000 ) ); # for incr_parse
 
+        decode_error($@) if $@;
         decode_error("malformed JSON string, neither array, object, number, string or atom") unless $valid_start;
 
         if ( !$idx->[ P_ALLOW_NONREF ] and !ref $result ) {
@@ -1336,7 +1337,7 @@ BEGIN {
         *JSON::PP::reftype = \&Scalar::Util::reftype;
         *JSON::PP::refaddr = \&Scalar::Util::refaddr;
     }
-    else{ # This code is from Sclar::Util.
+    else{ # This code is from Scalar::Util.
         # warn $@;
         eval 'sub UNIVERSAL::a_sub_not_likely_to_be_here { ref($_[0]) }';
         *JSON::PP::blessed = sub {
@@ -1461,15 +1462,14 @@ sub incr_parse {
             my @ret;
 
             $self->{incr_parsing} = 1;
-
             do {
-                push @ret, $self->_incr_parse( $coder, $self->{incr_text} );
+                my $obj = $self->_incr_parse( $coder, $self->{incr_text} );
+                push @ret, $obj if $obj;
 
                 unless ( !$self->{incr_nest} and $self->{incr_mode} == INCR_M_JSON ) {
                     $self->{incr_mode} = INCR_M_WS if $self->{incr_mode} != INCR_M_STR;
                 }
-
-            } until ( length $self->{incr_text} >= $self->{incr_p} );
+            } until ( !length($self->{incr_text}) || $self->{incr_p} );
 
             $self->{incr_parsing} = 0;
 
@@ -1555,10 +1555,16 @@ sub _incr_parse {
     $self->{incr_p} = $restore;
     $self->{incr_c} = $p;
 
-    my ( $obj, $tail ) = $coder->PP_decode_json( substr( $self->{incr_text}, 0, $p ), 0x10000001 );
+    my ( $obj, $tail, $err ) = $coder->PP_decode_json( substr( $self->{incr_text}, 0, $p ), 0x10000001 );
+ 
+    if ($err && $self->{incr_nest} < 0) {
+        die $err;
+    }
 
-    $self->{incr_text} = substr( $self->{incr_text}, $p );
-    $self->{incr_p} = 0;
+    if (defined $obj) {
+        $self->{incr_text} = substr( $self->{incr_text}, $p );
+        $self->{incr_p} = 0;
+    }
 
     return $obj || '';
 }
