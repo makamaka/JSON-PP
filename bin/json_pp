@@ -19,9 +19,10 @@ GetOptions(
    'v'   => \( my $opt_verbose ),
    'f=s' => \( my $opt_from = 'json' ),
    't=s' => \( my $opt_to = 'json' ),
+   'i=i' => \( my $opt_indent = 2 ),
    'json_opt=s' => \( my $json_opt = 'pretty' ),
    'V'   => \( my $version ),
-) or die "Usage: $0 [-v] -f from_format [-t to_format]\n";
+) or die "Usage: $0 [-v] -f from_format [-t to_format] [-json_opt json_opts] [-i indent_length]\n";
 
 
 if ( $version ) {
@@ -31,13 +32,20 @@ if ( $version ) {
 
 
 $json_opt = '' if $json_opt eq '-';
+$opt_indent = 2 if ! defined($opt_indent);
 
-my @json_opt = grep { $allow_json_opt{ $_ } or die "'$_' is invalid json opttion" } split/,/, $json_opt;
+my %json_opts;
+foreach (split/,/, $json_opt) {
+    my ($val,$opt) = $_ =~ /^(no_)?(.*$)$/;
+    die "'$_' is invalid json opttion" unless ($opt or $allow_json_opt{$opt});
+    $json_opts{$opt} = ($val ne "no_");
+}
+
 
 my %F = (
    'json' => sub {
       my $json = JSON::PP->new;
-      $json->$_() for @json_opt;
+      $json->$_($json_opts{$_}) for keys %json_opts;
       $json->decode( $_ );
    },
    'eval' => sub {
@@ -52,7 +60,8 @@ my %T = (
    'null' => sub { "" },
    'json' => sub {
       my $json = JSON::PP->new;
-      $json->$_() for @json_opt;
+      $json->$_($json_opts{$_}) for keys %json_opts;
+      $json->indent_length($opt_indent);
       $json->encode( $_ );
    },
    'dumper' => sub {
@@ -90,7 +99,7 @@ json_pp - JSON::PP command utility
 
 =head1 SYNOPSIS
 
-    json_pp [-v] [-f from_format] [-t to_format] [-json_opt options_to_json]
+    json_pp [-v] [-f from_format] [-t to_format] [-json_opt options_to_json] [-i indent_length]
 
 =head1 DESCRIPTION
 
@@ -101,9 +110,7 @@ The default input format is json and the default output format is json with pret
 
 =head1 OPTIONS
 
-=head2 -f
-
-    -f from_format
+=head2 -f from_format
 
 Reads a data in the given format from STDIN.
 
@@ -121,7 +128,7 @@ as Perl code
 
 =back
 
-=head2 -t
+=head2 -t to_format
 
 Writes a data in the given format to STDOUT.
 
@@ -141,7 +148,7 @@ as Data::Dumper
 
 =back
 
-=head2 -json_opt
+=head2 -json_opt json_opts
 
 options to JSON::PP
 
@@ -149,6 +156,12 @@ Acceptable options are:
 
     ascii latin1 utf8 pretty indent space_before space_after relaxed canonical allow_nonref
     allow_singlequote allow_barekey allow_bignum loose escape_slash
+
+To diable an option, prefix the option with "no_" as in "no_indent".
+
+=head2 -i indent_length
+
+Indentation length in spaces. Default length is 2 spaces.
 
 =head2 -v
 
