@@ -264,7 +264,7 @@ It was a perl core module in Perl 5.14.
 
 2.02  Wed Dec 26 11:08:19 2007
 	[JSON]
-	- Now support_by_pp allows to use indent_length()
+	- Now support_by_pp allows using indent_length()
 
 	[JSON::PP] 2.02
 	- added get_indent_length
