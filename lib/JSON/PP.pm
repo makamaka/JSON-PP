@@ -131,7 +131,6 @@ sub new {
         max_size    => 0,
         indent      => 0,
         FLAGS       => 0,
-        fallback      => sub { encode_error('Invalid value. JSON can only reference.') },
         indent_length => 3,
     };
 
@@ -416,7 +415,7 @@ sub allow_bigint {
         elsif( blessed($value) and  $value->isa('JSON::PP::Boolean') ){
             return $$value == 1 ? 'true' : 'false';
         }
-        elsif ($type) {
+        else {
             if ((overload::StrVal($value) =~ /=(\w+)/)[0]) {
                 return $self->value_to_json("$value");
             }
@@ -441,12 +440,6 @@ sub allow_bigint {
              }
 
         }
-        else {
-            return $self->{fallback}->($value)
-                 if ($self->{fallback} and ref($self->{fallback}) eq 'CODE');
-            return 'null';
-        }
-
     }
 
 
