@@ -1045,6 +1045,7 @@ BEGIN {
     sub number {
         my $n    = '';
         my $v;
+        my $is_dec;
 
         # According to RFC4627, hex or oct digts are invalid.
         if($ch eq '0'){
@@ -1087,6 +1088,7 @@ BEGIN {
 
         if(defined $ch and $ch eq '.'){
             $n .= '.';
+            $is_dec = 1;
 
             next_chr;
             if (!defined $ch or $ch !~ /\d/) {
@@ -1142,7 +1144,7 @@ BEGIN {
             return Math::BigFloat->new($v);
         }
 
-        return 0+$v;
+        return $is_dec ? $v/1.0 : 0+$v;
     }
 
 
