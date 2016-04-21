@@ -1,7 +1,7 @@
 Revision history for Perl extension JSON::PP.
 --------------------------------------------------------------------------
 
-JSON::PP had been inculded in JSON distribution (CPAN module).
+JSON::PP had been included in JSON distribution (CPAN module).
 It was a perl core module in Perl 5.14.
 
 --------------------------------------------------------------------------
@@ -25,7 +25,7 @@ It was a perl core module in Perl 5.14.
           https://rt.cpan.org/Public/Bug/Display.html?id=83421
 
 2.27200  Sun May 22 12:17:51 2011
-	- fixed incr_parse docodeing string more correctly (rt#68032 by LCONS)
+	- fixed incr_parse decoding string more correctly (rt#68032 by LCONS)
 
 2.27105  Tue Mar  8 12:38:42 2011
 	- removed t/900_pod.t from package because of author test
@@ -99,14 +99,14 @@ It was a perl core module in Perl 5.14.
 	- updated 'INCREMENTAL PARSING' section
 	[JSON::PP]
 	- decode_prefix() didn't count a consumed text length properly.
-	- enhanced XS compatibilty
+	- enhanced XS compatibility
 	    in the case of decoding a white space garbaged text.
 
 2.19  Tue Mar 30 13:40:24 2010
 	[JSON]
 	- fixed typo (rt#53535 by Angel Abad)
 	- added a recommendation
-              refering to (en|de)code_json to pod (suggested by tokuhirom)
+              referring to (en|de)code_json to pod (suggested by tokuhirom)
 	- added 'HOW DO I DECODE A DATA FROM OUTER AND ENCODE TO OUTER' to pod.
 
 2.18  Tue Mar 23 15:18:10 2010
@@ -154,7 +154,7 @@ It was a perl core module in Perl 5.14.
 	[JSON::PP::5005]
 	- _decode_unicode() returned a 0x80-0xff value as UTF8 encoded byte.
 	[JSON]
-	- added a refference to JSON::XS's document "JSON and ECMAscript".
+	- added a reference to JSON::XS's document "JSON and ECMAscript".
 	- fixed a typo in the document (pointed by Jim Cromie).
 
 2.12  Wed Jul 16 11:14:35 2008
@@ -247,7 +247,7 @@ It was a perl core module in Perl 5.14.
 	- fixed support_by_pp setting
 
 	[JSON::PP] 2.04
-	- enhanced the error message compatiblity to XS.
+	- enhanced the error message compatibility to XS.
 
 2.03  Fri Jan  4 14:10:58 2008
 	[JSON]
@@ -264,7 +264,7 @@ It was a perl core module in Perl 5.14.
 
 2.02  Wed Dec 26 11:08:19 2007
 	[JSON]
-	- Now support_by_pp allows to use indent_length()
+	- Now support_by_pp allows using indent_length()
 
 	[JSON::PP] 2.02
 	- added get_indent_length
