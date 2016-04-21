@@ -608,7 +608,7 @@ BEGIN {
 
     my $text; # json data
     my $at;   # offset
-    my $ch;   # 1 character
+    my $ch;   # first character
     my $len;  # text length (changed according to UTF8 or NON UTF8)
     # INTERNAL
     my $depth;          # nest counter
@@ -1385,7 +1385,7 @@ BEGIN {
 }
 
 
-# shamefully copied and modified from JSON::XS code.
+# shamelessly copied and modified from JSON::XS code.
 
 $JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::PP::Boolean" };
 $JSON::PP::false = do { bless \(my $dummy = 0), "JSON::PP::Boolean" };
