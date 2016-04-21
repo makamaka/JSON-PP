@@ -1,7 +1,7 @@
 JSON::PP
 =================
 
-JSON::PP had been inculded in JSON distribution (CPAN module).
+JSON::PP had been included in JSON distribution (CPAN module).
 It was a perl core module in Perl 5.14.
 
 =================
