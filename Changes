@@ -6,7 +6,20 @@ It was a perl core module in Perl 5.14.
 
 --------------------------------------------------------------------------
 
-2.27300
+2.27400  2016-04-23
+	[JSON::PP] appleid and merged long term neglected patches & PRs.
+	           thanks to charsbar
+
+	- document patches
+	  by AM909, leon[at]astray.com, dsteinbrunner, jwilk, alfiedotwtf
+	- modified Makefile.PL to set UNINST=1 if needed on old perls
+	  by dagolden
+	- decode decimals to Perl's internal NV type
+	  by dagolden
+
+	see to https://github.com/makamaka/JSON-PP/commits/master
+
+2.27300  2014-10-06
 	- fixed a problem about substr in perl 5.8.6 and below
 	  many people report this issue and patched by haarg[at]haarg.org
 
