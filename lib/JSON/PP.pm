@@ -2592,7 +2592,7 @@ C<JSON> will install these missing overloading features to the backend modules.
 
 A JSON null atom becomes C<undef> in Perl.
 
-C<JSON::PP::null> returns C<unddef>.
+C<JSON::PP::null> returns C<undef>.
 
 =back
 
