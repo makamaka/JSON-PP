@@ -1271,6 +1271,8 @@ sub _decode_unicode {
 BEGIN {
 
     unless ( defined &utf8::is_utf8 ) {
+       local @INC = @INC;
+       pop @INC if $INC[-1] eq '.';
        require Encode;
        *utf8::is_utf8 = *Encode::is_utf8;
     }
@@ -1332,6 +1334,8 @@ BEGIN {
 #
 
 BEGIN {
+    local @INC = @INC;
+    pop @INC if $INC[-1] eq '.';
     eval 'require Scalar::Util';
     unless($@){
         *JSON::PP::blessed = \&Scalar::Util::blessed;
