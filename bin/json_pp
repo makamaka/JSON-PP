@@ -2,6 +2,7 @@
 
 use strict;
 use Getopt::Long;
+no lib '.';
 
 use JSON::PP ();
 
