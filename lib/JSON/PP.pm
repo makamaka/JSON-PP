@@ -1617,7 +1617,7 @@ JSON::PP - JSON::XS compatible pure-Perl module.
 
  # OO-interface
 
- $coder = JSON::PP->new->ascii->pretty->allow_nonref;
+ $json = JSON::PP->new->ascii->pretty->allow_nonref;
  
  $json_text   = $json->encode( $perl_scalar );
  $perl_scalar = $json->decode( $json_text );
