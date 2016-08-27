@@ -367,7 +367,7 @@ sub allow_bigint {
             if ( OLD_PERL ) { utf8::decode($k) } # key for Perl 5.6 / be optimized
             push @res, string_to_json( $self, $k )
                           .  $del
-                          . ( $self->object_to_json( $obj->{$k} ) || $self->value_to_json( $obj->{$k} ) );
+                          . ( ref $obj->{$k} ? $self->object_to_json( $obj->{$k} ) : $self->value_to_json( $obj->{$k} ) );
         }
 
         --$depth;
@@ -387,7 +387,7 @@ sub allow_bigint {
         my ($pre, $post) = $indent ? $self->_up_indent() : ('', '');
 
         for my $v (@$obj){
-            push @res, $self->object_to_json($v) || $self->value_to_json($v);
+            push @res, ref($v) ? $self->object_to_json($v) : $self->value_to_json($v);
         }
 
         --$depth;
@@ -1271,6 +1271,8 @@ sub _decode_unicode {
 BEGIN {
 
     unless ( defined &utf8::is_utf8 ) {
+       local @INC = @INC;
+       pop @INC if $INC[-1] eq '.';
        require Encode;
        *utf8::is_utf8 = *Encode::is_utf8;
     }
@@ -1332,6 +1334,8 @@ BEGIN {
 #
 
 BEGIN {
+    local @INC = @INC;
+    pop @INC if $INC[-1] eq '.';
     eval 'require Scalar::Util';
     unless($@){
         *JSON::PP::blessed = \&Scalar::Util::blessed;
@@ -1613,7 +1617,7 @@ JSON::PP - JSON::XS compatible pure-Perl module.
 
  # OO-interface
 
- $coder = JSON::PP->new->ascii->pretty->allow_nonref;
+ $json = JSON::PP->new->ascii->pretty->allow_nonref;
  
  $json_text   = $json->encode( $perl_scalar );
  $perl_scalar = $json->decode( $json_text );
@@ -2775,6 +2779,8 @@ This is not a character C<U+12345> but bytes - C<0xf0 0x92 0x8d 0x85>.
 
 
 =head1 SEE ALSO
+
+The F<json_pp> command line utility for quick experiments.
 
 Most of the document are copied and modified from JSON::XS doc.
 
