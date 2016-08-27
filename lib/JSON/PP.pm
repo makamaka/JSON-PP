@@ -367,7 +367,7 @@ sub allow_bigint {
             if ( OLD_PERL ) { utf8::decode($k) } # key for Perl 5.6 / be optimized
             push @res, string_to_json( $self, $k )
                           .  $del
-                          . ( $self->object_to_json( $obj->{$k} ) || $self->value_to_json( $obj->{$k} ) );
+                          . ( ref $obj->{$k} ? $self->object_to_json( $obj->{$k} ) : $self->value_to_json( $obj->{$k} ) );
         }
 
         --$depth;
@@ -387,7 +387,7 @@ sub allow_bigint {
         my ($pre, $post) = $indent ? $self->_up_indent() : ('', '');
 
         for my $v (@$obj){
-            push @res, $self->object_to_json($v) || $self->value_to_json($v);
+            push @res, ref($v) ? $self->object_to_json($v) : $self->value_to_json($v);
         }
 
         --$depth;
