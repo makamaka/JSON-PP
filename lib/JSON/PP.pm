@@ -2780,6 +2780,8 @@ This is not a character C<U+12345> but bytes - C<0xf0 0x92 0x8d 0x85>.
 
 =head1 SEE ALSO
 
+The F<json_pp> command line utility for quick experiments.
+
 Most of the document are copied and modified from JSON::XS doc.
 
 L<JSON::XS>
