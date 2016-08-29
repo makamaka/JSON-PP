@@ -58,6 +58,11 @@ my %T = (
    },
    'dumper' => sub {
       require Data::Dumper;
+      local $Data::Dumper::Terse     = 1;
+      local $Data::Dumper::Indent    = 1;
+      local $Data::Dumper::Useqq     = 1;
+      local $Data::Dumper::Quotekeys = 0;
+      local $Data::Dumper::Sortkeys  = 1;
       Data::Dumper::Dumper($_)
    },
 );
