@@ -930,6 +930,7 @@ BEGIN {
             }
         }
 
+        $at-- if defined $ch and $ch ne '';
         decode_error(", or ] expected while parsing array");
     }
 
@@ -996,7 +997,7 @@ BEGIN {
 
         }
 
-        $at--;
+        $at-- if defined $ch and $ch ne '';
         decode_error(", or } expected while parsing object/hash");
     }
 
