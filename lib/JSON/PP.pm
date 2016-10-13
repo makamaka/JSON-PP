@@ -1343,7 +1343,7 @@ BEGIN {
         *JSON::PP::reftype = \&Scalar::Util::reftype;
         *JSON::PP::refaddr = \&Scalar::Util::refaddr;
     }
-    else{ # This code is from Sclar::Util.
+    else{ # This code is from Scalar::Util.
         # warn $@;
         eval 'sub UNIVERSAL::a_sub_not_likely_to_be_here { ref($_[0]) }';
         *JSON::PP::blessed = sub {
@@ -2619,7 +2619,7 @@ in hash keys (or JSON objects), they will usually be encoded in a
 pseudo-random order that can change between runs of the same program but
 stays generally the same within a single run of a program. C<JSON>
 optionally sort the hash keys (determined by the I<canonical> flag), so
-the same datastructure will serialise to the same JSON text (given same
+the same data structure will serialise to the same JSON text (given same
 settings and version of JSON::XS), but this incurs a runtime overhead
 and is only rarely useful, e.g. when you want to compare some JSON text
 against another for equality.
