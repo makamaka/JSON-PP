@@ -319,7 +319,7 @@ sub allow_bigint {
         elsif ($type) { # blessed object?
             if (blessed($obj)) {
 
-                return $self->value_to_json($obj) if ( $obj->isa('JSON::PP::Boolean') );
+                return $self->value_to_json($obj) if ( $obj->isa('JSON::PP::Boolean') || $obj->isa('JSON::PP::NumberIfLooksLikeOne') );
 
                 if ( $convert_blessed and $obj->can('TO_JSON') ) {
                     my $result = $obj->TO_JSON();
@@ -416,6 +416,10 @@ sub allow_bigint {
         }
         elsif( blessed($value) and  $value->isa('JSON::PP::Boolean') ){
             return $$value == 1 ? 'true' : 'false';
+        }
+        elsif( blessed($value) and $value->isa('JSON::PP::NumberIfLooksLikeOne') ){
+            return $$value if Scalar::Util::looks_like_number($$value);
+            return $self->object_to_json($$value);
         }
         elsif ($type) {
             if ((overload::StrVal($value) =~ /=(\w+)/)[0]) {
@@ -1403,6 +1407,10 @@ sub is_bool { defined $_[0] and UNIVERSAL::isa($_[0], "JSON::PP::Boolean"); }
 sub true  { $JSON::PP::true  }
 sub false { $JSON::PP::false }
 sub null  { undef; }
+
+sub number_if_looks_like_one {
+    bless \(my $dummy = $_[0]), 'JSON::PP::NumberIfLooksLikeOne';
+}
 
 ###############################
 
