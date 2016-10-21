@@ -409,10 +409,16 @@ sub allow_bigint {
             # string & "" -> ""
             # number & "" -> 0 (with warning)
             # nan and inf can detect as numbers, so check with * 0
-            return $value
-                if length((my $dummy = "") & $value)
+            if (length((my $dummy = "") & $value)
                 && 0 + $value eq $value
-                && $value * 0 == 0;
+            ) {
+                if ($value * 0 == 0) {
+                    return $value;
+                } else {
+                    # TODO: decide what to do with inf/nan
+                    return $value;
+                }
+            }
             return string_to_json($self, $value);
         }
         elsif( blessed($value) and  $value->isa('JSON::PP::Boolean') ){
