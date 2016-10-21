@@ -1,6 +1,6 @@
 use Test::More;
 use strict;
-BEGIN { plan tests => 5 }
+BEGIN { plan tests => 3 }
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 use JSON::PP;
 
