@@ -8,7 +8,6 @@ use base qw(Exporter);
 use overload ();
 
 use Carp ();
-use B ();
 #use Devel::Peek;
 
 $JSON::PP::VERSION = '2.27400';
@@ -131,7 +130,6 @@ sub new {
         max_size    => 0,
         indent      => 0,
         FLAGS       => 0,
-        fallback      => sub { encode_error('Invalid value. JSON can only reference.') },
         indent_length => 3,
     };
 
@@ -403,21 +401,24 @@ sub allow_bigint {
 
         return 'null' if(!defined $value);
 
-        my $b_obj = B::svref_2object(\$value);  # for round trip problem
-        my $flags = $b_obj->FLAGS;
-
-        return $value # as is 
-            if $flags & ( B::SVp_IOK | B::SVp_NOK ) and !( $flags & B::SVp_POK ); # SvTYPE is IV or NV?
-
         my $type = ref($value);
 
-        if(!$type){
+        if (!$type) {
+            no warnings 'numeric';
+            # detect numbers
+            # string & "" -> ""
+            # number & "" -> 0 (with warning)
+            # nan and inf can detect as numbers, so check with * 0
+            return $value
+                if length((my $dummy = "") & $value)
+                && 0 + $value eq $value
+                && $value * 0 == 0;
             return string_to_json($self, $value);
         }
         elsif( blessed($value) and  $value->isa('JSON::PP::Boolean') ){
             return $$value == 1 ? 'true' : 'false';
         }
-        elsif ($type) {
+        else {
             if ((overload::StrVal($value) =~ /=(\w+)/)[0]) {
                 return $self->value_to_json("$value");
             }
@@ -442,12 +443,6 @@ sub allow_bigint {
              }
 
         }
-        else {
-            return $self->{fallback}->($value)
-                 if ($self->{fallback} and ref($self->{fallback}) eq 'CODE');
-            return 'null';
-        }
-
     }
 
 
@@ -1351,6 +1346,7 @@ BEGIN {
             local($@, $SIG{__DIE__}, $SIG{__WARN__});
             ref($_[0]) ? eval { $_[0]->a_sub_not_likely_to_be_here } : undef;
         };
+        require B;
         my %tmap = qw(
             B::NULL   SCALAR
             B::HV     HASH
