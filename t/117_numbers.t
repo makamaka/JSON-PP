@@ -4,8 +4,9 @@ BEGIN { plan tests => 5 }
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 use JSON::PP;
 
-is encode_json([9**9**9]), '["inf"]';
-is encode_json([-sin(9**9**9)]), '["nan"]';
+# TODO ("inf"/"nan" representations are not portable)
+# is encode_json([9**9**9]), '["inf"]';
+# is encode_json([-sin(9**9**9)]), '["nan"]';
 
 my $num = 3;
 my $str = "$num";
