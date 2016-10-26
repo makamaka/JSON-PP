@@ -1322,7 +1322,7 @@ BEGIN {
         sub JSON::PP::incr_text : lvalue {
             $_[0]->{_incr_parser} ||= JSON::PP::IncrParser->new;
 
-            if ( $_[0]->{_incr_parser}->{incr_parsing} ) {
+            if ( $_[0]->{_incr_parser}->{incr_pos} ) {
                 Carp::croak("incr_text cannot be called when the incremental parser already started parsing");
             }
             $_[0]->{_incr_parser}->{incr_text};
@@ -1433,16 +1433,14 @@ use constant INCR_M_C1   => 5;
 
 $JSON::PP::IncrParser::VERSION = '1.01';
 
-my $unpack_format = $] < 5.006 ? 'C*' : 'U*';
-
 sub new {
     my ( $class ) = @_;
 
     bless {
         incr_nest    => 0,
         incr_text    => undef,
-        incr_parsing => 0,
-        incr_p       => 0,
+        incr_pos     => 0,
+        incr_mode    => 0,
     }, $class;
 }
 
@@ -1460,122 +1458,150 @@ sub incr_parse {
         $self->{incr_text} .= $text;
     }
 
-
-    my $max_size = $coder->get_max_size;
-
     if ( defined wantarray ) {
-
-        $self->{incr_mode} = INCR_M_WS unless defined $self->{incr_mode};
-
-        if ( wantarray ) {
-            my @ret;
-
-            $self->{incr_parsing} = 1;
-
+        my $max_size = $coder->get_max_size;
+        my $p = $self->{incr_pos};
+        my @ret;
+        {
             do {
-                push @ret, $self->_incr_parse( $coder, $self->{incr_text} );
+                unless ( $self->{incr_nest} <= 0 and $self->{incr_mode} == INCR_M_JSON ) {
+                    $self->_incr_parse( $coder );
 
-                unless ( !$self->{incr_nest} and $self->{incr_mode} == INCR_M_JSON ) {
-                    $self->{incr_mode} = INCR_M_WS if $self->{incr_mode} != INCR_M_STR;
+                    if ( $max_size and $self->{incr_pos} > $max_size ) {
+                        Carp::croak("attempted decode of JSON text of $self->{incr_pos} bytes size, but max_size is set to $max_size");
+                    }
+                    unless ( $self->{incr_nest} <= 0 and $self->{incr_mode} == INCR_M_JSON ) {
+                        # as an optimisation, do not accumulate white space in the incr buffer
+                        if ( $self->{incr_mode} == INCR_M_WS and $self->{incr_pos} ) {
+                            $self->{incr_pos} = 0;
+                            $self->{incr_text} = '';
+                        }
+                        last;
+                    }
                 }
 
-            } until ( length $self->{incr_text} >= $self->{incr_p} );
+                my ($obj, $offset) = $coder->PP_decode_json( $self->{incr_text}, 0x10000001 );
+                push @ret, $obj;
+                use bytes;
+                $self->{incr_text} = substr( $self->{incr_text}, $offset || 0 );
+                $self->{incr_pos} = 0;
+                $self->{incr_nest} = 0;
+                $self->{incr_mode} = 0;
+                last unless wantarray;
+            } while ( wantarray );
+        }
 
-            $self->{incr_parsing} = 0;
-
+        if ( wantarray ) {
             return @ret;
         }
         else { # in scalar context
-            $self->{incr_parsing} = 1;
-            my $obj = $self->_incr_parse( $coder, $self->{incr_text} );
-            $self->{incr_parsing} = 0 if defined $obj; # pointed by Martin J. Evans
-            return $obj ? $obj : undef; # $obj is an empty string, parsing was completed.
+            return $ret[0] ? $ret[0] : undef;
         }
-
     }
-
 }
 
 
 sub _incr_parse {
-    my ( $self, $coder, $text, $skip ) = @_;
-    my $p = $self->{incr_p};
-    my $restore = $p;
-
-    my @obj;
+    my ($self, $coder) = @_;
+    my $text = $self->{incr_text};
     my $len = length $text;
+    my $p = $self->{incr_pos};
 
-    if ( $self->{incr_mode} == INCR_M_WS ) {
-        while ( $len > $p ) {
-            my $s = substr( $text, $p, 1 );
-            $p++ and next if ( 0x20 >= unpack($unpack_format, $s) );
-            $self->{incr_mode} = INCR_M_JSON;
-            last;
-       }
-    }
-
+INCR_PARSE:
     while ( $len > $p ) {
-        my $s = substr( $text, $p++, 1 );
+        my $s = substr( $text, $p, 1 );
+        last INCR_PARSE unless defined $s;
+        my $mode = $self->{incr_mode};
 
-        if ( $s eq '"' ) {
-            if (substr( $text, $p - 2, 1 ) eq '\\' ) {
-                next;
+        if ( $mode == INCR_M_WS ) {
+            while ( $len > $p ) {
+                $s = substr( $text, $p, 1 );
+                last INCR_PARSE unless defined $s;
+                if ( ord($s) > 0x20 ) {
+                    if ( $s eq '#' ) {
+                        $self->{incr_mode} = INCR_M_C0;
+                        redo INCR_PARSE;
+                    } else {
+                        $self->{incr_mode} = INCR_M_JSON;
+                        redo INCR_PARSE;
+                    }
+                }
+                $p++;
             }
-
-            if ( $self->{incr_mode} != INCR_M_STR  ) {
-                $self->{incr_mode} = INCR_M_STR;
-            }
-            else {
-                $self->{incr_mode} = INCR_M_JSON;
-                unless ( $self->{incr_nest} ) {
+        } elsif ( $mode == INCR_M_BS ) {
+            $p++;
+            $self->{incr_mode} = INCR_M_STR;
+            redo INCR_PARSE;
+        } elsif ( $mode == INCR_M_C0 or $mode == INCR_M_C1 ) {
+            while ( $len > $p ) {
+                $s = substr( $text, $p, 1 );
+                last INCR_PARSE unless defined $s;
+                if ( $s eq "\n" ) {
+                    $self->{incr_mode} = $self->{incr_mode} == INCR_M_C0 ? INCR_M_WS : INCR_M_JSON;
                     last;
                 }
+                $p++;
             }
-        }
+            next;
+        } elsif ( $mode == INCR_M_STR ) {
+            while ( $len > $p ) {
+                $s = substr( $text, $p, 1 );
+                last INCR_PARSE unless defined $s;
+                if ( $s eq '"' ) {
+                    $p++;
+                    $self->{incr_mode} = INCR_M_JSON;
 
-        if ( $self->{incr_mode} == INCR_M_JSON ) {
-
-            if ( $s eq '[' or $s eq '{' ) {
-                if ( ++$self->{incr_nest} > $coder->get_max_depth ) {
-                    Carp::croak('json text or perl structure exceeds maximum nesting level (max_depth set too low?)');
+                    last INCR_PARSE unless $self->{incr_nest};
+                    redo INCR_PARSE;
+                }
+                elsif ( $s eq '\\' ) {
+                    $p++;
+                    if ( !defined substr($text, $p, 1) ) {
+                        $self->{incr_mode} = INCR_M_BS;
+                        last INCR_PARSE;
+                    }
+                }
+                $p++;
+            }
+        } elsif ( $mode == INCR_M_JSON ) {
+            while ( $len > $p ) {
+                $s = substr( $text, $p++, 1 );
+                if ( $s eq "\x00" ) {
+                    $p--;
+                    last INCR_PARSE;
+                } elsif ( $s eq "\x09" or $s eq "\x0a" or $s eq "\x0d" or $s eq "\x20" ) {
+                    if ( !$self->{incr_nest} ) {
+                        $p--; # do not eat the whitespace, let the next round do it
+                        last INCR_PARSE;
+                    }
+                    next;
+                } elsif ( $s eq '"' ) {
+                    $self->{incr_mode} = INCR_M_STR;
+                    redo INCR_PARSE;
+                } elsif ( $s eq '[' or $s eq '{' ) {
+                    if ( ++$self->{incr_nest} > $coder->get_max_depth ) {
+                        Carp::croak('json text or perl structure exceeds maximum nesting level (max_depth set too low?)');
+                    }
+                    next;
+                } elsif ( $s eq ']' or $s eq '}' ) {
+                    if ( --$self->{incr_nest} <= 0 ) {
+                        last INCR_PARSE;
+                    }
+                } elsif ( $s eq '#' ) {
+                    $self->{incr_mode} = INCR_M_C1;
+                    redo INCR_PARSE;
                 }
             }
-            elsif ( $s eq ']' or $s eq '}' ) {
-                last if ( --$self->{incr_nest} <= 0 );
-            }
-            elsif ( $s eq '#' ) {
-                while ( $len > $p ) {
-                    last if substr( $text, $p++, 1 ) eq "\n";
-                }
-            }
-
         }
-
     }
 
-    $self->{incr_p} = $p;
-
-    return if ( $self->{incr_mode} == INCR_M_STR and not $self->{incr_nest} );
-    return if ( $self->{incr_mode} == INCR_M_JSON and $self->{incr_nest} > 0 );
-
-    return '' unless ( length substr( $self->{incr_text}, 0, $p ) );
-
-    local $Carp::CarpLevel = 2;
-
-    $self->{incr_p} = $restore;
-    $self->{incr_c} = $p;
-
-    my ( $obj, $tail ) = $coder->PP_decode_json( substr( $self->{incr_text}, 0, $p ), 0x10000001 );
-
-    $self->{incr_text} = substr( $self->{incr_text}, $p );
-    $self->{incr_p} = 0;
-
-    return $obj || '';
+    $self->{incr_pos} = $p;
+    $self->{incr_parsing} = $p ? 1 : 0; # for backward compatibility
 }
 
 
 sub incr_text {
-    if ( $_[0]->{incr_parsing} ) {
+    if ( $_[0]->{incr_pos} ) {
         Carp::croak("incr_text cannot be called when the incremental parser already started parsing");
     }
     $_[0]->{incr_text};
@@ -1584,18 +1610,19 @@ sub incr_text {
 
 sub incr_skip {
     my $self  = shift;
-    $self->{incr_text} = substr( $self->{incr_text}, $self->{incr_c} );
-    $self->{incr_p} = 0;
+    $self->{incr_text} = substr( $self->{incr_text}, $self->{incr_pos} );
+    $self->{incr_pos}     = 0;
+    $self->{incr_mode}    = 0;
+    $self->{incr_nest}    = 0;
 }
 
 
 sub incr_reset {
     my $self = shift;
     $self->{incr_text}    = undef;
-    $self->{incr_p}       = 0;
+    $self->{incr_pos}     = 0;
     $self->{incr_mode}    = 0;
     $self->{incr_nest}    = 0;
-    $self->{incr_parsing} = 0;
 }
 
 ###############################

@@ -9,10 +9,10 @@ my $kb = 'a' x 1024;
 my $hash = { map { $_ => $kb } (1..40) };
 my $data = join ( '', $json->encode($hash), $json->encode($hash) );
 my $size = length($data);
-note "Total size: [$size]";
+# note "Total size: [$size]";
 my $offset = 0;
 while ($size) {
-    note "Bytes left [$size]";
+    # note "Bytes left [$size]";
     my $incr = substr($data, $offset, 4096);
     my $bytes = length($incr);
     $size -= $bytes;
