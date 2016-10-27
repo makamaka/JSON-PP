@@ -6,7 +6,7 @@ use lib qw( ./lib );
 
 my %prereq = $] < 5.006 ? ( 'JSON::PP::Compat5005' => 0 )
            : $] < 5.008 ? ( 'JSON::PP::Compat5006' => 0 )
-           : ()
+           : ( 'Scalar::Util' => 1.08 )  # for 5.8.0 only
            ;
 
 # ensure old versions installed from bundled copy in ExtUtils::MakeMaker
