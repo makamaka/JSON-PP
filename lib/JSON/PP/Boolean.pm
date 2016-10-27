@@ -8,6 +8,8 @@ use overload (
     fallback => 1,
 );
 
+$JSON::PP::Boolean::VERSION = '2.27400';
+
 1;
 
 __END__
