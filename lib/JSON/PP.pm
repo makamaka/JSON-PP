@@ -89,16 +89,6 @@ BEGIN {
 
 # Functions
 
-my %encode_allow_method
-     = map {($_ => 1)} qw/utf8 pretty allow_nonref latin1 self_encode escape_slash
-                          allow_blessed convert_blessed indent indent_length allow_bignum
-                          as_nonblessed
-                        /;
-my %decode_allow_method
-     = map {($_ => 1)} qw/utf8 allow_nonref loose allow_singlequote allow_bignum
-                          allow_barekey max_size relaxed/;
-
-
 my $JSON; # cache
 
 sub encode_json ($) { # encode
