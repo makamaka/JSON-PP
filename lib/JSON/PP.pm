@@ -6,6 +6,7 @@ use 5.005;
 use strict;
 use base qw(Exporter);
 use overload ();
+use JSON::PP::Boolean;
 
 use Carp ();
 #use Devel::Peek;
@@ -1405,18 +1406,6 @@ sub is_bool { defined $_[0] and UNIVERSAL::isa($_[0], "JSON::PP::Boolean"); }
 sub true  { $JSON::PP::true  }
 sub false { $JSON::PP::false }
 sub null  { undef; }
-
-###############################
-
-package JSON::PP::Boolean;
-
-use overload (
-   "0+"     => sub { ${$_[0]} },
-   "++"     => sub { $_[0] = ${$_[0]} + 1 },
-   "--"     => sub { $_[0] = ${$_[0]} - 1 },
-   fallback => 1,
-);
-
 
 ###############################
 
