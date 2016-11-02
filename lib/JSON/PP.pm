@@ -1041,38 +1041,22 @@ BEGIN {
         my $v;
         my $is_dec;
 
-        # According to RFC4627, hex or oct digits are invalid.
-        if($ch eq '0'){
-            my $peek = substr($text,$at,1);
-            my $hex  = $peek =~ /[xX]/; # 0 or 1
-
-            if($hex){
-                decode_error("malformed number (leading zero must not be followed by another digit)");
-                ($n) = ( substr($text, $at+1) =~ /^([0-9a-fA-F]+)/);
-            }
-            else{ # oct
-                ($n) = ( substr($text, $at) =~ /^([0-7]+)/);
-                if (defined $n and length $n > 1) {
-                    decode_error("malformed number (leading zero must not be followed by another digit)");
-                }
-            }
-
-            if(defined $n and length($n)){
-                if (!$hex and length($n) == 1) {
-                   decode_error("malformed number (leading zero must not be followed by another digit)");
-                }
-                $at += length($n) + $hex;
-                next_chr;
-                return $hex ? hex($n) : oct($n);
-            }
-        }
-
         if($ch eq '-'){
             $n = '-';
             next_chr;
             if (!defined $ch or $ch !~ /\d/) {
                 decode_error("malformed number (no digits after initial minus)");
             }
+        }
+
+        # According to RFC4627, hex or oct digits are invalid.
+        if($ch eq '0'){
+            my $peek = substr($text,$at,1);
+            if($peek =~ /^[0-9a-dfA-DF]/){ # e may be valid (exponential)
+                decode_error("malformed number (leading zero must not be followed by another digit)");
+            }
+            $n .= $ch;
+            next_chr;
         }
 
         while(defined $ch and $ch =~ /\d/){
