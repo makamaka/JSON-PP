@@ -829,7 +829,7 @@ BEGIN {
 
     sub white {
         while( defined $ch  ){
-            if($ch le ' '){
+            if($ch eq '' or $ch =~ /\A[ \t\r\n]\z/){
                 next_chr();
             }
             elsif($relaxed and $ch eq '/'){
