@@ -832,7 +832,7 @@ BEGIN {
             if($ch le ' '){
                 next_chr();
             }
-            elsif($ch eq '/'){
+            elsif($relaxed and $ch eq '/'){
                 next_chr();
                 if(defined $ch and $ch eq '/'){
                     1 while(defined(next_chr()) and $ch ne "\n" and $ch ne "\r");
