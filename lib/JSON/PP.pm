@@ -674,6 +674,10 @@ BEGIN {
                     : ( $octets[2]                ) ? 'UTF-16LE'
                     : (!$octets[2]                ) ? 'UTF-32LE'
                     : 'unknown';
+        if ($len > 4 and $encoding ne 'UTF-8' and $encoding ne 'unknown') {
+            require Encode;
+            $len = Encode::from_to($text, $encoding, 'utf-8');
+        }
 
         white(); # remove head white space
 
