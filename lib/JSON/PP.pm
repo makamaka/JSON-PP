@@ -703,12 +703,12 @@ BEGIN {
 
         white(); # remove tail white space
 
+        return ( $result, $consumed ) if $want_offset; # all right if decode_prefix
         if ( $ch ) {
-            return ( $result, $consumed ) if $want_offset; # all right if decode_prefix
             decode_error("garbage after JSON object");
         }
 
-        ( $want_offset ) ? ( $result, $consumed ) : $result;
+        $result;
     }
 
 
