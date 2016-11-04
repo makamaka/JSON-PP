@@ -195,8 +195,14 @@ sub filter_json_object {
 }
 
 sub filter_json_single_key_object {
-    if (@_ > 1) {
+    if (@_ == 1 or @_ > 3) {
+        Carp::croak("Usage: JSON::PP::filter_json_single_key_object(self, key, callback = undef)");
+    }
+    if (defined $_[2] and ref $_[2] eq 'CODE') {
         $_[0]->{cb_sk_object}->{$_[1]} = $_[2];
+    } else {
+        delete $_[0]->{cb_sk_object}->{$_[1]};
+        delete $_[0]->{cb_sk_object} unless %{$_[0]->{cb_sk_object} || {}};
     }
     $_[0]->{F_HOOK} = ($_[0]->{cb_object} or $_[0]->{cb_sk_object}) ? 1 : 0;
     $_[0];
