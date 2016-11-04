@@ -1268,21 +1268,21 @@ BEGIN {
         *JSON::PP::JSON_PP_encode_latin1     = \&_encode_latin1;
         *JSON::PP::JSON_PP_decode_surrogates = \&_decode_surrogates;
         *JSON::PP::JSON_PP_decode_unicode    = \&_decode_unicode;
-    }
 
-    if (!OLD_PERL and $] < 5.008003) { # join() in 5.8.0 - 5.8.2 is broken.
-        package JSON::PP;
-        require subs;
-        subs->import('join');
-        eval q|
-            sub join {
-                return '' if (@_ < 2);
-                my $j   = shift;
-                my $str = shift;
-                for (@_) { $str .= $j . $_; }
-                return $str;
-            }
-        |;
+        if ($] < 5.008003) { # join() in 5.8.0 - 5.8.2 is broken.
+            package JSON::PP;
+            require subs;
+            subs->import('join');
+            eval q|
+                sub join {
+                    return '' if (@_ < 2);
+                    my $j   = shift;
+                    my $str = shift;
+                    for (@_) { $str .= $j . $_; }
+                    return $str;
+                }
+            |;
+        }
     }
 
 
