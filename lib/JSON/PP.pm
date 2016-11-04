@@ -635,7 +635,6 @@ BEGIN {
 
     # $opt flag
     # 0x00000001 .... decode_prefix
-    # 0x10000000 .... incr_parse
 
     sub PP_decode_json {
         my ($self, $opt); # $opt is an effective flag during this decode_json.
@@ -1455,7 +1454,7 @@ sub incr_parse {
                     }
                 }
 
-                my ($obj, $offset) = $coder->PP_decode_json( $self->{incr_text}, 0x10000001 );
+                my ($obj, $offset) = $coder->PP_decode_json( $self->{incr_text}, 0x00000001 );
                 push @ret, $obj;
                 use bytes;
                 $self->{incr_text} = substr( $self->{incr_text}, $offset || 0 );
