@@ -185,7 +185,11 @@ sub get_max_size { $_[0]->{max_size}; }
 
 
 sub filter_json_object {
-    $_[0]->{cb_object} = defined $_[1] ? $_[1] : 0;
+    if (defined $_[1] and ref $_[1] eq 'CODE') {
+        $_[0]->{cb_object} = $_[1];
+    } else {
+        delete $_[0]->{cb_object};
+    }
     $_[0]->{F_HOOK} = ($_[0]->{cb_object} or $_[0]->{cb_sk_object}) ? 1 : 0;
     $_[0];
 }
