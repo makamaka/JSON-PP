@@ -695,8 +695,6 @@ BEGIN {
 
         my $result = value();
 
-        return undef if ( !$result && ( $opt & 0x10000000 ) ); # for incr_parse
-
         decode_error("malformed JSON string, neither array, object, number, string or atom") unless $valid_start;
 
         if ( !$idx->[ P_ALLOW_NONREF ] and !ref $result ) {
