@@ -704,9 +704,8 @@ BEGIN {
         white(); # remove tail white space
 
         return ( $result, $consumed ) if $want_offset; # all right if decode_prefix
-        if ( $ch ) {
-            decode_error("garbage after JSON object");
-        }
+
+        decode_error("garbage after JSON object") if defined $ch;
 
         $result;
     }
