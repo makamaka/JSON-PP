@@ -633,13 +633,10 @@ BEGIN {
     my $loose;          # 
     my $allow_barekey;  # bareKey
 
-    # $opt flag
-    # 0x00000001 .... decode_prefix
-
     sub PP_decode_json {
-        my ($self, $opt); # $opt is an effective flag during this decode_json.
+        my ($self, $want_offset); # $opt is an effective flag during this decode_json.
 
-        ($self, $text, $opt) = @_;
+        ($self, $text, $want_offset) = @_;
 
         ($at, $ch, $depth) = (0, '', 0);
 
@@ -709,11 +706,11 @@ BEGIN {
         white(); # remove tail white space
 
         if ( $ch ) {
-            return ( $result, $consumed ) if ($opt & 0x00000001); # all right if decode_prefix
+            return ( $result, $consumed ) if $want_offset; # all right if decode_prefix
             decode_error("garbage after JSON object");
         }
 
-        ( $opt & 0x00000001 ) ? ( $result, $consumed ) : $result;
+        ( $want_offset ) ? ( $result, $consumed ) : $result;
     }
 
 
