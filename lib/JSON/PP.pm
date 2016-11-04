@@ -687,11 +687,9 @@ BEGIN {
 
         white(); # remove head white space
 
-        my $valid_start = defined $ch; # Is there a first character for JSON structure?
+        decode_error("malformed JSON string, neither array, object, number, string or atom") unless defined $ch; # Is there a first character for JSON structure?
 
         my $result = value();
-
-        decode_error("malformed JSON string, neither array, object, number, string or atom") unless $valid_start;
 
         if ( !$idx->[ P_ALLOW_NONREF ] and !ref $result ) {
                 decode_error(
