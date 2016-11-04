@@ -54,7 +54,7 @@ BEGIN {
 
     # Perl version check, Unicode handling is enabled?
     # Helper module sets @JSON::PP::_properties.
-    if ($] < 5.008 ) {
+    if ( OLD_PERL ) {
         my $helper = $] >= 5.006 ? 'JSON::PP::Compat5006' : 'JSON::PP::Compat5005';
         eval qq| require $helper |;
         if ($@) { Carp::croak $@; }
@@ -1163,11 +1163,14 @@ BEGIN {
         my $no_rep = shift;
         my $str    = defined $text ? substr($text, $at) : '';
         my $mess   = '';
-        my $type   = $] >= 5.008           ? 'U*'
-                   : $] <  5.006           ? 'C*'
-                   : utf8::is_utf8( $str ) ? 'U*' # 5.6
-                   : 'C*'
-                   ;
+        my $type   = 'U*';
+
+        if ( OLD_PERL ) {
+            my $type   =  $] <  5.006           ? 'C*'
+                        : utf8::is_utf8( $str ) ? 'U*' # 5.6
+                        : 'C*'
+                        ;
+        }
 
         for my $c ( unpack( $type, $str ) ) { # emulate pv_uni_display() ?
             $mess .=  $c == 0x07 ? '\a'
@@ -1260,14 +1263,14 @@ BEGIN {
        *utf8::is_utf8 = *Encode::is_utf8;
     }
 
-    if ( $] >= 5.008 ) {
+    if ( !OLD_PERL ) {
         *JSON::PP::JSON_PP_encode_ascii      = \&_encode_ascii;
         *JSON::PP::JSON_PP_encode_latin1     = \&_encode_latin1;
         *JSON::PP::JSON_PP_decode_surrogates = \&_decode_surrogates;
         *JSON::PP::JSON_PP_decode_unicode    = \&_decode_unicode;
     }
 
-    if ($] >= 5.008 and $] < 5.008003) { # join() in 5.8.0 - 5.8.2 is broken.
+    if (!OLD_PERL and $] < 5.008003) { # join() in 5.8.0 - 5.8.2 is broken.
         package JSON::PP;
         require subs;
         subs->import('join');
