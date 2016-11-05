@@ -40,6 +40,8 @@ use constant P_AS_NONBLESSED        => 17;
 
 use constant P_ALLOW_UNKNOWN        => 18;
 
+use constant P_DISALLOW_DUPKEYS     => 19;
+
 use constant OLD_PERL => $] < 5.008 ? 1 : 0;
 
 BEGIN {
@@ -50,6 +52,7 @@ BEGIN {
     my @pp_bit_properties = qw(
             allow_singlequote allow_bignum loose
             allow_barekey escape_slash as_nonblessed
+            disallow_dupkeys
     );
 
     # Perl version check, Unicode handling is enabled?
@@ -632,6 +635,7 @@ BEGIN {
     my $singlequote;    # loosely quoting
     my $loose;          # 
     my $allow_barekey;  # bareKey
+    my $disallow_dupkeys;
 
     sub PP_decode_json {
         my ($self, $want_offset); # $opt is an effective flag during this decode_json.
@@ -646,8 +650,8 @@ BEGIN {
 
         my $idx = $self->{PROPS};
 
-        ($utf8, $relaxed, $loose, $allow_bigint, $allow_barekey, $singlequote)
-            = @{$idx}[P_UTF8, P_RELAXED, P_LOOSE .. P_ALLOW_SINGLEQUOTE];
+        ($utf8, $relaxed, $loose, $allow_bigint, $allow_barekey, $singlequote, $disallow_dupkeys)
+            = @{$idx}[P_UTF8, P_RELAXED, P_LOOSE .. P_ALLOW_SINGLEQUOTE, P_DISALLOW_DUPKEYS];
 
         if ( $utf8 ) {
             utf8::downgrade( $text, 1 ) or Carp::croak("Wide character in subroutine entry");
@@ -953,6 +957,9 @@ BEGIN {
         else {
             while (defined $ch) {
                 $k = ($allow_barekey and $ch ne '"' and $ch ne "'") ? bareKey() : string();
+                if ($disallow_dupkeys and exists $o->{$k}) {
+                    decode_error('Duplicate keys not allowed');
+                }
                 white();
 
                 if(!defined $ch or $ch ne ':'){
@@ -2419,6 +2426,15 @@ As same as the C<relaxed> option, this option may be used to parse
 application-specific files written by humans.
 
     $json->allow_barekey->decode('{foo:"bar"}');
+
+
+=head2 disallow_dupkeys
+
+    $json = $json->disallow_dupkeys([$enable])
+
+If C<$enable> is true (or missing), then C<decode> will throw an error
+if a JSON object repeats a key.
+
 
 =head2 allow_bignum
 
