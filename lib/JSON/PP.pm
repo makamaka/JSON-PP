@@ -734,15 +734,20 @@ BEGIN {
 
     sub value {
         white();
-        return          if(!defined $ch);
-        return object() if($ch eq '{');
-        return array()  if($ch eq '[');
-        return string() if($ch eq '"' or ($singlequote and $ch eq "'"));
-        return number() if($ch =~ /[0-9]/ or $ch eq '-');
+        return           if(!defined $ch);
+        return object()  if($ch eq '{');
+        return array()   if($ch eq '[');
+        return string(1) if($ch eq '"' or ($singlequote and $ch eq "'"));
+        return number()  if($ch =~ /[0-9]/ or $ch eq '-');
         return word();
     }
 
+    sub quotedKey {
+        string(0);
+    }
+
     sub string {
+        my ($wrap) = @_;
         my ($i, $s, $t, $u);
         my $utf16;
         my $is_utf8;
@@ -765,7 +770,7 @@ BEGIN {
 
                     utf8::decode($s) if($is_utf8);
 
-                    return $s;
+                    return $wrap ? wrap_string($s) : $s;
                 }
                 elsif($ch eq '\\'){
                     next_chr();
@@ -844,6 +849,10 @@ BEGIN {
         }
 
         decode_error("unexpected end of string while parsing JSON string");
+    }
+
+    sub wrap_string {
+      return $_[0];
     }
 
 
@@ -967,7 +976,10 @@ BEGIN {
         }
         else {
             while (defined $ch) {
-                $k = ($allow_barekey and $ch ne '"' and $ch ne "'") ? bareKey() : string();
+                $k = ($allow_barekey and $ch ne '"' and $ch ne "'")
+                   ? bareKey()
+                   : quotedKey();
+
                 white();
 
                 if(!defined $ch or $ch ne ':'){
@@ -1128,6 +1140,11 @@ BEGIN {
 
         $v .= $n;
 
+        wrap_number($v);
+    }
+
+    sub wrap_number {
+        my ($v) = @_;
         if ($v !~ /[.eE]/ and length $v > $max_intsize) {
             if ($allow_bigint) { # from Adam Sussman
                 require Math::BigInt;
@@ -1144,7 +1161,6 @@ BEGIN {
 
         return $is_dec ? $v/1.0 : 0+$v;
     }
-
 
     sub is_valid_utf8 {
 
