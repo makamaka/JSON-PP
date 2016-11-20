@@ -44,6 +44,11 @@ use constant P_AS_NONBLESSED        => 17;
 use constant P_ALLOW_UNKNOWN        => 18;
 
 use constant OLD_PERL => $] < 5.008 ? 1 : 0;
+use constant USE_B => 0;
+
+if (USE_B) {
+    require B;
+}
 
 BEGIN {
     my @xs_compati_bit_properties = qw(
@@ -399,6 +404,25 @@ sub allow_bigint {
         return '[' . $pre . join( ",$pre", @res ) . $post . ']';
     }
 
+    sub _looks_like_number {
+        my $value = shift;
+        if (USE_B) {
+            my $b_obj = B::svref_2object(\$value);
+            my $flags = $b_obj->FLAGS;
+            return 1 if $flags & ( B::SVp_IOK | B::SVp_NOK ) and !( $flags & B::SVp_POK );
+            return;
+        } else {
+            no warnings 'numeric';
+            # detect numbers
+            # string & "" -> ""
+            # number & "" -> 0 (with warning)
+            # nan and inf can detect as numbers, so check with * 0
+            return unless length((my $dummy = "") & $value);
+            return unless 0 + $value eq $value;
+            return 1 if $value * 0 == 0;
+            return -1; # inf/nan
+        }
+    }
 
     sub value_to_json {
         my ($self, $value) = @_;
@@ -408,20 +432,8 @@ sub allow_bigint {
         my $type = ref($value);
 
         if (!$type) {
-            no warnings 'numeric';
-            # detect numbers
-            # string & "" -> ""
-            # number & "" -> 0 (with warning)
-            # nan and inf can detect as numbers, so check with * 0
-            if (length((my $dummy = "") & $value)
-                && 0 + $value eq $value
-            ) {
-                if ($value * 0 == 0) {
-                    return $value;
-                } else {
-                    # TODO: decide what to do with inf/nan
-                    return $value;
-                }
+            if (_looks_like_number($value)) {
+                return $value;
             }
             return string_to_json($self, $value);
         }
