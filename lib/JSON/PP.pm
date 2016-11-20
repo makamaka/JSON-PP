@@ -122,8 +122,6 @@ sub new {
     my $self  = {
         max_depth   => 512,
         max_size    => 0,
-        indent      => 0,
-        FLAGS       => 0,
         indent_length => 3,
     };
 
