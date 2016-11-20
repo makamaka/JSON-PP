@@ -374,7 +374,8 @@ sub allow_bigint {
         --$depth;
         $self->_down_indent() if ($indent);
 
-        return   '{' . ( @res ? $pre : '' ) . ( @res ? join( ",$pre", @res ) . $post : '' )  . '}';
+        return '{}' unless @res;
+        return '{' . $pre . join( ",$pre", @res ) . $post . '}';
     }
 
 
@@ -394,7 +395,8 @@ sub allow_bigint {
         --$depth;
         $self->_down_indent() if ($indent);
 
-        return '[' . ( @res ? $pre : '' ) . ( @res ? join( ",$pre", @res ) . $post : '' ) . ']';
+        return '[]' unless @res;
+        return '[' . $pre . join( ",$pre", @res ) . $post . ']';
     }
 
 
