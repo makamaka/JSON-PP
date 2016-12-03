@@ -648,6 +648,17 @@ BEGIN {
     my $loose;          # 
     my $allow_barekey;  # bareKey
 
+    sub _detect_utf_encoding {
+        my $text = shift;
+        my @octets = unpack('C4', $text);
+        return ( $octets[0] and  $octets[1]) ? 'UTF-8'
+             : (!$octets[0] and  $octets[1]) ? 'UTF-16BE'
+             : (!$octets[0] and !$octets[1]) ? 'UTF-32BE'
+             : ( $octets[2]                ) ? 'UTF-16LE'
+             : (!$octets[2]                ) ? 'UTF-32LE'
+             : 'unknown';
+    }
+
     sub PP_decode_json {
         my ($self, $want_offset);
 
@@ -686,15 +697,7 @@ BEGIN {
             ) if ($bytes > $max_size);
         }
 
-        # Currently no effect
-        # should use regexp
-        my @octets = unpack('C4', $text);
-        $encoding =   ( $octets[0] and  $octets[1]) ? 'UTF-8'
-                    : (!$octets[0] and  $octets[1]) ? 'UTF-16BE'
-                    : (!$octets[0] and !$octets[1]) ? 'UTF-32BE'
-                    : ( $octets[2]                ) ? 'UTF-16LE'
-                    : (!$octets[2]                ) ? 'UTF-32LE'
-                    : 'unknown';
+        $encoding = _detect_utf_encoding($text);
         if ($len > 4 and $encoding ne 'UTF-8' and $encoding ne 'unknown') {
             require Encode;
             $len = Encode::from_to($text, $encoding, 'utf-8');
