@@ -6,6 +6,29 @@ It was a perl core module in Perl 5.14.
 
 --------------------------------------------------------------------------
 
+2.91_01  2016-12-03
+	- changed the number detection logic, patched by haarg
+	  (experimental)
+	- merged PR from dagolden to correct 0 handling
+	- removed base.pm dependency (dolmen)
+	- fixed wrong character offset spotted by ilmari
+	- applied patches from Jarkko Hietaniemi to address VAX issues
+	- small doc fixes from bessarabov, gregoa, Chris Anderson
+	- applied a patch to remove . in @INC in json_pp (Tony Cook)
+	- removed $VAR1 from json_pp output, spotted by tokuhirom
+	- fixed an issue to ignore trailing 0
+	- added Scalar::Util dependency for Perl 5.8+
+	- fixed issues spotted by Nicolas Seriot's JSON Test Suite
+	  including experimental UTF-16/32 support and backward
+	  incompatible change of C style comment handling (now disabled
+	  by default)
+	- moved the guts of JSON::PP::Boolean into lib/JSON/PP/Boolean.pm
+	  and gave it a proper version
+	- refactored incremental parser to let it handle incomplete
+	  JSON text properly
+	- imported and tweaked tests from JSON.pm
+	- minor code clean up
+
 2.27400  2016-04-23
 	[JSON::PP] appleid and merged long term neglected patches & PRs.
 	           thanks to charsbar
