@@ -69,24 +69,24 @@ BEGIN {
     }
 
     for my $name (@xs_compati_bit_properties, @pp_bit_properties) {
-        my $flag_name = 'P_' . uc($name);
+        my $property_id = 'P_' . uc($name);
 
         eval qq/
             sub $name {
                 my \$enable = defined \$_[1] ? \$_[1] : 1;
 
                 if (\$enable) {
-                    \$_[0]->{PROPS}->[$flag_name] = 1;
+                    \$_[0]->{PROPS}->[$property_id] = 1;
                 }
                 else {
-                    \$_[0]->{PROPS}->[$flag_name] = 0;
+                    \$_[0]->{PROPS}->[$property_id] = 0;
                 }
 
                 \$_[0];
             }
 
             sub get_$name {
-                \$_[0]->{PROPS}->[$flag_name] ? 1 : '';
+                \$_[0]->{PROPS}->[$property_id] ? 1 : '';
             }
         /;
     }
