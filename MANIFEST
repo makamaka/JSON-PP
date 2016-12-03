@@ -1,10 +1,9 @@
+bin/json_pp
 Changes
 lib/JSON/PP.pm
 lib/JSON/PP/Boolean.pm
-bin/json_pp
 Makefile.PL
-MANIFEST
-META.yml			Module meta-data (added by MakeMaker)
+MANIFEST			This list of files
 README
 t/000_load.t
 t/001_utf8.t
@@ -40,5 +39,10 @@ t/113_overloaded_eq.t
 t/114_decode_prefix.t
 t/115_tie_ixhash.t
 t/116_incr_parse_fixed.t
-t/zero-mojibake.t
+t/117_numbers.t
 t/_unicode_handling.pm
+t/gh_28_json_test_suite.t
+t/gh_29_trailing_false_value.t
+t/rt_116998_wrong_character_offset.t
+t/rt_90071_incr_parse.t
+t/zero-mojibake.t
