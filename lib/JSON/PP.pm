@@ -275,11 +275,11 @@ sub allow_bigint {
         $indent_count = 0;
         $depth        = 0;
 
-        my $idx = $self->{PROPS};
+        my $props = $self->{PROPS};
 
         ($ascii, $latin1, $utf8, $indent, $canonical, $space_before, $space_after, $allow_blessed,
             $convert_blessed, $escape_slash, $bignum, $as_nonblessed)
-         = @{$idx}[P_ASCII .. P_SPACE_AFTER, P_ALLOW_BLESSED, P_CONVERT_BLESSED,
+         = @{$props}[P_ASCII .. P_SPACE_AFTER, P_ALLOW_BLESSED, P_CONVERT_BLESSED,
                     P_ESCAPE_SLASH, P_ALLOW_BIGNUM, P_AS_NONBLESSED];
 
         ($max_depth, $indent_length) = @{$self}{qw/max_depth indent_length/};
@@ -293,7 +293,7 @@ sub allow_bigint {
         }
 
         encode_error("hash- or arrayref expected (not a simple scalar, use allow_nonref to allow this)")
-             if(!ref $obj and !$idx->[ P_ALLOW_NONREF ]);
+             if(!ref $obj and !$props->[ P_ALLOW_NONREF ]);
 
         my $str  = $self->object_to_json($obj);
 
@@ -303,7 +303,7 @@ sub allow_bigint {
             utf8::upgrade($str);
         }
 
-        if ($idx->[ P_SHRINK ]) {
+        if ($props->[ P_SHRINK ]) {
             utf8::downgrade($str, 1);
         }
 
@@ -659,10 +659,10 @@ BEGIN {
             decode_error("malformed JSON string, neither array, object, number, string or atom");
         }
 
-        my $idx = $self->{PROPS};
+        my $props = $self->{PROPS};
 
         ($utf8, $relaxed, $loose, $allow_bigint, $allow_barekey, $singlequote)
-            = @{$idx}[P_UTF8, P_RELAXED, P_LOOSE .. P_ALLOW_SINGLEQUOTE];
+            = @{$props}[P_UTF8, P_RELAXED, P_LOOSE .. P_ALLOW_SINGLEQUOTE];
 
         if ( $utf8 ) {
             utf8::downgrade( $text, 1 ) or Carp::croak("Wide character in subroutine entry");
@@ -706,7 +706,7 @@ BEGIN {
 
         my $result = value();
 
-        if ( !$idx->[ P_ALLOW_NONREF ] and !ref $result ) {
+        if ( !$props->[ P_ALLOW_NONREF ] and !ref $result ) {
                 decode_error(
                 'JSON text must be an object or array (but found number, string, true, false or null,'
                        . ' use allow_nonref to allow this)', 1);
