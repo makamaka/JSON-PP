@@ -649,7 +649,7 @@ BEGIN {
     my $allow_barekey;  # bareKey
 
     sub PP_decode_json {
-        my ($self, $want_offset); # $opt is an effective flag during this decode_json.
+        my ($self, $want_offset);
 
         ($self, $text, $want_offset) = @_;
 
