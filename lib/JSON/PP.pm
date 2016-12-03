@@ -746,13 +746,12 @@ BEGIN {
     }
 
     sub string {
-        my ($i, $s, $t, $u);
         my $utf16;
         my $is_utf8;
 
         ($is_valid_utf8, $utf8_len) = ('', 0);
 
-        $s = ''; # basically UTF8 flag on
+        my $s = ''; # basically UTF8 flag on
 
         if($ch eq '"' or ($singlequote and $ch eq "'")){
             my $boundChar = $ch;
