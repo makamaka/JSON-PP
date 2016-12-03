@@ -643,7 +643,7 @@ BEGIN {
 
     my $F_HOOK;
 
-    my $allow_bigint;   # using Math::BigInt
+    my $allow_bignum;   # using Math::BigInt/BigFloat
     my $singlequote;    # loosely quoting
     my $loose;          # 
     my $allow_barekey;  # bareKey
@@ -672,7 +672,7 @@ BEGIN {
 
         my $props = $self->{PROPS};
 
-        ($utf8, $relaxed, $loose, $allow_bigint, $allow_barekey, $singlequote)
+        ($utf8, $relaxed, $loose, $allow_bignum, $allow_barekey, $singlequote)
             = @{$props}[P_UTF8, P_RELAXED, P_LOOSE .. P_ALLOW_SINGLEQUOTE];
 
         if ( $utf8 ) {
@@ -1132,7 +1132,7 @@ BEGIN {
         $v .= $n;
 
         if ($v !~ /[.eE]/ and length $v > $max_intsize) {
-            if ($allow_bigint) { # from Adam Sussman
+            if ($allow_bignum) { # from Adam Sussman
                 require Math::BigInt;
                 return Math::BigInt->new($v);
             }
@@ -1140,7 +1140,7 @@ BEGIN {
                 return "$v";
             }
         }
-        elsif ($allow_bigint) {
+        elsif ($allow_bignum) {
             require Math::BigFloat;
             return Math::BigFloat->new($v);
         }
