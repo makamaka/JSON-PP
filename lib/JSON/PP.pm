@@ -452,17 +452,17 @@ sub allow_bigint {
                        : encode_error("cannot encode reference to scalar");
             }
 
-             if ( $self->{PROPS}->[ P_ALLOW_UNKNOWN ] ) {
-                 return 'null';
-             }
-             else {
-                 if ( $type eq 'SCALAR' or $type eq 'REF' ) {
+            if ( $self->{PROPS}->[ P_ALLOW_UNKNOWN ] ) {
+                return 'null';
+            }
+            else {
+                if ( $type eq 'SCALAR' or $type eq 'REF' ) {
                     encode_error("cannot encode reference to scalar");
-                 }
-                 else {
+                }
+                else {
                     encode_error("encountered $value, but JSON can only represent references to arrays or hashes");
-                 }
-             }
+                }
+            }
 
         }
     }
