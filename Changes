@@ -6,6 +6,9 @@ It was a perl core module in Perl 5.14.
 
 --------------------------------------------------------------------------
 
+2.91_02  2016-12-04
+	- fixed not to fail tests under Perl 5.25.* (srezic++)
+
 2.91_01  2016-12-03
 	- changed the number detection logic, patched by haarg
 	  (experimental)
