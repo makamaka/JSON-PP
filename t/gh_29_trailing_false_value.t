@@ -7,5 +7,7 @@ BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
 use JSON::PP;
 
-eval { JSON::PP->new->decode('{}0') };
-ok $@;
+{ #SKIP_UNLESS_PP 2.90,1
+    eval { JSON::PP->new->decode('{}0') };
+    ok $@;
+}

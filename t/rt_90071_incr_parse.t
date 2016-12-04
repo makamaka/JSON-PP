@@ -1,8 +1,11 @@
 use strict;
 use Test::More;
-BEGIN { plan tests => 2 };
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 use JSON::PP;
+
+#SKIP_ALL_UNLESS_PP 2.90
+
+BEGIN { plan tests => 2 };
 
 my $json = JSON::PP->new;
 my $kb = 'a' x 1024;

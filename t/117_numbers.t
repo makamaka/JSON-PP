@@ -1,8 +1,12 @@
 use Test::More;
 use strict;
-BEGIN { plan tests => 3 }
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 use JSON::PP;
+
+#SKIP_ALL_UNLESS_PP 2.90
+#SKIP_ALL_IF_XS
+
+BEGIN { plan tests => 3 }
 
 # TODO ("inf"/"nan" representations are not portable)
 # is encode_json([9**9**9]), '["inf"]';
