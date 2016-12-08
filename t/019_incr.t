@@ -57,10 +57,10 @@ splitter +JSON::PP->new->allow_nonref, ' "5" ';
       my $j4 = $coder->incr_parse; ok ($coder->incr_text !~ s/^\s*,//, "cskip4");
       my $j5 = $coder->incr_parse; ok ($coder->incr_text !~ s/^\s*,//, "cskip5");
 
-      ok ('[5]' eq encode_json $j1, "cjson1");
-      ok ('{"":1}' eq encode_json $j2, "cjson2");
-      ok ('[1,2,3]' eq encode_json $j3, "cjson3");
-      ok ('{"3":null}' eq encode_json $j4, "cjson4");
+      ok ('[5]' eq encode_json($j1), "cjson1");
+      ok ('{"":1}' eq encode_json($j2), "cjson2");
+      ok ('[1,2,3]' eq encode_json($j3), "cjson3");
+      ok ('{"3":null}' eq encode_json($j4), "cjson4");
       ok (!defined $j5, "cjson5");
    }
 }
