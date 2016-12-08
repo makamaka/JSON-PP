@@ -46,8 +46,10 @@ use constant P_ALLOW_UNKNOWN        => 18;
 use constant OLD_PERL => $] < 5.008 ? 1 : 0;
 use constant USE_B => 0;
 
+BEGIN {
 if (USE_B) {
     require B;
+}
 }
 
 BEGIN {
