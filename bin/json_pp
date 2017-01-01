@@ -6,8 +6,6 @@ use Getopt::Long;
 
 use JSON::PP ();
 
-my $VERSION = '1.00';
-
 # imported from JSON-XS/bin/json_xs
 
 my %allow_json_opt = map { $_ => 1 } qw(
@@ -26,7 +24,7 @@ GetOptions(
 
 
 if ( $version ) {
-    print "$VERSION\n";
+    print "$JSON::PP::VERSION\n";
     exit;
 }
 
