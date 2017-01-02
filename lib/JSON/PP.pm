@@ -1678,7 +1678,7 @@ JSON::PP is a pure-Perl module and has compatibility to JSON::XS.
 
 This module knows how to handle Unicode (depending on Perl version).
 
-See to L<JSON::XS/A FEW NOTES ON UNICODE AND PERL> and L<UNICODE HANDLING ON PERLS>.
+See L<JSON::XS/A FEW NOTES ON UNICODE AND PERL> and L<UNICODE HANDLING ON PERLS>.
 
 
 =item * round-trip integrity
@@ -1823,7 +1823,7 @@ Or C<decode $encoding> all string values and C<encode_json>:
 
 This method is a proper way but probably not efficient.
 
-See to L<Encode>, L<perluniintro>.
+See L<Encode>, L<perluniintro>.
 
 
 =head1 METHODS
@@ -1854,10 +1854,10 @@ be chained:
 If $enable is true (or missing), then the encode method will not generate characters outside
 the code range 0..127. Any Unicode characters outside that range will be escaped using either
 a single \uXXXX or a double \uHHHH\uLLLLL escape sequence, as per RFC4627.
-(See to L<JSON::XS/OBJECT-ORIENTED INTERFACE>).
+(See L<JSON::XS/OBJECT-ORIENTED INTERFACE>).
 
 In Perl 5.005, there is no character having high value (more than 255).
-See to L<UNICODE HANDLING ON PERLS>.
+See L<UNICODE HANDLING ON PERLS>.
 
 If $enable is false, then the encode method will not escape Unicode characters unless
 required by the JSON syntax or other flags. This results in a faster and more compact format.
@@ -1880,7 +1880,7 @@ unless required by the JSON syntax or other flags.
   JSON::XS->new->latin1->encode (["\x{89}\x{abc}"]
   => ["\x{89}\\u0abc"]    # (perl syntax, U+abc escaped, U+89 not)
 
-See to L<UNICODE HANDLING ON PERLS>.
+See L<UNICODE HANDLING ON PERLS>.
 
 =head2 utf8
 
@@ -1894,7 +1894,7 @@ an UTF-8-encoded string. Please note that UTF-8-encoded strings do not contain a
 characters outside the range 0..255, they are thus useful for bytewise/binary I/O.
 
 (In Perl 5.005, any character outside the range 0..255 does not exist.
-See to L<UNICODE HANDLING ON PERLS>.)
+See L<UNICODE HANDLING ON PERLS>.)
 
 In future versions, enabling this option might enable autodetection of the UTF-16 and UTF-32
 encoding families, as described in RFC4627.
@@ -2043,7 +2043,7 @@ as key-value pairs have no inherent ordering in Perl.
 This setting has no effect when decoding JSON texts.
 
 If you want your own sorting routine, you can give a code reference
-or a subroutine name to C<sort_by>. See to C<JSON::PP OWN METHODS>.
+or a subroutine name to C<sort_by>. See C<JSON::PP OWN METHODS>.
 
 =head2 allow_nonref
 
@@ -2217,9 +2217,9 @@ It will also try to downgrade any strings to octet-form if possible.
 
 In JSON::PP, it is noop about resizing strings but tries
 C<utf8::downgrade> to the returned string by C<encode>.
-See to L<utf8>.
+See L<utf8>.
 
-See to L<JSON::XS/OBJECT-ORIENTED INTERFACE>
+See L<JSON::XS/OBJECT-ORIENTED INTERFACE>
 
 =head2 max_depth
 
@@ -2402,7 +2402,7 @@ This is useful if you want to repeatedly parse JSON objects and want to
 ignore any trailing data, which means you have to reset the parser after
 each successful decode.
 
-See to L<JSON::XS/INCREMENTAL PARSING> for examples.
+See L<JSON::XS/INCREMENTAL PARSING> for examples.
 
 
 =head1 JSON::PP OWN METHODS
@@ -2451,7 +2451,7 @@ objects into JSON numbers with C<allow_blessed> enabled.
    print $json->encode($bigfloat);
    # => 2.000000000000000000000000001
 
-See to L<JSON::XS/MAPPING> about the normal conversion of JSON number.
+See L<JSON::XS/MAPPING> about the normal conversion of JSON number.
 
 =head2 loose
 
@@ -2543,7 +2543,7 @@ Returns
 This section is copied from JSON::XS and modified to C<JSON::PP>.
 JSON::XS and JSON::PP mapping mechanisms are almost equivalent.
 
-See to L<JSON::XS/MAPPING>.
+See L<JSON::XS/MAPPING>.
 
 =head2 JSON -> PERL
 
@@ -2669,7 +2669,7 @@ how to deal with this: basically, you can choose between throwing an
 exception, encoding the reference as if it weren't blessed, or provide
 your own serialiser method.
 
-See to L<convert_blessed>.
+See L<convert_blessed>.
 
 =item simple scalars
 
