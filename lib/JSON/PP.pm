@@ -1636,10 +1636,8 @@ JSON::PP - JSON::XS compatible pure-Perl module.
 
  $json = JSON::PP->new->ascii->pretty->allow_nonref;
  
- $json_text   = $json->encode( $perl_scalar );
+ $pretty_printed_json_text = $json->encode( $perl_scalar );
  $perl_scalar = $json->decode( $json_text );
- 
- $pretty_printed = $json->pretty->encode( $perl_scalar ); # pretty-printing
  
  # Note that JSON version 2.0 and above will automatically use
  # JSON::XS or JSON::PP, so you should be able to just:
