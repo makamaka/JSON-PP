@@ -101,7 +101,7 @@ BEGIN {
 
 my $JSON; # cache
 
-sub encode_json ($) { # encode
+sub encode_json ($;$) { # encode
     ($JSON ||= __PACKAGE__->new->utf8)->encode(@_);
 }
 
@@ -137,7 +137,7 @@ sub new {
 
 
 sub encode {
-    return $_[0]->PP_encode_json($_[1]);
+    return $_[0]->PP_encode_json($_[1], $_[2]);
 }
 
 
@@ -273,6 +273,7 @@ sub allow_bigint {
     sub PP_encode_json {
         my $self = shift;
         my $obj  = shift;
+        my $spec = shift;
 
         $indent_count = 0;
         $depth        = 0;
@@ -297,7 +298,7 @@ sub allow_bigint {
         encode_error("hash- or arrayref expected (not a simple scalar, use allow_nonref to allow this)")
              if(!ref $obj and !$props->[ P_ALLOW_NONREF ]);
 
-        my $str  = $self->object_to_json($obj);
+        my $str  = $self->object_to_json($obj, $spec);
 
         $str .= "\n" if ( $indent ); # JSON::XS 2.26 compatible
 
@@ -314,68 +315,164 @@ sub allow_bigint {
 
 
     sub object_to_json {
-        my ($self, $obj) = @_;
+        my ($self, $obj, $spec) = @_;
         my $type = ref($obj);
 
+        my $spectype;
+
+        if (defined $spec) {
+            $spectype = ref($spec);
+            if ($spectype eq 'JSON::PP::Spec::HashOf') {
+                $spectype = 'HASH';
+            }
+            elsif ($spectype eq 'JSON::PP::Spec::ArrayOf') {
+                $spectype = 'ARRAY';
+            }
+            elsif ($spectype eq 'JSON::PP::Spec::AnyOf') {
+                my $maintype = $type;
+                $maintype = '' unless $maintype eq 'ARRAY' or $maintype eq 'HASH';
+                foreach (@$spec) {
+                    my $subtype = ref($_);
+                    if ($subtype eq 'JSON::PP::Spec::HashOf') {
+                        $subtype = 'HASH';
+                    }
+                    elsif ($subtype eq 'JSON::PP::Spec::ArrayOf') {
+                        $subtype = 'ARRAY';
+                    }
+                    elsif (!$subtype) {
+                        $subtype = $_;
+                    }
+                    $subtype = '' unless $subtype eq 'ARRAY' or $subtype eq 'HASH';
+                    if ($subtype eq $maintype) {
+                        $spec = $_;
+                        $spectype = $subtype;
+                        last;
+                    }
+                }
+                if ($spectype ne $maintype) {
+                    encode_error(sprintf(
+                        "object '%s' does not match any (%s) spec type",
+                        $obj, join(' or ', @$spec)
+                    ));
+                }
+            }
+            elsif ($spectype ne 'ARRAY' and $spectype ne 'HASH') {
+                $spectype = '';
+            }
+        }
+
+        if (defined $spectype and $spectype ne '' and $spectype ne $type) {
+            encode_error(sprintf(
+                "object '%s' does not match spec type '%s'",
+                $obj, $spectype
+            ));
+        }
+
         if($type eq 'HASH'){
-            return $self->hash_to_json($obj);
+            return $self->hash_to_json($obj, $spec);
         }
         elsif($type eq 'ARRAY'){
-            return $self->array_to_json($obj);
+            return $self->array_to_json($obj, $spec);
         }
-        elsif ($type) { # blessed object?
-            if (blessed($obj)) {
+        elsif ($type and blessed($obj)) { # blessed object?
+            return $self->value_to_json($obj, $spec) if ( $obj->isa('JSON::PP::Boolean') );
 
-                return $self->value_to_json($obj) if ( $obj->isa('JSON::PP::Boolean') );
-
-                if ( $convert_blessed and $obj->can('TO_JSON') ) {
-                    my $result = $obj->TO_JSON();
-                    if ( defined $result and ref( $result ) ) {
-                        if ( refaddr( $obj ) eq refaddr( $result ) ) {
-                            encode_error( sprintf(
-                                "%s::TO_JSON method returned same object as was passed instead of a new one",
-                                ref $obj
-                            ) );
-                        }
+            if ( $convert_blessed and $obj->can('TO_JSON') ) {
+                my $result = $obj->TO_JSON();
+                if ( defined $result and ref( $result ) ) {
+                    if ( refaddr( $obj ) eq refaddr( $result ) ) {
+                        encode_error( sprintf(
+                            "%s::TO_JSON method returned same object as was passed instead of a new one",
+                            ref $obj
+                        ) );
                     }
-
-                    return $self->object_to_json( $result );
                 }
 
-                return "$obj" if ( $bignum and _is_bignum($obj) );
-                return $self->blessed_to_json($obj) if ($allow_blessed and $as_nonblessed); # will be removed.
-
-                encode_error( sprintf("encountered object '%s', but neither allow_blessed "
-                    . "nor convert_blessed settings are enabled", $obj)
-                ) unless ($allow_blessed);
-
-                return 'null';
+                return $self->object_to_json($result, $spec);
             }
-            else {
-                return $self->value_to_json($obj);
-            }
+
+            return "$obj" if ( $bignum and _is_bignum($obj) );
+            return $self->blessed_to_json($obj, $spec) if ($allow_blessed and $as_nonblessed); # will be removed.
+
+            encode_error( sprintf("encountered object '%s', but neither allow_blessed "
+                . "nor convert_blessed settings are enabled", $obj)
+            ) unless ($allow_blessed);
+
+            return 'null';
         }
         else{
-            return $self->value_to_json($obj);
+            return $self->value_to_json($obj, $spec);
         }
     }
 
 
     sub hash_to_json {
-        my ($self, $obj) = @_;
+        my ($self, $obj, $spec) = @_;
         my @res;
 
         encode_error("json text or perl structure exceeds maximum nesting level (max_depth set too low?)")
                                          if (++$depth > $max_depth);
+
+        my $spectype = defined $spec ? ref($spec) : undef;
+
+        if (defined $spectype and $spectype eq 'JSON::PP::Spec::AnyOf') {
+            foreach (@$spec) {
+                next unless defined $_;
+                my $subspectype = ref($_);
+                next unless $subspectype ne 'JSON::PP::Spec::HashOf' and $subspectype ne 'HASH';
+                $spec = $_;
+                $spectype = $subspectype;
+                last;
+            }
+            if ($spectype eq 'JSON::PP::Spec::AnyOf') {
+                encode_error(sprintf(
+                    "object '%s' does not match any (%s) spec type",
+                    $obj, join(' or ', @$spec)
+                ));
+            }
+        }
+
+        if (defined $spectype) {
+            if ($spectype ne 'JSON::PP::Spec::HashOf' and $spectype ne 'HASH') {
+                encode_error(sprintf(
+                    "object '%s' does not match spec type '%s'",
+                    $obj, $spec
+                ));
+            }
+            if ($spectype eq 'HASH') {
+                if (%$spec != %$obj) {
+                    encode_error(sprintf(
+                        "number of keys in '%s' does not match number of keys in spec type '%s'",
+                        $obj, $spec
+                    ));
+                }
+                for my $k (keys %$obj) {
+                    if (!exists $spec->{$k}) {
+                        encode_error(sprintf(
+                            "item '%s' does not have defined spec type in HASH for key '%s'", $obj->{$k}, $k
+                        ));
+                    }
+                }
+            }
+        }
 
         my ($pre, $post) = $indent ? $self->_up_indent() : ('', '');
         my $del = ($space_before ? ' ' : '') . ':' . ($space_after ? ' ' : '');
 
         for my $k ( _sort( $obj ) ) {
             if ( OLD_PERL ) { utf8::decode($k) } # key for Perl 5.6 / be optimized
+            my $type;
+            if (defined $spectype) {
+                if ($spectype eq 'JSON::PP::Spec::HashOf') {
+                    $type = $$spec;
+                }
+                elsif ($spectype eq 'HASH') {
+                    $type = $spec->{$k};
+                }
+            }
             push @res, string_to_json( $self, $k )
                           .  $del
-                          . ( ref $obj->{$k} ? $self->object_to_json( $obj->{$k} ) : $self->value_to_json( $obj->{$k} ) );
+                          . ( ref $obj->{$k} ? $self->object_to_json( $obj->{$k}, $type ) : $self->value_to_json( $obj->{$k}, $type ) );
         }
 
         --$depth;
@@ -387,16 +484,60 @@ sub allow_bigint {
 
 
     sub array_to_json {
-        my ($self, $obj) = @_;
+        my ($self, $obj, $spec) = @_;
         my @res;
 
         encode_error("json text or perl structure exceeds maximum nesting level (max_depth set too low?)")
                                          if (++$depth > $max_depth);
 
+        my $spectype = defined $spec ? ref($spec) : undef;
+
+        if (defined $spectype and $spectype eq 'JSON::PP::Spec::AnyOf') {
+            foreach (@$spec) {
+                next unless defined $_;
+                my $subspectype = ref($_);
+                next unless $subspectype ne 'JSON::PP::Spec::ArrayOf' and $subspectype ne 'ARRAY';
+                $spec = $_;
+                $spectype = $subspectype;
+                last;
+            }
+            if ($spectype eq 'JSON::PP::Spec::AnyOf') {
+                encode_error(sprintf(
+                    "object '%s' does not match any (%s) spec type",
+                    $obj, join(' or ', @$spec)
+                ));
+            }
+        }
+
+        if (defined $spectype) {
+            if ($spectype ne 'JSON::PP::Spec::ArrayOf' and $spectype ne 'ARRAY') {
+                encode_error(sprintf(
+                    "object '%s' does not match spec type '%s'",
+                    $obj, $spec
+                ));
+            }
+            if ($spectype eq 'ARRAY' and $#$spec != $#$obj) {
+                encode_error(sprintf(
+                    "number of items in '%s' does not match number of items in spec type '%s'",
+                    $obj, $spec
+                ));
+            }
+        }
+
         my ($pre, $post) = $indent ? $self->_up_indent() : ('', '');
 
-        for my $v (@$obj){
-            push @res, ref($v) ? $self->object_to_json($v) : $self->value_to_json($v);
+        for my $i (0..$#$obj) {
+            my $v = $obj->[$i];
+            my $type;
+            if (defined $spectype) {
+                if ($spectype eq 'JSON::PP::Spec::ArrayOf') {
+                    $type = $$spec;
+                }
+                elsif ($spectype eq 'ARRAY') {
+                    $type = $spec->[$i];
+                }
+            }
+            push @res, ref($v) ? $self->object_to_json($v, $type) : $self->value_to_json($v, $type);
         }
 
         --$depth;
@@ -411,51 +552,110 @@ sub allow_bigint {
         if (USE_B) {
             my $b_obj = B::svref_2object(\$value);
             my $flags = $b_obj->FLAGS;
-            return 1 if $flags & ( B::SVp_IOK() | B::SVp_NOK() ) and !( $flags & B::SVp_POK() );
-            return;
+            return 2 if $flags & ( B::SVp_NOK() ) and !( $flags & B::SVp_POK() );
+            return 1 if $flags & ( B::SVp_IOK() ) and !( $flags & B::SVp_POK() );
+            return 0;
         } else {
             no warnings 'numeric';
             # detect numbers
             # string & "" -> ""
             # number & "" -> 0 (with warning)
             # nan and inf can detect as numbers, so check with * 0
-            return unless length((my $dummy = "") & $value);
-            return unless 0 + $value eq $value;
-            return 1 if $value * 0 == 0;
-            return -1; # inf/nan
+            return 0 unless length((my $dummy = "") & $value);
+            return 0 unless 0 + $value eq $value;
+            return -1 unless $value * 0 == 0; # inf/nan
+            return 2 if int($value) != $value; # float
+            return 2 if $value =~ m/[eE]/; # overflow float
+            return 1;
         }
     }
 
     sub value_to_json {
-        my ($self, $value) = @_;
-
-        return 'null' if(!defined $value);
+        my ($self, $value, $spec) = @_;
 
         my $type = ref($value);
 
-        if (!$type) {
-            if (_looks_like_number($value)) {
-                return $value;
+        my $allownull = 1;
+        my $spectype;
+
+        if (defined $spec) {
+            $allownull = 0;
+            $spectype = ref($spec);
+            if ($spectype eq 'JSON::PP::Spec::AnyOf') {
+                foreach (@$spec) {
+                    next if ref($_);
+                    if ($_ eq 'NULL') {
+                        $allownull = 1;
+                        next;
+                    }
+                    $spectype = $_;
+                }
+                if ($spectype eq 'JSON::PP::Spec::AnyOf') {
+                    encode_error(sprintf(
+                        "object '%s' does not match any (%s) spec type",
+                        $value, join(' or ', @$spec)
+                    ));
+                }
             }
-            return string_to_json($self, $value);
+            else {
+                $spectype = $spec;
+            }
+            if ($spectype eq 'NULL') {
+                $allownull = 1;
+                $value = undef;
+            }
+            $spectype = undef if $spectype eq 'SCALAR';
+        }
+
+        if (!defined $value) {
+            return 'null' if $allownull;
+            return 'false' if $spectype eq 'BOOL';
+            return '0' if $spectype eq 'INT';
+            return '0.0' if $spectype eq 'FLOAT';
+            return '""' if $spectype eq 'STRING';
+            encode_error("cannot encode undef to type '$spectype'");
+        }
+
+        if (!$type) {
+            my $is_number = _looks_like_number($value);
+            $spectype = ($is_number == 2) ? 'FLOAT' : ($is_number == 1) ? 'INT' : 'STRING' unless defined $spectype;
+            return $value ? 'true' : 'false' if $spectype eq 'BOOL';
+            if ($spectype eq 'INT') {
+                my $retval = int($value);
+                return 0 if $retval !~ m/^-?\d+$/;
+                return $retval;
+            }
+            elsif ($spectype eq 'FLOAT') {
+                my $retval = $value+0;
+                $retval .= '.0' if $retval =~ m/^-?\d+$/;
+                return 0 if $retval !~ m/^-?\d+(?:\.\d+)?([eE][\-\+]?\d+)?$/;
+                return $retval;
+            }
+            return string_to_json($self, $value) if $spectype eq 'STRING';
+            encode_error("cannot encode '$value' to type '$spectype'");
         }
         elsif( blessed($value) and  $value->isa('JSON::PP::Boolean') ){
-            return $$value == 1 ? 'true' : 'false';
+            $spectype = 'BOOL' unless defined $spectype;
+            return $$value ? 'true' : 'false' if $spectype eq 'BOOL';
+            return $$value ? '1' : '0' if $spectype eq 'INT';
+            return $$value ? '1.0' : '0.0' if $spectype eq 'FLOAT';
+            return $$value ? '"true"' : '"false"' if $spectype eq 'STRING';
+            encode_error("cannot encode '$value' to type '$spectype'");
         }
         else {
             if ((overload::StrVal($value) =~ /=(\w+)/)[0]) {
-                return $self->value_to_json("$value");
+                return $self->value_to_json("$value", $spec);
             }
 
             if ($type eq 'SCALAR' and defined $$value) {
-                return   $$value eq '1' ? 'true'
-                       : $$value eq '0' ? 'false'
-                       : $self->{PROPS}->[ P_ALLOW_UNKNOWN ] ? 'null'
-                       : encode_error("cannot encode reference to scalar");
+                my $boolval = $$value;
+                return $self->value_to_json(bless(\(my $dummy = $boolval), 'JSON::PP::Boolean'), $spec) if $boolval eq '1' or $boolval eq '0';
+                return $self->value_to_json(undef, $spec) if $self->{PROPS}->[ P_ALLOW_UNKNOWN ];
+                encode_error("cannot encode reference to scalar");
             }
 
             if ( $self->{PROPS}->[ P_ALLOW_UNKNOWN ] ) {
-                return 'null';
+                return $self->value_to_json(undef, $spec);
             }
             else {
                 if ( $type eq 'SCALAR' or $type eq 'REF' ) {
@@ -508,10 +708,10 @@ sub allow_bigint {
     sub blessed_to_json {
         my $reftype = reftype($_[1]) || '';
         if ($reftype eq 'HASH') {
-            return $_[0]->hash_to_json($_[1]);
+            return $_[0]->hash_to_json($_[1], $_[2]);
         }
         elsif ($reftype eq 'ARRAY') {
-            return $_[0]->array_to_json($_[1]);
+            return $_[0]->array_to_json($_[1], $_[2]);
         }
         else {
             return 'null';
