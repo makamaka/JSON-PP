@@ -1649,24 +1649,26 @@ JSON::PP - JSON::XS compatible pure-Perl module.
 
     2.91_01
 
-L<JSON::XS> 2.27 (~2.30) compatible.
-
-=head1 NOTE
-
-JSON::PP had been included in JSON distribution (CPAN module).
-It was a perl core module in Perl 5.14.
-
 =head1 DESCRIPTION
 
-This module is L<JSON::XS> compatible pure Perl module.
-(Perl 5.8 or later is recommended)
+JSON::PP is a pure perl JSON decoder/encoder (as of RFC4627, which
+we know is obsolete but we still stick to; see below for an option
+to support part of RFC7159), and (almost) compatible to much
+faster L<JSON::XS> written by Marc Lehmann in C. JSON::PP works as
+a fallback module when you use L<JSON> module without having
+installed JSON::XS.
 
-JSON::XS is the fastest and most proper JSON module on CPAN.
-It is written by Marc Lehmann in C, so must be compiled and
-installed in the used environment.
+Because of this fallback feature of JSON.pm, JSON::PP tries not to
+be more JavaScript-friendly than JSON::XS (i.e. not to escape extra
+characters such as U+2028 and U+2029 nor support RFC7159/ECMA-404),
+in order for you not to lose such JavaScript-friendliness silently
+when you use JSON.pm and install JSON::XS for speed or by accident.
+If you need JavaScript-friendly RFC7159-compliant pure perl module,
+try L<JSON::Tiny>, which is derived from L<Mojolicious> web
+framework and is also smaller and faster than JSON::PP.
 
-JSON::PP is a pure-Perl module and has compatibility to JSON::XS.
-
+JSON::PP has been in the Perl core since Perl 5.14, mainly for
+CPAN toolchain modules to parse META.json.
 
 =head2 FEATURES
 
