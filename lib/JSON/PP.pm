@@ -2414,38 +2414,6 @@ subroutine name and the special variables C<$a>, C<$b> will begin
 
 If $integer is set, then the effect is same as C<canonical> on.
 
-=head1 INTERNAL
-
-For developers.
-
-=over
-
-=item PP_encode_box
-
-Returns
-
-        {
-            depth        => $depth,
-            indent_count => $indent_count,
-        }
-
-
-=item PP_decode_box
-
-Returns
-
-        {
-            text    => $text,
-            at      => $at,
-            ch      => $ch,
-            len     => $len,
-            depth   => $depth,
-            encoding      => $encoding,
-            is_valid_utf8 => $is_valid_utf8,
-        };
-
-=back
-
 =head1 MAPPING
 
 This section is copied from JSON::XS and modified to C<JSON::PP>.
