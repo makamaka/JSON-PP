@@ -2290,13 +2290,6 @@ JSON object or b) parsing multiple JSON objects separated by non-JSON text
 
     $json->incr_text =~ s/\s*,\s*//;
 
-In Perl 5.005, C<lvalue> attribute is not available.
-You must write codes like the below:
-
-    $string = $json->incr_text;
-    $string =~ s/\s*,\s*//;
-    $json->incr_text( $string );
-
 =head2 incr_skip
 
     $json->incr_skip
