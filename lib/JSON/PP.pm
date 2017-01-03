@@ -1672,17 +1672,21 @@ CPAN toolchain modules to parse META.json.
 
 =head1 FUNCTIONAL INTERFACE
 
-Some documents are copied and modified from L<JSON::XS/FUNCTIONAL INTERFACE>.
+This section is taken from JSON::XS almost verbatim. C<encode_json>
+and C<decode_json> are exported by default.
 
 =head2 encode_json
 
     $json_text = encode_json $perl_scalar
 
-Converts the given Perl data structure to a UTF-8 encoded, binary string.
+Converts the given Perl data structure to a UTF-8 encoded, binary string
+(that is, the string contains octets only). Croaks on error.
 
 This function call is functionally identical to:
 
     $json_text = JSON::PP->new->utf8->encode($perl_scalar)
+
+Except being faster.
 
 =head2 decode_json
 
@@ -1690,11 +1694,13 @@ This function call is functionally identical to:
 
 The opposite of C<encode_json>: expects an UTF-8 (binary) string and tries
 to parse that as an UTF-8 encoded JSON text, returning the resulting
-reference.
+reference. Croaks on error.
 
 This function call is functionally identical to:
 
     $perl_scalar = JSON::PP->new->utf8->decode($json_text)
+
+Except being faster.
 
 =head2 JSON::PP::is_bool
 
