@@ -2213,6 +2213,107 @@ and you need to know where the JSON text ends.
    JSON::PP->new->decode_prefix ("[1] the tail")
    => ([1], 3)
 
+=head1 JSON::PP OWN METHODS
+
+=head2 allow_singlequote
+
+    $json = $json->allow_singlequote([$enable])
+
+If C<$enable> is true (or missing), then C<decode> will accept
+JSON strings quoted by single quotations that are invalid JSON
+format.
+
+    $json->allow_singlequote->decode({"foo":'bar'});
+    $json->allow_singlequote->decode({'foo':"bar"});
+    $json->allow_singlequote->decode({'foo':'bar'});
+
+As same as the C<relaxed> option, this option may be used to parse
+application-specific files written by humans.
+
+
+=head2 allow_barekey
+
+    $json = $json->allow_barekey([$enable])
+
+If C<$enable> is true (or missing), then C<decode> will accept
+bare keys of JSON object that are invalid JSON format.
+
+As same as the C<relaxed> option, this option may be used to parse
+application-specific files written by humans.
+
+    $json->allow_barekey->decode('{foo:"bar"}');
+
+=head2 allow_bignum
+
+    $json = $json->allow_bignum([$enable])
+
+If C<$enable> is true (or missing), then C<decode> will convert
+the big integer Perl cannot handle as integer into a L<Math::BigInt>
+object and convert a floating number (any) into a L<Math::BigFloat>.
+
+On the contrary, C<encode> converts C<Math::BigInt> objects and C<Math::BigFloat>
+objects into JSON numbers with C<allow_blessed> enabled.
+
+   $json->allow_nonref->allow_blessed->allow_bignum;
+   $bigfloat = $json->decode('2.000000000000000000000000001');
+   print $json->encode($bigfloat);
+   # => 2.000000000000000000000000001
+
+See L<JSON::XS/MAPPING> about the normal conversion of JSON number.
+
+=head2 loose
+
+    $json = $json->loose([$enable])
+
+The unescaped [\x00-\x1f\x22\x2f\x5c] strings are invalid in JSON strings
+and the module doesn't allow you to C<decode> to these (except for \x2f).
+If C<$enable> is true (or missing), then C<decode>  will accept these
+unescaped strings.
+
+    $json->loose->decode(qq|["abc
+                                   def"]|);
+
+See L<JSON::XS/SECURITY CONSIDERATIONS>.
+
+=head2 escape_slash
+
+    $json = $json->escape_slash([$enable])
+
+According to JSON Grammar, I<slash> (U+002F) is escaped. But default
+JSON::PP (as same as JSON::XS) encodes strings without escaping slash.
+
+If C<$enable> is true (or missing), then C<encode> will escape slashes.
+
+=head2 indent_length
+
+    $json = $json->indent_length($length)
+
+JSON::XS indent space length is 3 and cannot be changed.
+JSON::PP set the indent space length with the given $length.
+The default is 3. The acceptable range is 0 to 15.
+
+=head2 sort_by
+
+    $json = $json->sort_by($function_name)
+    $json = $json->sort_by($subroutine_ref)
+
+If $function_name or $subroutine_ref are set, its sort routine are used
+in encoding JSON objects.
+
+   $js = $pc->sort_by(sub { $JSON::PP::a cmp $JSON::PP::b })->encode($obj);
+   # is($js, q|{"a":1,"b":2,"c":3,"d":4,"e":5,"f":6,"g":7,"h":8,"i":9}|);
+
+   $js = $pc->sort_by('own_sort')->encode($obj);
+   # is($js, q|{"a":1,"b":2,"c":3,"d":4,"e":5,"f":6,"g":7,"h":8,"i":9}|);
+
+   sub JSON::PP::own_sort { $JSON::PP::a cmp $JSON::PP::b }
+
+As the sorting routine runs in the JSON::PP scope, the given
+subroutine name and the special variables C<$a>, C<$b> will begin
+'JSON::PP::'.
+
+If $integer is set, then the effect is same as C<canonical> on.
+
 =head1 INCREMENTAL PARSING
 
 This section is also taken from JSON::XS.
@@ -2319,107 +2420,6 @@ it will be as if the parser had never parsed anything.
 This is useful if you want to repeatedly parse JSON objects and want to
 ignore any trailing data, which means you have to reset the parser after
 each successful decode.
-
-=head1 JSON::PP OWN METHODS
-
-=head2 allow_singlequote
-
-    $json = $json->allow_singlequote([$enable])
-
-If C<$enable> is true (or missing), then C<decode> will accept
-JSON strings quoted by single quotations that are invalid JSON
-format.
-
-    $json->allow_singlequote->decode({"foo":'bar'});
-    $json->allow_singlequote->decode({'foo':"bar"});
-    $json->allow_singlequote->decode({'foo':'bar'});
-
-As same as the C<relaxed> option, this option may be used to parse
-application-specific files written by humans.
-
-
-=head2 allow_barekey
-
-    $json = $json->allow_barekey([$enable])
-
-If C<$enable> is true (or missing), then C<decode> will accept
-bare keys of JSON object that are invalid JSON format.
-
-As same as the C<relaxed> option, this option may be used to parse
-application-specific files written by humans.
-
-    $json->allow_barekey->decode('{foo:"bar"}');
-
-=head2 allow_bignum
-
-    $json = $json->allow_bignum([$enable])
-
-If C<$enable> is true (or missing), then C<decode> will convert
-the big integer Perl cannot handle as integer into a L<Math::BigInt>
-object and convert a floating number (any) into a L<Math::BigFloat>.
-
-On the contrary, C<encode> converts C<Math::BigInt> objects and C<Math::BigFloat>
-objects into JSON numbers with C<allow_blessed> enabled.
-
-   $json->allow_nonref->allow_blessed->allow_bignum;
-   $bigfloat = $json->decode('2.000000000000000000000000001');
-   print $json->encode($bigfloat);
-   # => 2.000000000000000000000000001
-
-See L<JSON::XS/MAPPING> about the normal conversion of JSON number.
-
-=head2 loose
-
-    $json = $json->loose([$enable])
-
-The unescaped [\x00-\x1f\x22\x2f\x5c] strings are invalid in JSON strings
-and the module doesn't allow you to C<decode> to these (except for \x2f).
-If C<$enable> is true (or missing), then C<decode>  will accept these
-unescaped strings.
-
-    $json->loose->decode(qq|["abc
-                                   def"]|);
-
-See L<JSON::XS/SECURITY CONSIDERATIONS>.
-
-=head2 escape_slash
-
-    $json = $json->escape_slash([$enable])
-
-According to JSON Grammar, I<slash> (U+002F) is escaped. But default
-JSON::PP (as same as JSON::XS) encodes strings without escaping slash.
-
-If C<$enable> is true (or missing), then C<encode> will escape slashes.
-
-=head2 indent_length
-
-    $json = $json->indent_length($length)
-
-JSON::XS indent space length is 3 and cannot be changed.
-JSON::PP set the indent space length with the given $length.
-The default is 3. The acceptable range is 0 to 15.
-
-=head2 sort_by
-
-    $json = $json->sort_by($function_name)
-    $json = $json->sort_by($subroutine_ref)
-
-If $function_name or $subroutine_ref are set, its sort routine are used
-in encoding JSON objects.
-
-   $js = $pc->sort_by(sub { $JSON::PP::a cmp $JSON::PP::b })->encode($obj);
-   # is($js, q|{"a":1,"b":2,"c":3,"d":4,"e":5,"f":6,"g":7,"h":8,"i":9}|);
-
-   $js = $pc->sort_by('own_sort')->encode($obj);
-   # is($js, q|{"a":1,"b":2,"c":3,"d":4,"e":5,"f":6,"g":7,"h":8,"i":9}|);
-
-   sub JSON::PP::own_sort { $JSON::PP::a cmp $JSON::PP::b }
-
-As the sorting routine runs in the JSON::PP scope, the given
-subroutine name and the special variables C<$a>, C<$b> will begin
-'JSON::PP::'.
-
-If $integer is set, then the effect is same as C<canonical> on.
 
 =head1 MAPPING
 
