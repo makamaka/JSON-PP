@@ -1678,7 +1678,7 @@ CPAN toolchain modules to parse META.json.
 
 This module knows how to handle Unicode (depending on Perl version).
 
-See L<JSON::XS/A FEW NOTES ON UNICODE AND PERL> and L<UNICODE HANDLING ON PERLS>.
+See L<JSON::XS/A FEW NOTES ON UNICODE AND PERL>.
 
 
 =item * round-trip integrity
@@ -1779,9 +1779,6 @@ the code range 0..127. Any Unicode characters outside that range will be escaped
 a single \uXXXX or a double \uHHHH\uLLLLL escape sequence, as per RFC4627.
 (See L<JSON::XS/OBJECT-ORIENTED INTERFACE>).
 
-In Perl 5.005, there is no character having high value (more than 255).
-See L<UNICODE HANDLING ON PERLS>.
-
 If $enable is false, then the encode method will not escape Unicode characters unless
 required by the JSON syntax or other flags. This results in a faster and more compact format.
 
@@ -1803,8 +1800,6 @@ unless required by the JSON syntax or other flags.
   JSON::XS->new->latin1->encode (["\x{89}\x{abc}"]
   => ["\x{89}\\u0abc"]    # (perl syntax, U+abc escaped, U+89 not)
 
-See L<UNICODE HANDLING ON PERLS>.
-
 =head2 utf8
 
     $json = $json->utf8([$enable])
@@ -1815,9 +1810,6 @@ If $enable is true (or missing), then the encode method will encode the JSON res
 into UTF-8, as required by many protocols, while the decode method expects to be handled
 an UTF-8-encoded string. Please note that UTF-8-encoded strings do not contain any
 characters outside the range 0..255, they are thus useful for bytewise/binary I/O.
-
-(In Perl 5.005, any character outside the range 0..255 does not exist.
-See L<UNICODE HANDLING ON PERLS>.)
 
 In future versions, enabling this option might enable autodetection of the UTF-16 and UTF-32
 encoding families, as described in RFC4627.
@@ -2643,68 +2635,6 @@ objects into JSON numbers.
 
 
 =back
-
-=head1 UNICODE HANDLING ON PERLS
-
-If you do not know about Unicode on Perl well,
-please check L<JSON::XS/A FEW NOTES ON UNICODE AND PERL>.
-
-=head2 Perl 5.8 and later
-
-Perl can handle Unicode and the JSON::PP de/encode methods also work properly.
-
-    $json->allow_nonref->encode(chr hex 3042);
-    $json->allow_nonref->encode(chr hex 12345);
-
-Returns C<"\u3042"> and C<"\ud808\udf45"> respectively.
-
-    $json->allow_nonref->decode('"\u3042"');
-    $json->allow_nonref->decode('"\ud808\udf45"');
-
-Returns UTF-8 encoded strings with UTF8 flag, regarded as C<U+3042> and C<U+12345>.
-
-Note that the versions from Perl 5.8.0 to 5.8.2, Perl built-in C<join> was broken,
-so JSON::PP wraps the C<join> with a subroutine. Thus JSON::PP works slow in the versions.
-
-
-=head2 Perl 5.6
-
-Perl can handle Unicode and the JSON::PP de/encode methods also work.
-
-=head2 Perl 5.005
-
-Perl 5.005 is a byte semantics world -- all strings are sequences of bytes.
-That means the unicode handling is not available.
-
-In encoding,
-
-    $json->allow_nonref->encode(chr hex 3042);  # hex 3042 is 12354.
-    $json->allow_nonref->encode(chr hex 12345); # hex 12345 is 74565.
-
-Returns C<B> and C<E>, as C<chr> takes a value more than 255, it treats
-as C<$value % 256>, so the above codes are equivalent to :
-
-    $json->allow_nonref->encode(chr 66);
-    $json->allow_nonref->encode(chr 69);
-
-In decoding,
-
-    $json->decode('"\u00e3\u0081\u0082"');
-
-The returned is a byte sequence C<0xE3 0x81 0x82> for UTF-8 encoded
-Japanese character (C<HIRAGANA LETTER A>).
-And if it is represented in Unicode code point, C<U+3042>.
-
-Next, 
-
-    $json->decode('"\u3042"');
-
-We ordinary expect the returned value is a Unicode character C<U+3042>.
-But here is 5.005 world. This is C<0xE3 0x81 0x82>.
-
-    $json->decode('"\ud808\udf45"');
-
-This is not a character C<U+12345> but bytes - C<0xf0 0x92 0x8d 0x85>.
 
 =head1 HOW DO I DECODE A DATA FROM OUTER AND ENCODE TO OUTER
 
