@@ -2712,6 +2712,8 @@ Most of the document are copied and modified from JSON::XS doc.
 
 L<JSON::XS>, L<JSON>, L<JSON::Tiny>
 
+L<JSON::PP::Compat5005> and L<JSON::PP::Compat5006> for older perl users.
+
 RFC4627 (L<http://www.ietf.org/rfc/rfc4627.txt>)
 
 =head1 AUTHOR
