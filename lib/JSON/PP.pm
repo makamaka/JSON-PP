@@ -1749,83 +1749,6 @@ Returns C<undef>.
 See L<MAPPING>, below, for more information on how JSON values are mapped to
 Perl.
 
-
-=head1 HOW DO I DECODE A DATA FROM OUTER AND ENCODE TO OUTER
-
-This section supposes that your perl version is 5.8 or later.
-
-If you know a JSON text from an outer world - a network, a file content, and so on,
-is encoded in UTF-8, you should use C<decode_json> or C<JSON> module object
-with C<utf8> enabled. And the decoded result will contain UNICODE characters.
-
-  # from network
-  my $json        = JSON::PP->new->utf8;
-  my $json_text   = CGI->new->param( 'json_data' );
-  my $perl_scalar = $json->decode( $json_text );
-  
-  # from file content
-  local $/;
-  open( my $fh, '<', 'json.data' );
-  $json_text   = <$fh>;
-  $perl_scalar = decode_json( $json_text );
-
-If an outer data is not encoded in UTF-8, firstly you should C<decode> it.
-
-  use Encode;
-  local $/;
-  open( my $fh, '<', 'json.data' );
-  my $encoding = 'cp932';
-  my $unicode_json_text = decode( $encoding, <$fh> ); # UNICODE
-  
-  # or you can write the below code.
-  #
-  # open( my $fh, "<:encoding($encoding)", 'json.data' );
-  # $unicode_json_text = <$fh>;
-
-In this case, C<$unicode_json_text> is of course UNICODE string.
-So you B<cannot> use C<decode_json> nor C<JSON> module object with C<utf8> enabled.
-Instead of them, you use C<JSON> module object with C<utf8> disable.
-
-  $perl_scalar = $json->utf8(0)->decode( $unicode_json_text );
-
-Or C<encode 'utf8'> and C<decode_json>:
-
-  $perl_scalar = decode_json( encode( 'utf8', $unicode_json_text ) );
-  # this way is not efficient.
-
-And now, you want to convert your C<$perl_scalar> into JSON data and
-send it to an outer world - a network or a file content, and so on.
-
-Your data usually contains UNICODE strings and you want the converted data to be encoded
-in UTF-8, you should use C<encode_json> or C<JSON> module object with C<utf8> enabled.
-
-  print encode_json( $perl_scalar ); # to a network? file? or display?
-  # or
-  print $json->utf8->encode( $perl_scalar );
-
-If C<$perl_scalar> does not contain UNICODE but C<$encoding>-encoded strings
-for some reason, then its characters are regarded as B<latin1> for perl
-(because it does not concern with your $encoding).
-You B<cannot> use C<encode_json> nor C<JSON> module object with C<utf8> enabled.
-Instead of them, you use C<JSON> module object with C<utf8> disable.
-Note that the resulted text is a UNICODE string but no problem to print it.
-
-  # $perl_scalar contains $encoding encoded string values
-  $unicode_json_text = $json->utf8(0)->encode( $perl_scalar );
-  # $unicode_json_text consists of characters less than 0x100
-  print $unicode_json_text;
-
-Or C<decode $encoding> all string values and C<encode_json>:
-
-  $perl_scalar->{ foo } = decode( $encoding, $perl_scalar->{ foo } );
-  # ... do it to each string values, then encode_json
-  $json_text = encode_json( $perl_scalar );
-
-This method is a proper way but probably not efficient.
-
-See L<Encode>, L<perluniintro>.
-
-
 =head1 METHODS
 
 Basically, check to L<JSON> or L<JSON::XS>.
@@ -2783,17 +2706,80 @@ But here is 5.005 world. This is C<0xE3 0x81 0x82>.
 
 This is not a character C<U+12345> but bytes - C<0xf0 0x92 0x8d 0x85>.
 
+=head1 HOW DO I DECODE A DATA FROM OUTER AND ENCODE TO OUTER
 
-=head1 TODO
+This section supposes that your perl version is 5.8 or later.
 
-=over
+If you know a JSON text from an outer world - a network, a file content, and so on,
+is encoded in UTF-8, you should use C<decode_json> or C<JSON> module object
+with C<utf8> enabled. And the decoded result will contain UNICODE characters.
 
-=item speed
+  # from network
+  my $json        = JSON::PP->new->utf8;
+  my $json_text   = CGI->new->param( 'json_data' );
+  my $perl_scalar = $json->decode( $json_text );
+  
+  # from file content
+  local $/;
+  open( my $fh, '<', 'json.data' );
+  $json_text   = <$fh>;
+  $perl_scalar = decode_json( $json_text );
 
-=item memory saving
+If an outer data is not encoded in UTF-8, firstly you should C<decode> it.
 
-=back
+  use Encode;
+  local $/;
+  open( my $fh, '<', 'json.data' );
+  my $encoding = 'cp932';
+  my $unicode_json_text = decode( $encoding, <$fh> ); # UNICODE
+  
+  # or you can write the below code.
+  #
+  # open( my $fh, "<:encoding($encoding)", 'json.data' );
+  # $unicode_json_text = <$fh>;
 
+In this case, C<$unicode_json_text> is of course UNICODE string.
+So you B<cannot> use C<decode_json> nor C<JSON> module object with C<utf8> enabled.
+Instead of them, you use C<JSON> module object with C<utf8> disable.
+
+  $perl_scalar = $json->utf8(0)->decode( $unicode_json_text );
+
+Or C<encode 'utf8'> and C<decode_json>:
+
+  $perl_scalar = decode_json( encode( 'utf8', $unicode_json_text ) );
+  # this way is not efficient.
+
+And now, you want to convert your C<$perl_scalar> into JSON data and
+send it to an outer world - a network or a file content, and so on.
+
+Your data usually contains UNICODE strings and you want the converted data to be encoded
+in UTF-8, you should use C<encode_json> or C<JSON> module object with C<utf8> enabled.
+
+  print encode_json( $perl_scalar ); # to a network? file? or display?
+  # or
+  print $json->utf8->encode( $perl_scalar );
+
+If C<$perl_scalar> does not contain UNICODE but C<$encoding>-encoded strings
+for some reason, then its characters are regarded as B<latin1> for perl
+(because it does not concern with your $encoding).
+You B<cannot> use C<encode_json> nor C<JSON> module object with C<utf8> enabled.
+Instead of them, you use C<JSON> module object with C<utf8> disable.
+Note that the resulted text is a UNICODE string but no problem to print it.
+
+  # $perl_scalar contains $encoding encoded string values
+  $unicode_json_text = $json->utf8(0)->encode( $perl_scalar );
+  # $unicode_json_text consists of characters less than 0x100
+  print $unicode_json_text;
+
+Or C<decode $encoding> all string values and C<encode_json>:
+
+  $perl_scalar->{ foo } = decode( $encoding, $perl_scalar->{ foo } );
+  # ... do it to each string values, then encode_json
+  $json_text = encode_json( $perl_scalar );
+
+This method is a proper way but probably not efficient.
+
+See L<Encode>, L<perluniintro>.
 
 =head1 SEE ALSO
 
