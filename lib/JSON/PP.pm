@@ -2787,7 +2787,7 @@ The F<json_pp> command line utility for quick experiments.
 
 Most of the document are copied and modified from JSON::XS doc.
 
-L<JSON::XS>
+L<JSON::XS>, L<JSON>, L<JSON::Tiny>
 
 RFC4627 (L<http://www.ietf.org/rfc/rfc4627.txt>)
 
