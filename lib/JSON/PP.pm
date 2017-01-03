@@ -1670,34 +1670,6 @@ framework and is also smaller and faster than JSON::PP.
 JSON::PP has been in the Perl core since Perl 5.14, mainly for
 CPAN toolchain modules to parse META.json.
 
-=head2 FEATURES
-
-=over
-
-=item * correct unicode handling
-
-This module knows how to handle Unicode (depending on Perl version).
-
-See L<JSON::XS/A FEW NOTES ON UNICODE AND PERL>.
-
-
-=item * round-trip integrity
-
-When you serialise a perl data structure using only data types supported
-by JSON and Perl, the deserialised data structure is identical on the Perl
-level. (e.g. the string "2.0" doesn't suddenly become "2" just because
-it looks like a number). There I<are> minor exceptions to this, read the
-MAPPING section below to learn about those.
-
-
-=item * strict checking of JSON correctness
-
-There is no guessing, no generating of illegal JSON texts by default,
-and only JSON is accepted as input by default (the latter is a security feature).
-But when some options are set, loose checking features are available.
-
-=back
-
 =head1 FUNCTIONAL INTERFACE
 
 Some documents are copied and modified from L<JSON::XS/FUNCTIONAL INTERFACE>.
