@@ -1704,20 +1704,6 @@ Returns true if the passed scalar represents either JSON::PP::true or
 JSON::PP::false, two constants that act like C<1> and C<0> respectively
 and are also used to represent JSON C<true> and C<false> in Perl strings.
 
-=head2 JSON::PP::true
-
-Returns JSON true value which is blessed object.
-It C<isa> JSON::PP::Boolean object.
-
-=head2 JSON::PP::false
-
-Returns JSON false value which is blessed object.
-It C<isa> JSON::PP::Boolean object.
-
-=head2 JSON::PP::null
-
-Returns C<undef>.
-
 See L<MAPPING>, below, for more information on how JSON values are mapped to
 Perl.
 
