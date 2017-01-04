@@ -1937,7 +1937,7 @@ character, after which more white-space and comments are allowed.
         # neither this one...
   ]
 
-=item * C-style multiple-line '/* */'-comments
+=item * C-style multiple-line '/* */'-comments (JSON::PP only)
 
 Whenever JSON allows whitespace, C-style multiple-line comments are additionally
 allowed. Everything between C</*> and C<*/> is a comment, after which
@@ -1948,7 +1948,7 @@ more white-space and comments are allowed.
         /* neither this one... */
   ]
 
-=item * C++-style one-line '//'-comments
+=item * C++-style one-line '//'-comments (JSON::PP only)
 
 Whenever JSON allows whitespace, C++-style one-line comments are additionally
 allowed. They are terminated by the first carriage-return or line-feed
