@@ -2811,7 +2811,8 @@ proper subset of most 8-bit and multibyte encodings in use in the world.
 
 The F<json_pp> command line utility for quick experiments.
 
-L<JSON::XS>, L<JSON>, L<JSON::Tiny>
+L<JSON::XS>, L<Cpanel::JSON::XS>, L<JSON::Tiny> for faster alternatives,
+and L<JSON> for easy migration.
 
 L<JSON::PP::Compat5005> and L<JSON::PP::Compat5006> for older perl users.
 
