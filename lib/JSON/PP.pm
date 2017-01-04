@@ -1756,7 +1756,7 @@ If C<$enable> is false, then the C<encode> method will not escape Unicode
 characters unless required by the JSON syntax or other flags. This results
 in a faster and more compact format.
 
-See also the section I<ENCODING/CODESET FLAG NOTES> in the L<JSON::XS> document.
+See also the section I<ENCODING/CODESET FLAG NOTES> later in this document.
 
 The main use for this flag is to produce JSON texts that can be
 transmitted over a 7-bit channel, as the encoded JSON texts will not
@@ -1781,7 +1781,7 @@ expects Unicode, which is a strict superset of latin1.
 If C<$enable> is false, then the C<encode> method will not escape Unicode
 characters unless required by the JSON syntax or other flags.
 
-See also the section I<ENCODING/CODESET FLAG NOTES> in the L<JSON::XS> document.
+See also the section I<ENCODING/CODESET FLAG NOTES> later in this document.
 
 The main use for this flag is efficiently encoding binary data as JSON
 text, as most octets will not be escaped, resulting in a smaller encoded
@@ -1813,7 +1813,7 @@ string as a (non-encoded) Unicode string, while C<decode> expects thus a
 Unicode string.  Any decoding or encoding (e.g. to UTF-8 or UTF-16) needs
 to be done yourself, e.g. using the Encode module.
 
-See also the section I<ENCODING/CODESET FLAG NOTES> in the L<JSON::XS> document.
+See also the section I<ENCODING/CODESET FLAG NOTES> later in this document.
 
 Example, output UTF-16BE-encoded JSON:
 
