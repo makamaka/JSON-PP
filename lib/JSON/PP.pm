@@ -2666,6 +2666,48 @@ to numify values that may start with values that look like a number
 
 =back
 
+=head2 OBJECT SERIALISATION
+
+As for Perl objects, JSON::PP only supports a pure JSON representation (without the ability to deserialise the object automatically again).
+
+=head3 SERIALISATION
+
+What happens when C<JSON::PP> encounters a Perl object depends on the
+C<allow_blessed>, C<convert_blessed> and C<allow_bignum> settings, which are
+used in this order:
+
+=over 4
+
+=item 1. C<convert_blessed> is enabled and the object has a C<TO_JSON> method.
+
+In this case, the C<TO_JSON> method of the object is invoked in scalar
+context. It must return a single scalar that can be directly encoded into
+JSON. This scalar replaces the object in the JSON text.
+
+For example, the following C<TO_JSON> method will convert all L<URI>
+objects to JSON strings when serialised. The fatc that these values
+originally were L<URI> objects is lost.
+
+   sub URI::TO_JSON {
+      my ($uri) = @_;
+      $uri->as_string
+   }
+
+=item 2. C<allow_bignum> is enabled and the object is a C<Math::BigInt> or C<Math::BigFloat>.
+
+The object will be serialised as a JSON number value.
+
+=item 3. C<allow_blessed> is enabled.
+
+The object will be serialised as a JSON null value.
+
+=item 4. none of the above
+
+If none of the settings are enabled or the respective methods are missing,
+C<JSON::PP> throws an exception.
+
+=back
+
 =head1 HOW DO I DECODE A DATA FROM OUTER AND ENCODE TO OUTER
 
 This section supposes that your perl version is 5.8 or later.
