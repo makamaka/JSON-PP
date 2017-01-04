@@ -2480,10 +2480,16 @@ each successful decode.
 
 =head1 MAPPING
 
-This section is copied from JSON::XS and modified to C<JSON::PP>.
-JSON::XS and JSON::PP mapping mechanisms are almost equivalent.
+Most of this section is also taken from JSON::XS.
 
-See L<JSON::XS/MAPPING>.
+This section describes how JSON::PP maps Perl values to JSON values and
+vice versa. These mappings are designed to "do the right thing" in most
+circumstances automatically, preserving round-tripping characteristics
+(what you put in comes out as something equivalent).
+
+For the more enlightened: note that in the following descriptions,
+lowercase I<perl> refers to the Perl interpreter, while uppercase I<Perl>
+refers to the abstract Perl language itself.
 
 =head2 JSON -> PERL
 
@@ -2512,7 +2518,7 @@ the Perl level, there is no difference between those as Perl handles all
 the conversion details, but an integer may take slightly less memory and
 might represent more values exactly than floating point numbers.
 
-If the number consists of digits only, C<JSON> will try to represent
+If the number consists of digits only, JSON::PP will try to represent
 it as an integer value. If that fails, it will try to represent it as
 a numeric (floating point) value if that is possible without loss of
 precision. Otherwise it will preserve the number as a string value (in
@@ -2526,36 +2532,30 @@ the JSON number will still be re-encoded as a JSON number).
 
 Note that precision is not accuracy - binary floating point values cannot
 represent most decimal fractions exactly, and when converting from and to
-floating point, C<JSON> only guarantees precision up to but not including
+floating point, JSON::PP only guarantees precision up to but not including
 the least significant bit.
 
-When C<allow_bignum> is enabled, the big integers 
-and the numeric can be optionally converted into L<Math::BigInt> and
-L<Math::BigFloat> objects.
+When C<allow_bignum> is enabled, big integer values and any numeric
+values will be converted into L<Math::BigInt> and L<Math::BigFloat>
+objects respectively, without becoming string scalars or losing
+precision.
 
 =item true, false
 
 These JSON atoms become C<JSON::PP::true> and C<JSON::PP::false>,
 respectively. They are overloaded to act almost exactly like the numbers
 C<1> and C<0>. You can check whether a scalar is a JSON boolean by using
-the C<JSON::is_bool> function.
-
-   print JSON::PP::true . "\n";
-    => true
-   print JSON::PP::true + 1;
-    => 1
-
-   ok(JSON::true eq  '1');
-   ok(JSON::true == 1);
-
-C<JSON> will install these missing overloading features to the backend modules.
-
+the C<JSON::PP::is_bool> function.
 
 =item null
 
 A JSON null atom becomes C<undef> in Perl.
 
-C<JSON::PP::null> returns C<undef>.
+=item shell-style comments (C<< # I<text> >>)
+
+As a nonstandard extension to the JSON syntax that is enabled by the
+C<relaxed> setting, shell-style comments are allowed. They can start
+anywhere outside strings and go till the end of the line.
 
 =back
 
@@ -2570,16 +2570,14 @@ a Perl value.
 
 =item hash references
 
-Perl hash references become JSON objects. As there is no inherent ordering
-in hash keys (or JSON objects), they will usually be encoded in a
-pseudo-random order that can change between runs of the same program but
-stays generally the same within a single run of a program. C<JSON>
-optionally sort the hash keys (determined by the I<canonical> flag), so
-the same data structure will serialise to the same JSON text (given same
-settings and version of JSON::XS), but this incurs a runtime overhead
-and is only rarely useful, e.g. when you want to compare some JSON text
-against another for equality.
-
+Perl hash references become JSON objects. As there is no inherent
+ordering in hash keys (or JSON objects), they will usually be encoded
+in a pseudo-random order. JSON::PP can optionally sort the hash keys
+(determined by the I<canonical> flag and/or I<sort_by> property), so
+the same data structure will serialise to the same JSON text (given
+same settings and version of JSON::PP), but this incurs a runtime
+overhead and is only rarely useful, e.g. when you want to compare some
+JSON text against another for equality.
 
 =item array references
 
@@ -2590,31 +2588,30 @@ Perl array references become JSON arrays.
 Other unblessed references are generally not allowed and will cause an
 exception to be thrown, except for references to the integers C<0> and
 C<1>, which get turned into C<false> and C<true> atoms in JSON. You can
-also use C<JSON::false> and C<JSON::true> to improve readability.
+also use C<JSON::PP::false> and C<JSON::PP::true> to improve
+readability.
 
-   to_json [\0,JSON::PP::true]      # yields [false,true]
+   to_json [\0, JSON::PP::true]      # yields [false,true]
 
-=item JSON::PP::true, JSON::PP::false, JSON::PP::null
+=item JSON::PP::true, JSON::PP::false
 
 These special values become JSON true and JSON false values,
 respectively. You can also use C<\1> and C<\0> directly if you want.
 
-JSON::PP::null returns C<undef>.
+=item JSON::PP::null
+
+This special value becomes JSON null.
 
 =item blessed objects
 
-Blessed objects are not directly representable in JSON. See the
-C<allow_blessed> and C<convert_blessed> methods on various options on
-how to deal with this: basically, you can choose between throwing an
-exception, encoding the reference as if it weren't blessed, or provide
-your own serialiser method.
-
-See L<convert_blessed>.
+Blessed objects are not directly representable in JSON, but C<JSON::PP>
+allows various ways of handling objects. See L<OBJECT SERIALISATION>,
+below, for details.
 
 =item simple scalars
 
 Simple Perl scalars (any scalar that is not a reference) are the most
-difficult objects to encode: JSON::XS and JSON::PP will encode undefined scalars as
+difficult objects to encode: JSON::PP will encode undefined scalars as
 JSON C<null> values, scalars that have last been used in a string context
 before encoding as JSON strings, and anything else as number value:
 
@@ -2636,6 +2633,7 @@ You can force the type to be a string by stringifying it:
    "$x";        # stringified
    $x .= "";    # another, more awkward way to stringify
    print $x;    # perl does it for you, too, quite often
+                # (but for older perls)
 
 You can force the type to be a number by numifying it:
 
@@ -2652,12 +2650,19 @@ extensions to the floating point numbers of your platform, such as
 infinities or NaN's - these cannot be represented in JSON, and it is an
 error to pass those in.
 
-=item Big Number
-
-When C<allow_bignum> is enabled, 
-C<encode> converts C<Math::BigInt> objects and C<Math::BigFloat>
-objects into JSON numbers.
-
+JSON::PP (and JSON::XS) trusts what you pass to C<encode> method
+(or C<encode_json> function) is a clean, validated data structure with
+values that can be represented as valid JSON values only, because it's
+not from an external data source (as opposed to JSON texts you pass to
+C<decode> or C<decode_json>, which JSON::PP considers tainted and
+doesn't trust). As JSON::PP doesn't know exactly what you and consumers
+of your JSON texts want the unexpected values to be (you may want to
+convert them into null, or to stringify them with or without
+normalisation (string representation of infinities/NaN may vary
+depending on platforms), or to croak without conversion), you're advised
+to do what you and your consumers need before you encode, and also not
+to numify values that may start with values that look like a number
+(including infinities/NaN), without validating.
 
 =back
 
