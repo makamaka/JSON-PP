@@ -1064,6 +1064,7 @@ BEGIN {
         my $n    = '';
         my $v;
         my $is_dec;
+        my $is_exp;
 
         if($ch eq '-'){
             $n = '-';
@@ -1107,6 +1108,7 @@ BEGIN {
 
         if(defined $ch and ($ch eq 'e' or $ch eq 'E')){
             $n .= $ch;
+            $is_exp = 1;
             next_chr;
 
             if(defined($ch) and ($ch eq '+' or $ch eq '-')){
@@ -1132,18 +1134,21 @@ BEGIN {
 
         $v .= $n;
 
-        if ($v !~ /[.eE]/ and length $v > $max_intsize) {
-            if ($allow_bignum) { # from Adam Sussman
-                require Math::BigInt;
-                return Math::BigInt->new($v);
+        if ($is_dec or $is_exp) {
+            if ($allow_bignum) {
+                require Math::BigFloat;
+                return Math::BigFloat->new($v);
             }
-            else {
-                return "$v";
+        } else {
+            if (length $v > $max_intsize) {
+                if ($allow_bignum) { # from Adam Sussman
+                    require Math::BigInt;
+                    return Math::BigInt->new($v);
+                }
+                else {
+                    return "$v";
+                }
             }
-        }
-        elsif ($allow_bignum) {
-            require Math::BigFloat;
-            return Math::BigFloat->new($v);
         }
 
         return $is_dec ? $v/1.0 : 0+$v;
