@@ -2708,80 +2708,104 @@ C<JSON::PP> throws an exception.
 
 =back
 
-=head1 HOW DO I DECODE A DATA FROM OUTER AND ENCODE TO OUTER
+=head1 ENCODING/CODESET FLAG NOTES
 
-This section supposes that your perl version is 5.8 or later.
+This section is taken from JSON::XS.
 
-If you know a JSON text from an outer world - a network, a file content, and so on,
-is encoded in UTF-8, you should use C<decode_json> or C<JSON> module object
-with C<utf8> enabled. And the decoded result will contain UNICODE characters.
+The interested reader might have seen a number of flags that signify
+encodings or codesets - C<utf8>, C<latin1> and C<ascii>. There seems to be
+some confusion on what these do, so here is a short comparison:
 
-  # from network
-  my $json        = JSON::PP->new->utf8;
-  my $json_text   = CGI->new->param( 'json_data' );
-  my $perl_scalar = $json->decode( $json_text );
-  
-  # from file content
-  local $/;
-  open( my $fh, '<', 'json.data' );
-  $json_text   = <$fh>;
-  $perl_scalar = decode_json( $json_text );
+C<utf8> controls whether the JSON text created by C<encode> (and expected
+by C<decode>) is UTF-8 encoded or not, while C<latin1> and C<ascii> only
+control whether C<encode> escapes character values outside their respective
+codeset range. Neither of these flags conflict with each other, although
+some combinations make less sense than others.
 
-If an outer data is not encoded in UTF-8, firstly you should C<decode> it.
+Care has been taken to make all flags symmetrical with respect to
+C<encode> and C<decode>, that is, texts encoded with any combination of
+these flag values will be correctly decoded when the same flags are used
+- in general, if you use different flag settings while encoding vs. when
+decoding you likely have a bug somewhere.
 
-  use Encode;
-  local $/;
-  open( my $fh, '<', 'json.data' );
-  my $encoding = 'cp932';
-  my $unicode_json_text = decode( $encoding, <$fh> ); # UNICODE
-  
-  # or you can write the below code.
-  #
-  # open( my $fh, "<:encoding($encoding)", 'json.data' );
-  # $unicode_json_text = <$fh>;
+Below comes a verbose discussion of these flags. Note that a "codeset" is
+simply an abstract set of character-codepoint pairs, while an encoding
+takes those codepoint numbers and I<encodes> them, in our case into
+octets. Unicode is (among other things) a codeset, UTF-8 is an encoding,
+and ISO-8859-1 (= latin 1) and ASCII are both codesets I<and> encodings at
+the same time, which can be confusing.
 
-In this case, C<$unicode_json_text> is of course UNICODE string.
-So you B<cannot> use C<decode_json> nor C<JSON> module object with C<utf8> enabled.
-Instead of them, you use C<JSON> module object with C<utf8> disable.
+=over 4
 
-  $perl_scalar = $json->utf8(0)->decode( $unicode_json_text );
+=item C<utf8> flag disabled
 
-Or C<encode 'utf8'> and C<decode_json>:
+When C<utf8> is disabled (the default), then C<encode>/C<decode> generate
+and expect Unicode strings, that is, characters with high ordinal Unicode
+values (> 255) will be encoded as such characters, and likewise such
+characters are decoded as-is, no changes to them will be done, except
+"(re-)interpreting" them as Unicode codepoints or Unicode characters,
+respectively (to Perl, these are the same thing in strings unless you do
+funny/weird/dumb stuff).
 
-  $perl_scalar = decode_json( encode( 'utf8', $unicode_json_text ) );
-  # this way is not efficient.
+This is useful when you want to do the encoding yourself (e.g. when you
+want to have UTF-16 encoded JSON texts) or when some other layer does
+the encoding for you (for example, when printing to a terminal using a
+filehandle that transparently encodes to UTF-8 you certainly do NOT want
+to UTF-8 encode your data first and have Perl encode it another time).
 
-And now, you want to convert your C<$perl_scalar> into JSON data and
-send it to an outer world - a network or a file content, and so on.
+=item C<utf8> flag enabled
 
-Your data usually contains UNICODE strings and you want the converted data to be encoded
-in UTF-8, you should use C<encode_json> or C<JSON> module object with C<utf8> enabled.
+If the C<utf8>-flag is enabled, C<encode>/C<decode> will encode all
+characters using the corresponding UTF-8 multi-byte sequence, and will
+expect your input strings to be encoded as UTF-8, that is, no "character"
+of the input string must have any value > 255, as UTF-8 does not allow
+that.
 
-  print encode_json( $perl_scalar ); # to a network? file? or display?
-  # or
-  print $json->utf8->encode( $perl_scalar );
+The C<utf8> flag therefore switches between two modes: disabled means you
+will get a Unicode string in Perl, enabled means you get an UTF-8 encoded
+octet/binary string in Perl.
 
-If C<$perl_scalar> does not contain UNICODE but C<$encoding>-encoded strings
-for some reason, then its characters are regarded as B<latin1> for perl
-(because it does not concern with your $encoding).
-You B<cannot> use C<encode_json> nor C<JSON> module object with C<utf8> enabled.
-Instead of them, you use C<JSON> module object with C<utf8> disable.
-Note that the resulted text is a UNICODE string but no problem to print it.
+=item C<latin1> or C<ascii> flags enabled
 
-  # $perl_scalar contains $encoding encoded string values
-  $unicode_json_text = $json->utf8(0)->encode( $perl_scalar );
-  # $unicode_json_text consists of characters less than 0x100
-  print $unicode_json_text;
+With C<latin1> (or C<ascii>) enabled, C<encode> will escape characters
+with ordinal values > 255 (> 127 with C<ascii>) and encode the remaining
+characters as specified by the C<utf8> flag.
 
-Or C<decode $encoding> all string values and C<encode_json>:
+If C<utf8> is disabled, then the result is also correctly encoded in those
+character sets (as both are proper subsets of Unicode, meaning that a
+Unicode string with all character values < 256 is the same thing as a
+ISO-8859-1 string, and a Unicode string with all character values < 128 is
+the same thing as an ASCII string in Perl).
 
-  $perl_scalar->{ foo } = decode( $encoding, $perl_scalar->{ foo } );
-  # ... do it to each string values, then encode_json
-  $json_text = encode_json( $perl_scalar );
+If C<utf8> is enabled, you still get a correct UTF-8-encoded string,
+regardless of these flags, just some more characters will be escaped using
+C<\uXXXX> then before.
 
-This method is a proper way but probably not efficient.
+Note that ISO-8859-1-I<encoded> strings are not compatible with UTF-8
+encoding, while ASCII-encoded strings are. That is because the ISO-8859-1
+encoding is NOT a subset of UTF-8 (despite the ISO-8859-1 I<codeset> being
+a subset of Unicode), while ASCII is.
 
-See L<Encode>, L<perluniintro>.
+Surprisingly, C<decode> will ignore these flags and so treat all input
+values as governed by the C<utf8> flag. If it is disabled, this allows you
+to decode ISO-8859-1- and ASCII-encoded strings, as both strict subsets of
+Unicode. If it is enabled, you can correctly decode UTF-8 encoded strings.
+
+So neither C<latin1> nor C<ascii> are incompatible with the C<utf8> flag -
+they only govern when the JSON output engine escapes a character or not.
+
+The main use for C<latin1> is to relatively efficiently store binary data
+as JSON, at the expense of breaking compatibility with most JSON decoders.
+
+The main use for C<ascii> is to force the output to not contain characters
+with values > 127, which means you can interpret the resulting string
+as UTF-8, ISO-8859-1, ASCII, KOI8-R or most about any character set and
+8-bit-encoding, and still get the same data structure back. This is useful
+when your channel for JSON transfer is not 8-bit clean or the encoding
+might be mangled in between (e.g. in mail), and works because ASCII is a
+proper subset of most 8-bit and multibyte encodings in use in the world.
+
+=back
 
 =head1 SEE ALSO
 
