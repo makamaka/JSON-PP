@@ -2811,8 +2811,6 @@ proper subset of most 8-bit and multibyte encodings in use in the world.
 
 The F<json_pp> command line utility for quick experiments.
 
-Most of the document are copied and modified from JSON::XS doc.
-
 L<JSON::XS>, L<JSON>, L<JSON::Tiny>
 
 L<JSON::PP::Compat5005> and L<JSON::PP::Compat5006> for older perl users.
