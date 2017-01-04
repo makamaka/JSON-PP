@@ -1957,9 +1957,6 @@ This setting has no effect when decoding JSON texts.
 
 This setting has currently no effect on tied hashes.
 
-If you want your own sorting routine, you can give a code reference
-or a subroutine name to C<sort_by>. See C<JSON::PP OWN METHODS>.
-
 =head2 allow_nonref
 
     $json = $json->allow_nonref([$enable])
@@ -2213,106 +2210,161 @@ and you need to know where the JSON text ends.
    JSON::PP->new->decode_prefix ("[1] the tail")
    => ([1], 3)
 
-=head1 JSON::PP OWN METHODS
+=head1 FLAGS FOR JSON::PP ONLY
+
+The following flags and properties are for JSON::PP only. If you use
+any of these, you can't make your application run faster by replacing
+JSON::PP with JSON::XS. If you need these and also speed boost,
+try L<Cpanel::JSON::XS>, a fork of JSON::XS by Reini Urban, which
+supports some of these.
 
 =head2 allow_singlequote
 
     $json = $json->allow_singlequote([$enable])
+    $enabled = $json->get_allow_singlequote
 
 If C<$enable> is true (or missing), then C<decode> will accept
-JSON strings quoted by single quotations that are invalid JSON
-format.
+invalid JSON texts that contain strings that begin and end with
+single quotation marks. C<encode> will not be affected in anyway.
+I<Be aware that this option makes you accept invalid JSON texts
+as if they were valid!>. I suggest only to use this option to
+parse application-specific files written by humans (configuration
+files, resource files etc.)
 
-    $json->allow_singlequote->decode({"foo":'bar'});
-    $json->allow_singlequote->decode({'foo':"bar"});
-    $json->allow_singlequote->decode({'foo':'bar'});
+If C<$enable> is false (the default), then C<decode> will only accept
+valid JSON texts.
 
-As same as the C<relaxed> option, this option may be used to parse
-application-specific files written by humans.
-
+    $json->allow_singlequote->decode(qq|{"foo":'bar'}|);
+    $json->allow_singlequote->decode(qq|{'foo':"bar"}|);
+    $json->allow_singlequote->decode(qq|{'foo':'bar'}|);
 
 =head2 allow_barekey
 
     $json = $json->allow_barekey([$enable])
+    $enabled = $json->get_allow_barekey
 
 If C<$enable> is true (or missing), then C<decode> will accept
-bare keys of JSON object that are invalid JSON format.
+invalid JSON texts that contain JSON objects whose names don't
+begin and end with quotation marks. C<encode> will not be affected
+in anyway. I<Be aware that this option makes you accept invalid JSON
+texts as if they were valid!>. I suggest only to use this option to
+parse application-specific files written by humans (configuration
+files, resource files etc.)
 
-As same as the C<relaxed> option, this option may be used to parse
-application-specific files written by humans.
+If C<$enable> is false (the default), then C<decode> will only accept
+valid JSON texts.
 
-    $json->allow_barekey->decode('{foo:"bar"}');
+    $json->allow_barekey->decode(qq|{foo:"bar"}|);
 
 =head2 allow_bignum
 
     $json = $json->allow_bignum([$enable])
+    $enabled = $json->get_allow_bignum
 
 If C<$enable> is true (or missing), then C<decode> will convert
-the big integer Perl cannot handle as integer into a L<Math::BigInt>
-object and convert a floating number (any) into a L<Math::BigFloat>.
+big integers Perl cannot handle as integer into L<Math::BigInt>
+objects and convert floating numbers into L<Math::BigFloat>
+objects. C<encode> will convert C<Math::BigInt> and C<Math::BigFloat>
+objects into JSON numbers.
 
-On the contrary, C<encode> converts C<Math::BigInt> objects and C<Math::BigFloat>
-objects into JSON numbers with C<allow_blessed> enabled.
-
-   $json->allow_nonref->allow_blessed->allow_bignum;
+   $json->allow_nonref->allow_bignum;
    $bigfloat = $json->decode('2.000000000000000000000000001');
    print $json->encode($bigfloat);
    # => 2.000000000000000000000000001
 
-See L<JSON::XS/MAPPING> about the normal conversion of JSON number.
+See also L<MAPPING>.
 
 =head2 loose
 
     $json = $json->loose([$enable])
+    $enabled = $json->get_loose
 
-The unescaped [\x00-\x1f\x22\x2f\x5c] strings are invalid in JSON strings
-and the module doesn't allow you to C<decode> to these (except for \x2f).
-If C<$enable> is true (or missing), then C<decode>  will accept these
-unescaped strings.
+If C<$enable> is true (or missing), then C<decode> will accept
+invalid JSON texts that contain unescaped [\x00-\x1f\x22\x5c]
+characters. C<encode> will not be affected in anyway.
+I<Be aware that this option makes you accept invalid JSON texts
+as if they were valid!>. I suggest only to use this option to
+parse application-specific files written by humans (configuration
+files, resource files etc.)
+
+If C<$enable> is false (the default), then C<decode> will only accept
+valid JSON texts.
 
     $json->loose->decode(qq|["abc
                                    def"]|);
 
-See L<JSON::XS/SECURITY CONSIDERATIONS>.
-
 =head2 escape_slash
 
     $json = $json->escape_slash([$enable])
+    $enabled = $json->get_escape_slash
 
-According to JSON Grammar, I<slash> (U+002F) is escaped. But default
-JSON::PP (as same as JSON::XS) encodes strings without escaping slash.
+If C<$enable> is true (or missing), then C<encode> will explicitly
+escape I<slash> (solidus; C<U+002F>) characters to reduce the risk of
+XSS (cross site scripting) that may be caused by C<< </script> >>
+in a JSON text, with the cost of bloating the size of JSON texts.
 
-If C<$enable> is true (or missing), then C<encode> will escape slashes.
+This option may be useful when you embed JSON in HTML, but embedding
+arbitrary JSON in HTML (by some HTML template toolkit or by string
+interpolation) is risky in general and should be avoided if you don't
+know how to do that correctly (i.e. escape necessary characters in
+correct order).
+
+C<decode> will not be affected in anyway.
 
 =head2 indent_length
 
-    $json = $json->indent_length($length)
+    $json = $json->indent_length($number_of_spaces)
+    $length = $json->get_indent_length
 
-JSON::XS indent space length is 3 and cannot be changed.
-JSON::PP set the indent space length with the given $length.
-The default is 3. The acceptable range is 0 to 15.
+This option is only useful when you also enable C<indent> or C<pretty>.
+
+JSON::XS indents with three spaces when you C<encode> (if requested
+by C<indent> or C<pretty>), and the number cannot be changed.
+JSON::PP allows you to change/get the number of indent spaces with these
+mutator/accessor. The default number of spaces is three (the same as
+JSON::XS), and the acceptable range is from C<0> (no indentation;
+it'd be better to disable indentation by C<indent(0)>) to C<15>.
 
 =head2 sort_by
 
-    $json = $json->sort_by($function_name)
-    $json = $json->sort_by($subroutine_ref)
+    $json = $json->sort_by($code_ref)
+    $json = $json->sort_by($subroutine_name)
 
-If $function_name or $subroutine_ref are set, its sort routine are used
-in encoding JSON objects.
+If you just want to sort keys (names) in JSON objects when you
+C<encode>, enable C<canonical> option (see above) that allows you to
+sort object keys alphabetically.
 
-   $js = $pc->sort_by(sub { $JSON::PP::a cmp $JSON::PP::b })->encode($obj);
-   # is($js, q|{"a":1,"b":2,"c":3,"d":4,"e":5,"f":6,"g":7,"h":8,"i":9}|);
+If you do need to sort non-alphabetically for whatever reasons,
+you can give a code reference (or a subroutine name) to C<sort_by>,
+then the argument will be passed to Perl's C<sort> built-in function.
 
-   $js = $pc->sort_by('own_sort')->encode($obj);
-   # is($js, q|{"a":1,"b":2,"c":3,"d":4,"e":5,"f":6,"g":7,"h":8,"i":9}|);
+As the sorting is done in the JSON::PP scope, you usually need to
+prepend C<JSON::PP::> to the subroutine name, and the special variables
+C<$a> and C<$b> used in the subrontine used by C<sort> function.
 
-   sub JSON::PP::own_sort { $JSON::PP::a cmp $JSON::PP::b }
+Example:
 
-As the sorting routine runs in the JSON::PP scope, the given
-subroutine name and the special variables C<$a>, C<$b> will begin
-'JSON::PP::'.
+   my %ORDER = (id => 1, class => 2, name => 3);
+   $json->sort_by(sub {
+       ($ORDER{$JSON::PP::a} // 999) <=> ($ORDER{$JSON::PP::b} // 999)
+       or $JSON::PP::a cmp $JSON::PP::b
+   });
+   print $json->encode([
+       {name => 'CPAN', id => 1, href => 'http://cpan.org'}
+   ]);
+   # [{"id":1,"name":"CPAN","href":"http://cpan.org"}]
 
-If $integer is set, then the effect is same as C<canonical> on.
+Note that C<sort_by> affects all the plain hashes in the data structure.
+If you need finer control, C<tie> necessary hashes with a module that
+implements ordered hash (such as L<Hash::Ordered> and L<Tie::IxHash>).
+C<canonical> and C<sort_by> don't affect the key order in C<tie>d
+hashes.
+
+   use Hash::Ordered;
+   tie my %hash, 'Hash::Ordered',
+       (name => 'CPAN', id => 1, href => 'http://cpan.org');
+   print $json->encode([\%hash]);
+   # [{"name":"CPAN","id":1,"href":"http://cpan.org"}] # order is kept
 
 =head1 INCREMENTAL PARSING
 
