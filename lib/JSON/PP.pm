@@ -2030,7 +2030,7 @@ leave it off unless you know your communications partner.
     
     $enabled = $json->get_allow_blessed
 
-See L<JSON::XS/OBJECT SERIALISATION> for details.
+See L<OBJECT SERIALISATION> for details.
 
 If C<$enable> is true (or missing), then the C<encode> method will not
 barf when it encounters a blessed reference that it cannot convert
@@ -2048,7 +2048,7 @@ This setting has no effect on C<decode>.
     
     $enabled = $json->get_convert_blessed
 
-See L<JSON::XS/OBJECT SERIALISATION> for details.
+See L<OBJECT SERIALISATION> for details.
 
 If C<$enable> is true (or missing), then C<encode>, upon encountering a
 blessed object, will check for the availability of the C<TO_JSON> method
