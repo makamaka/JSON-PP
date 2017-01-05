@@ -2515,7 +2515,7 @@ refers to the abstract Perl language itself.
 =item object
 
 A JSON object becomes a reference to a hash in Perl. No ordering of object
-keys is preserved (JSON does not preserver object key ordering itself).
+keys is preserved (JSON does not preserve object key ordering itself).
 
 =item array
 
