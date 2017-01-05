@@ -653,6 +653,7 @@ BEGIN {
     sub _detect_utf_encoding {
         my $text = shift;
         my @octets = unpack('C4', $text);
+        return 'unknown' unless defined $octets[3];
         return ( $octets[0] and  $octets[1]) ? 'UTF-8'
              : (!$octets[0] and  $octets[1]) ? 'UTF-16BE'
              : (!$octets[0] and !$octets[1]) ? 'UTF-32BE'
@@ -678,7 +679,13 @@ BEGIN {
             = @{$props}[P_UTF8, P_RELAXED, P_LOOSE .. P_ALLOW_SINGLEQUOTE];
 
         if ( $utf8 ) {
-            utf8::downgrade( $text, 1 ) or Carp::croak("Wide character in subroutine entry");
+            $encoding = _detect_utf_encoding($text);
+            if ($encoding ne 'UTF-8' and $encoding ne 'unknown') {
+                require Encode;
+                Encode::from_to($text, $encoding, 'utf-8');
+            } else {
+                utf8::downgrade( $text, 1 ) or Carp::croak("Wide character in subroutine entry");
+            }
         }
         else {
             utf8::upgrade( $text );
@@ -697,12 +704,6 @@ BEGIN {
                 sprintf("attempted decode of JSON text of %s bytes size, but max_size is set to %s"
                     , $bytes, $max_size), 1
             ) if ($bytes > $max_size);
-        }
-
-        $encoding = _detect_utf_encoding($text);
-        if ($len > 4 and $encoding ne 'UTF-8' and $encoding ne 'unknown') {
-            require Encode;
-            $len = Encode::from_to($text, $encoding, 'utf-8');
         }
 
         white(); # remove head white space
