@@ -2703,7 +2703,7 @@ context. It must return a single scalar that can be directly encoded into
 JSON. This scalar replaces the object in the JSON text.
 
 For example, the following C<TO_JSON> method will convert all L<URI>
-objects to JSON strings when serialised. The fatc that these values
+objects to JSON strings when serialised. The fact that these values
 originally were L<URI> objects is lost.
 
    sub URI::TO_JSON {
