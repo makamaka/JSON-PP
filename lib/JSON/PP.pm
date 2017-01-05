@@ -2186,9 +2186,6 @@ is rarely useful.
 
 See L<JSON::XS/SECURITY CONSIDERATIONS> for more info on why this is useful.
 
-When a large value (100 or more) was set and it de/encodes a deep nested object/text,
-it may raise a warning 'Deep recursion on subroutine' at the perl runtime phase.
-
 =head2 max_size
 
     $json = $json->max_size([$maximum_string_size])
