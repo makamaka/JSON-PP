@@ -438,7 +438,7 @@ sub allow_bigint {
             if (_looks_like_number($value)) {
                 return $value;
             }
-            return string_to_json($self, $value);
+            return $self->string_to_json($value);
         }
         elsif( blessed($value) and  $value->isa('JSON::PP::Boolean') ){
             return $$value == 1 ? 'true' : 'false';
