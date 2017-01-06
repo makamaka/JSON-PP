@@ -343,13 +343,14 @@ sub allow_bigint {
                 }
 
                 return "$obj" if ( $bignum and _is_bignum($obj) );
-                return $self->blessed_to_json($obj) if ($allow_blessed and $as_nonblessed); # will be removed.
 
+                if ($allow_blessed) {
+                    return $self->blessed_to_json($obj) if ($as_nonblessed); # will be removed.
+                    return 'null';
+                }
                 encode_error( sprintf("encountered object '%s', but neither allow_blessed "
                     . "nor convert_blessed settings are enabled", $obj)
-                ) unless ($allow_blessed);
-
-                return 'null';
+                );
             }
             else {
                 return $self->value_to_json($obj);
