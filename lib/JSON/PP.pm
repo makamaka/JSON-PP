@@ -374,7 +374,7 @@ sub allow_bigint {
 
         for my $k ( _sort( $obj ) ) {
             if ( OLD_PERL ) { utf8::decode($k) } # key for Perl 5.6 / be optimized
-            push @res, string_to_json( $self, $k )
+            push @res, $self->string_to_json( $k )
                           .  $del
                           . ( ref $obj->{$k} ? $self->object_to_json( $obj->{$k} ) : $self->value_to_json( $obj->{$k} ) );
         }
