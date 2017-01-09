@@ -1,10 +1,9 @@
 Revision history for Perl extension JSON::PP.
---------------------------------------------------------------------------
 
-JSON::PP had been included in JSON distribution (CPAN module).
-It was a perl core module in Perl 5.14.
-
---------------------------------------------------------------------------
+2.91_03  2017-01-09
+	- reworked documentation, based on the one for JSON::XS
+	- let json_pp utility to show the version of JSON::PP
+	- applied a patch to fix loading order of B module (pali++)
 
 2.91_02  2016-12-04
 	- fixed not to fail tests under Perl 5.25.* (srezic++)
