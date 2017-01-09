@@ -2329,9 +2329,8 @@ in a JSON text, with the cost of bloating the size of JSON texts.
 
 This option may be useful when you embed JSON in HTML, but embedding
 arbitrary JSON in HTML (by some HTML template toolkit or by string
-interpolation) is risky in general and should be avoided if you don't
-know how to do that correctly (i.e. escape necessary characters in
-correct order).
+interpolation) is risky in general. You must escape necessary
+characters in correct order, depending on the context.
 
 C<decode> will not be affected in anyway.
 
