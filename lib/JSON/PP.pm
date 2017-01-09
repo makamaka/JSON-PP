@@ -1734,7 +1734,7 @@ decoding style, within the limits of supported formats.
 Creates a new JSON::PP object that can be used to de/encode JSON
 strings. All boolean flags described below are by default I<disabled>.
 
-The mutators for flags all return the JSON object again and thus calls can
+The mutators for flags all return the JSON::PP object again and thus calls can
 be chained:
 
    my $json = JSON::PP->new->utf8->space_after->encode({a => [1,2]})
