@@ -2018,7 +2018,7 @@ If C<$enable> is true (or missing), then C<encode> will I<not> throw an
 exception when it encounters values it cannot represent in JSON (for
 example, filehandles) but instead will encode a JSON C<null> value. Note
 that blessed objects are not included here and are handled separately by
-c<allow_nonref>.
+c<allow_blessed>.
 
 If C<$enable> is false (the default), then C<encode> will throw an
 exception when it encounters anything it cannot encode as JSON.
