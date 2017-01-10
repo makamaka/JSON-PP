@@ -1,5 +1,8 @@
 Revision history for Perl extension JSON::PP.
 
+2.91_04  2017-01-10
+	- fixed isa tests for bignum
+
 2.91_03  2017-01-09
 	- reworked documentation, based on the one for JSON::XS
 	- let json_pp utility to show the version of JSON::PP
