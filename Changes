@@ -1,5 +1,8 @@
 Revision history for Perl extension JSON::PP.
 
+2.93  2017-05-15
+    - fix packaging issue
+
 2.92  2017-05-15
     - production release
 
