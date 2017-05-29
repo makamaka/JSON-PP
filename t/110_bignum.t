@@ -45,6 +45,6 @@ is("$num", '2.0000000000000000001');
 is($json->encode($num), '2.0000000000000000001');
 
 { #SKIP_UNLESS_PP 2.90, 1
-is($json->encode([Math::BigInt->new("0")]), '[0]', "zero bigint is 0 (the number), not '0' (the string)" );
+is($json->encode([Math::BigInt->new("0")]), "[${fix}0]", "zero bigint is 0 (the number), not '0' (the string)" );
 }
 }
