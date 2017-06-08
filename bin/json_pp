@@ -63,6 +63,14 @@ my %T = (
       local $Data::Dumper::Sortkeys  = 1;
       Data::Dumper::Dumper($_)
    },
+   'ddp' => sub {
+       require Data::Printer;
+       Data::Printer::p($_, colored => 0);
+   },
+   'ddp_color' => sub {
+       require Data::Printer;
+       Data::Printer::p($_, colored => 1);
+   },
 );
 
 
@@ -142,6 +150,14 @@ as JSON
 =item dumper
 
 as Data::Dumper
+
+=item ddp
+
+as Data::Printer
+
+=item ddp_color
+
+as Data::Printer with terminal colors enabled
 
 =back
 
