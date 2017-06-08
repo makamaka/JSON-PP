@@ -3,6 +3,7 @@
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use strict;
 use Getopt::Long;
+no lib '.';
 
 use JSON::PP ();
 
