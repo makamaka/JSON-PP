@@ -488,7 +488,7 @@ sub allow_bigint {
 
         $arg =~ s/([\x22\x5c\n\r\t\f\b])/$esc{$1}/g;
         $arg =~ s/\//\\\//g if ($escape_slash);
-        $arg =~ s/([\x00-\x08\x0b\x0e-\x1f])/'\\u00' . unpack('H2', $1)/eg;
+        $arg =~ s/([\x00-\x08\x0b\x0e-\x1f\x7f])/'\\u00' . unpack('H2', $1)/eg;
 
         if ($ascii) {
             $arg = JSON_PP_encode_ascii($arg);
