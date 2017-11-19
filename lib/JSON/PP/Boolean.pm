@@ -8,7 +8,7 @@ use overload (
     fallback => 1,
 );
 
-$JSON::PP::Boolean::VERSION = '2.95';
+$JSON::PP::Boolean::VERSION = '2.96';
 
 1;
 

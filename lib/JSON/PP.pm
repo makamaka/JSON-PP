@@ -14,7 +14,7 @@ use JSON::PP::Boolean;
 use Carp ();
 #use Devel::Peek;
 
-$JSON::PP::VERSION = '2.95';
+$JSON::PP::VERSION = '2.96';
 
 @JSON::PP::EXPORT = qw(encode_json decode_json from_json to_json);
 
@@ -1654,7 +1654,7 @@ JSON::PP - JSON::XS compatible pure-Perl module.
 
 =head1 VERSION
 
-    2.95
+    2.96
 
 =head1 DESCRIPTION
 

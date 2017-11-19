@@ -1,5 +1,8 @@
 Revision history for Perl extension JSON::PP.
 
+2.96  2017-11-20
+    - not to use newer Test::More features (RT-122421 for JSON)
+
 2.95  2017-11-20
     - json_pp now prints an encoded json string (RT#123653)
     - fix is_bool to use ->isa("JSON::PP::Boolean"), instead
