@@ -1,5 +1,8 @@
 Revision history for Perl extension JSON::PP.
 
+2.98000 to be released
+    - clarify json_pp options (RT-123766; Dan Jacobson)
+
 2.97000 2017-11-21
     - fix is_bool to use blessed() instead of ref() (jwrightecs++)
     - use 5 digit minor version number for a while to avoid confusion
