@@ -1,6 +1,6 @@
 Revision history for Perl extension JSON::PP.
 
-2.97001 to be released
+2.97001 2017-12-21
     - tweak internal number detector to always considers a flagged
       value as a string (GH#35, haarg++)
     - clarify json_pp options (RT-123766; Dan Jacobson)
