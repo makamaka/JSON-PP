@@ -9,7 +9,7 @@ use Exporter ();
 BEGIN { @JSON::PP::ISA = ('Exporter') }
 
 use overload ();
-use JSON::PP::Boolean;
+use bool;
 
 use Carp ();
 #use Devel::Peek;
@@ -326,7 +326,7 @@ sub allow_bigint {
         elsif ($type) { # blessed object?
             if (blessed($obj)) {
 
-                return $self->value_to_json($obj) if ( $obj->isa('JSON::PP::Boolean') );
+                return $self->value_to_json($obj) if ( $obj->isa('bool') );
 
                 if ( $convert_blessed and $obj->can('TO_JSON') ) {
                     my $result = $obj->TO_JSON();
@@ -442,7 +442,7 @@ sub allow_bigint {
             }
             return $self->string_to_json($value);
         }
-        elsif( blessed($value) and  $value->isa('JSON::PP::Boolean') ){
+        elsif( blessed($value) and  $value->isa('bool') ){
             return $$value == 1 ? 'true' : 'false';
         }
         else {
@@ -1407,7 +1407,7 @@ BEGIN {
 $JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::PP::Boolean" };
 $JSON::PP::false = do { bless \(my $dummy = 0), "JSON::PP::Boolean" };
 
-sub is_bool { blessed $_[0] and $_[0]->isa("JSON::PP::Boolean"); }
+sub is_bool { bool::is_bool(@_) }
 
 sub true  { $JSON::PP::true  }
 sub false { $JSON::PP::false }
