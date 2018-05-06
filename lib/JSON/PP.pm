@@ -1404,13 +1404,15 @@ BEGIN {
 
 # shamelessly copied and modified from JSON::XS code.
 
-$JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::PP::Boolean" };
-$JSON::PP::false = do { bless \(my $dummy = 0), "JSON::PP::Boolean" };
+$JSON::PP::true  = JSON::PP::Boolean::true;
+$JSON::PP::false = JSON::PP::Boolean::false;
 
-sub is_bool { blessed $_[0] and $_[0]->isa("JSON::PP::Boolean"); }
+BEGIN {
+    *is_bool = \&JSON::PP::Boolean::is_bool;
+    *true    = \&JSON::PP::Boolean::true;
+    *false   = \&JSON::PP::Boolean::false;
+}
 
-sub true  { $JSON::PP::true  }
-sub false { $JSON::PP::false }
 sub null  { undef; }
 
 ###############################
