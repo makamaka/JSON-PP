@@ -9,7 +9,7 @@ use Exporter ();
 BEGIN { @JSON::PP::ISA = ('Exporter') }
 
 use overload ();
-use JSON::PP::Boolean;
+use Types::Bool qw(true false is_bool);
 
 use Carp ();
 #use Devel::Peek;
@@ -326,7 +326,7 @@ sub allow_bigint {
         elsif ($type) { # blessed object?
             if (blessed($obj)) {
 
-                return $self->value_to_json($obj) if ( $obj->isa('JSON::PP::Boolean') );
+                return $self->value_to_json($obj) if ( $obj->isa('Types::Bool') );
 
                 if ( $convert_blessed and $obj->can('TO_JSON') ) {
                     my $result = $obj->TO_JSON();
@@ -442,7 +442,7 @@ sub allow_bigint {
             }
             return $self->string_to_json($value);
         }
-        elsif( blessed($value) and  $value->isa('JSON::PP::Boolean') ){
+        elsif( blessed($value) and  $value->isa('Types::Bool') ){
             return $$value == 1 ? 'true' : 'false';
         }
         else {
@@ -1404,14 +1404,8 @@ BEGIN {
 
 # shamelessly copied and modified from JSON::XS code.
 
-$JSON::PP::true  = JSON::PP::Boolean::true;
-$JSON::PP::false = JSON::PP::Boolean::false;
-
-BEGIN {
-    *is_bool = \&JSON::PP::Boolean::is_bool;
-    *true    = \&JSON::PP::Boolean::true;
-    *false   = \&JSON::PP::Boolean::false;
-}
+$JSON::PP::true  = true;
+$JSON::PP::false = false;
 
 sub null  { undef; }
 
