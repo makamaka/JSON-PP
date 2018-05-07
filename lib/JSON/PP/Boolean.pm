@@ -1,14 +1,7 @@
 
-BEGIN {
-    require Types::Bool;
-    *JSON::PP::Boolean:: = *Types::Bool::;
-}
+use Types::Bool ();
 
 package JSON::PP::Boolean;
-
-use strict;
-
-$JSON::PP::Boolean::VERSION = '2.97001';
 
 1;
 
