@@ -1,8 +1,6 @@
 
 use Types::Bool ();
 
-package JSON::PP::Boolean;
-
 1;
 
 __END__
