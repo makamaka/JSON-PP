@@ -1,6 +1,11 @@
 
 use Types::Bool ();
 
+package JSON::PP::Boolean;
+
+$JSON::PP::Boolean::VERSION = '2.97001'
+  unless $JSON::PP::Boolean::VERSION;
+
 1;
 
 __END__
