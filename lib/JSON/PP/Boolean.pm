@@ -1,13 +1,5 @@
 package JSON::PP::Boolean;
 
-use strict;
-use overload (
-    "0+"     => sub { ${$_[0]} },
-    "++"     => sub { $_[0] = ${$_[0]} + 1 },
-    "--"     => sub { $_[0] = ${$_[0]} - 1 },
-    fallback => 1,
-);
-
 $JSON::PP::Boolean::VERSION = '2.97001';
 
 1;
