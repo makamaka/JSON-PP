@@ -9,7 +9,7 @@ use Exporter ();
 BEGIN { @JSON::PP::ISA = ('Exporter') }
 
 use overload ();
-use Data::Bool qw(true false is_bool BOOL_PACKAGE);
+use Data::Bool qw(true false is_bool);
 
 use Carp ();
 #use Devel::Peek;
@@ -326,7 +326,7 @@ sub allow_bigint {
         elsif ($type) { # blessed object?
             if (blessed($obj)) {
 
-                return $self->value_to_json($obj) if ( $obj->isa(BOOL_PACKAGE) );
+                return $self->value_to_json($obj) if ( $obj->isa(Data::Bool::BOOL_PACKAGE) );
 
                 if ( $convert_blessed and $obj->can('TO_JSON') ) {
                     my $result = $obj->TO_JSON();
@@ -442,7 +442,7 @@ sub allow_bigint {
             }
             return $self->string_to_json($value);
         }
-        elsif( blessed($value) and  $value->isa(BOOL_PACKAGE) ){
+        elsif( blessed($value) and  $value->isa(Data::Bool::BOOL_PACKAGE) ){
             return $$value == 1 ? 'true' : 'false';
         }
         else {
