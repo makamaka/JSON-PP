@@ -9,7 +9,7 @@ use Exporter ();
 BEGIN { @JSON::PP::ISA = ('Exporter') }
 
 use overload ();
-use Types::Bool qw(true false is_bool BOOL_PACKAGE);
+use Data::Bool qw(true false is_bool BOOL_PACKAGE);
 
 use Carp ();
 #use Devel::Peek;

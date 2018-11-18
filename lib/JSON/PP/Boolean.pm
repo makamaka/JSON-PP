@@ -1,5 +1,5 @@
 
-use Types::Bool ();
+use Data::Bool ();
 
 package JSON::PP::Boolean;
 
