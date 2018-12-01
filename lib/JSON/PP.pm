@@ -1485,6 +1485,8 @@ use constant INCR_M_BS   => 2; # inside backslash
 use constant INCR_M_JSON => 3; # outside anything, count nesting
 use constant INCR_M_C0   => 4;
 use constant INCR_M_C1   => 5;
+use constant INCR_M_TFN  => 6;
+use constant INCR_M_NUM  => 7;
 
 $JSON::PP::IncrParser::VERSION = '1.01';
 
@@ -1550,7 +1552,7 @@ sub incr_parse {
             return @ret;
         }
         else { # in scalar context
-            return $ret[0] ? $ret[0] : undef;
+            return defined $ret[0] ? $ret[0] : undef;
         }
     }
 }
@@ -1598,6 +1600,28 @@ INCR_PARSE:
                 $p++;
             }
             next;
+        } elsif ( $mode == INCR_M_TFN ) {
+            while ( $len > $p ) {
+                $s = substr( $text, $p++, 1 );
+                next if defined $s and $s =~ /[rueals]/;
+                last;
+            }
+            $p--;
+            $self->{incr_mode} = INCR_M_JSON;
+
+            last INCR_PARSE unless $self->{incr_nest};
+            redo INCR_PARSE;
+        } elsif ( $mode == INCR_M_NUM ) {
+            while ( $len > $p ) {
+                $s = substr( $text, $p++, 1 );
+                next if defined $s and $s =~ /[0-9eE.+\-]/;
+                last;
+            }
+            $p--;
+            $self->{incr_mode} = INCR_M_JSON;
+
+            last INCR_PARSE unless $self->{incr_nest};
+            redo INCR_PARSE;
         } elsif ( $mode == INCR_M_STR ) {
             while ( $len > $p ) {
                 $s = substr( $text, $p, 1 );
@@ -1630,6 +1654,12 @@ INCR_PARSE:
                         last INCR_PARSE;
                     }
                     next;
+                } elsif ( $s eq 't' or $s eq 'f' or $s eq 'n' ) {
+                    $self->{incr_mode} = INCR_M_TFN;
+                    redo INCR_PARSE;
+                } elsif ( $s =~ /^[0-9\-]$/ ) {
+                    $self->{incr_mode} = INCR_M_NUM;
+                    redo INCR_PARSE;
                 } elsif ( $s eq '"' ) {
                     $self->{incr_mode} = INCR_M_STR;
                     redo INCR_PARSE;
