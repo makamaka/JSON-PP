@@ -1,0 +1,109 @@
+# This script is to copy tests from JSON::XS and modify
+
+use strict;
+use warnings;
+use FindBin;
+use Path::Tiny;
+
+my $root = path("$FindBin::Bin/../..");
+my $xs_root = $root->parent->child('JSON-XS');
+my $test_dir = $root->child('t');
+
+die "JSON-XS directory not found" unless -d $xs_root;
+
+for my $xs_test ($xs_root->child('t')->children) {
+    my $basename = $xs_test->basename;
+    $basename =~ s/^([0-9][0-9])/0$1/;
+    my $pp_test = $test_dir->child($basename);
+    if ($basename =~ /\.t$/) {
+        my $content = $xs_test->slurp;
+
+        # common stuff
+        $content =~ s/JSON::XS/JSON::PP/g;
+        $content =~ s/Types::Serialiser/JSON::PP/g;
+        $content =~ s/use JSON::PP;\nuse JSON::PP;\n/use JSON::PP;\n/g;
+        $content =~ s/our \$test;\nsub ok\(\$(;\$)?\) \{\n   print \$_\[0\] \? "" : "not ", "ok ", \+\+\$test, ".*?\\n";\n}\n//s;
+        $content =~ s/#! perl\n\n//s;
+        $content =~ s/BEGIN \{ \$\| = 1; print "1..(\d+)\\n"; }\n/use strict;\nuse Test::More;\nBEGIN { plan tests => $1 };\n/s unless $basename =~ /000_load/;
+        $content =~ s/\$xs/\$pp/g;
+
+        $content =~ s/((?:use utf8;\n)?use JSON::PP;\n)/BEGIN { \$ENV{PERL_JSON_BACKEND} = 0; }\n\n$1/s;
+
+        $content =~ s/(# copied over from JSON::PC and modified to use JSON::PP\n)/$1# copied over from JSON::XS and modified to use JSON::PP\n/s or $content =~ s/\A/# copied over from JSON::XS and modified to use JSON::PP\n\n/s;
+
+        # specific
+        if ($basename =~ /003_types/) {
+            $content =~ s/for \$v /for my \$v /;
+            $content =~ s/BEGIN \{ plan tests => (\d+) };\n/BEGIN \{ plan tests => $1 + 2 };\n/;
+            $content =~ s/(ok \(!JSON::PP::is_bool \$false\);\n)/$1ok \(!JSON::PP::is_bool "JSON::PP::Boolean"\);\nok \(!JSON::PP::is_bool \{}\); # GH-34\n/s;
+        }
+
+        if ($basename =~ /011_pc_expo/) {
+            $content =~ s/BEGIN \{ plan tests => (\d+) };\n/BEGIN \{ plan tests => $1 + 2 };\n/;
+            $content =~ s/(\$js = \$pc->encode\(\$obj\);\nis\(\$js,'\[\-123400\]', 'digit -1.234e5'\);\n)/{ #SKIP_IF_CPANEL\n$1}\n/;
+
+            $content .= <<'END';
+my $vax_float = (pack("d",1) =~ /^[\x80\x10]\x40/);
+
+if ($vax_float) {
+    # VAX has smaller float range.
+    $js  = q|[1.01e+37]|;
+    $obj = $pc->decode($js);
+    is($obj->[0], eval '1.01e+37', 'digit 1.01e+37');
+    $js = $pc->encode($obj);
+    like($js,qr/\[1.01[Ee]\+0?37\]/, 'digit 1.01e+37');
+} else {
+    $js  = q|[1.01e+67]|; # 30 -> 67 ... patched by H.Merijn Brand
+    $obj = $pc->decode($js);
+    is($obj->[0], eval '1.01e+67', 'digit 1.01e+67');
+    $js = $pc->encode($obj);
+    like($js,qr/\[1.01[Ee]\+0?67\]/, 'digit 1.01e+67');
+}
+END
+
+        }
+
+        if ($basename =~ /012_blessed/) {
+            $content =~ s/\{__,""}/{'__',""}/;
+            $content =~ s/\$js\->filter_json_single_key_object \(a => sub \{ }\);/\$js\->filter_json_single_key_object \(a => sub \{ return; }\); # sub {} is not suitable for Perl 5.6/;
+        }
+
+        if ($basename =~ /013_limit/) {
+            $content =~ s/(my \$js = JSON::PP->new;\n)/$1local \$^W; # to silence Deep recursion warnings\n/;
+        }
+
+        if ($basename =~ /014_latin1/) {
+            $content =~ s/print (.+?)\s+\?.*\\n";/ok ($1);/g;
+        }
+
+        if ($basename =~ /015_prefix/) {
+            $content =~ s/print \$\@ \? "not " : "", .*\\n";/ok (!\$\@);/g;
+            $content =~ s/print (.+?)\s+\?.*\\n";/ok ($1);/g;
+        }
+
+        if ($basename =~ /018_json_checker/) {
+            $content =~ s/(binmode DATA;\n)/my \$vax_float = (pack("d",1) =~ \/^[\\x80\\x10]\\x40\/);\n\n$1/s;
+            $content =~ s/(   my \$name = <DATA>;\n)/$1   if (\$vax_float && \$name =~ \/pass1.json\/) {\n       \$test =~ s\/\\b23456789012E66\\b\/23456789012E20\/;\n   }\n/s;
+        }
+
+        if ($basename =~ /022_comment_at_eof/) {
+            $content =~ s/# (provided by IKEGAMI\@cpan.org)/# the original test case was $1/;
+        }
+
+        if ($basename =~ /052_object/) {
+            $content =~ s/\$(json|obj|enc|dec) = /my \$$1 = /g;
+            $content =~ s/print (.+?)\s+\?.*\\n";/ok ($1);/g;
+            $content =~ s/print "ok \d+\\n";/ok (1);/g;
+        }
+
+        if ($basename =~ /099_binary/) {
+            $content =~ s/(, )([0-9])(\);)/$1" - $2"$3/g;
+        }
+
+
+        $pp_test->spew($content);
+        print STDERR "copied $xs_test to $pp_test\n";
+        next;
+    }
+    print STDERR "Skipped $xs_test\n";
+}
