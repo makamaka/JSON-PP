@@ -1285,17 +1285,26 @@ BEGIN {
 
         if ( $cb_sk_object and @ks == 1 and exists $cb_sk_object->{ $ks[0] } and ref $cb_sk_object->{ $ks[0] } ) {
             my @val = $cb_sk_object->{ $ks[0] }->( $o->{$ks[0]} );
-            if (@val == 1) {
+            if (@val == 0) {
+                return $o;
+            }
+            elsif (@val == 1) {
                 return $val[0];
+            }
+            else {
+                Carp::croak("filter_json_single_key_object callbacks must not return more than one scalar");
             }
         }
 
         my @val = $cb_object->($o) if ($cb_object);
-        if (@val == 0 or @val > 1) {
+        if (@val == 0) {
             return $o;
         }
-        else {
+        elsif (@val == 1) {
             return $val[0];
+        }
+        else {
+            Carp::croak("filter_json_object callbacks must not return more than one scalar");
         }
     }
 
