@@ -46,8 +46,10 @@ eval { JSON::PP->new->decode (*STDERR) }; ok !!$@; # cannot coerce GLOB
 
 eval { decode_json ("\"\xa0") }; ok $@ =~ /malformed.*character/;
 eval { decode_json ("\"\xa0\"") }; ok $@ =~ /malformed.*character/;
+{ #SKIP_UNLESS_XS4_COMPAT 4
 eval { decode_json ("1\x01") }; ok $@ =~ /garbage after/;
 eval { decode_json ("1\x00") }; ok $@ =~ /garbage after/;
 eval { decode_json ("\"\"\x00") }; ok $@ =~ /garbage after/;
 eval { decode_json ("[]\x00") }; ok $@ =~ /garbage after/;
+}
 

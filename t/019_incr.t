@@ -39,7 +39,9 @@ splitter +JSON::PP->new->allow_nonref (0), '[ "x\\"","\\u1000\\\\n\\nx" , 1,{"\\
 splitter +JSON::PP->new                  , '"test"';
 splitter +JSON::PP->new                  , ' "5" ';
 splitter +JSON::PP->new                  , '-1e5';
+{ #SKIP_UNLESS_PP 3, 33
 splitter +JSON::PP->new                  , ' 0.00E+00 ';
+}
 
 {
    my $text = '[5],{"":1} , [ 1,2, 3], {"3":null}';
