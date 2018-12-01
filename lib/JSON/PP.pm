@@ -134,6 +134,8 @@ sub new {
         indent_length => 3,
     };
 
+    $self->{PROPS}[P_ALLOW_NONREF] = 1;
+
     bless $self, $class;
 }
 
