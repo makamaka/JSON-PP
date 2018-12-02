@@ -95,6 +95,10 @@ END
             $content =~ s!(splitter \+JSON::PP->new\s+, ' 0\.00E\+00 ';)!{ #SKIP_UNLESS_PP 3, 33\n$1\n}!;
         }
 
+        if ($basename =~ /020_faihu/) {
+            $content =~ s|(use JSON::PP;)|BEGIN { if (\$\] < 5.008) { require Test::More; Test::More::plan(skip_all => "requires Perl 5.8 or later"); } };\n\n$1|;
+        }
+
         if ($basename =~ /022_comment_at_eof/) {
             $content =~ s/# (provided by IKEGAMI\@cpan.org)/# the original test case was $1/;
         }
