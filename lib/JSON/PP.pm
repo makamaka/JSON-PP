@@ -45,12 +45,12 @@ use constant P_ALLOW_UNKNOWN        => 18;
 use constant P_ALLOW_TAGS           => 19;
 
 use constant OLD_PERL => $] < 5.008 ? 1 : 0;
-use constant USE_B => 0;
+use constant USE_B => $ENV{PERL_JSON_PP_USE_B} || 0;
 
 BEGIN {
-if (USE_B) {
-    require B;
-}
+    if (USE_B) {
+        require B;
+    }
 }
 
 BEGIN {
