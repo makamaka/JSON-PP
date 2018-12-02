@@ -389,8 +389,7 @@ sub allow_bigint {
                     return $self->blessed_to_json($obj) if ($as_nonblessed); # will be removed.
                     return 'null';
                 }
-                encode_error( sprintf("encountered object '%s', but neither allow_blessed "
-                    . "nor convert_blessed settings are enabled", $obj)
+                encode_error( sprintf("encountered object '%s', but neither allow_blessed, convert_blessed nor allow_tags settings are enabled (or TO_JSON/FREEZE method missing)", $obj)
                 );
             }
             else {
