@@ -1,7 +1,9 @@
 package JSON::PP::Boolean;
 
 use strict;
-use overload (
+require overload;
+local $^W;
+overload::import('overload',
     "0+"     => sub { ${$_[0]} },
     "++"     => sub { $_[0] = ${$_[0]} + 1 },
     "--"     => sub { $_[0] = ${$_[0]} - 1 },
