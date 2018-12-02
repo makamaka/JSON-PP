@@ -888,8 +888,10 @@ BEGIN {
 
                     if (!$loose) {
                         if ($ch =~ /[\x00-\x1f\x22\x5c]/)  { # '/' ok
-                            $at--;
-                            decode_error('invalid character encountered while parsing JSON string');
+                            if (!$relaxed or $ch ne "\t") {
+                                $at--;
+                                decode_error('invalid character encountered while parsing JSON string');
+                            }
                         }
                     }
 
@@ -2076,6 +2078,16 @@ character, after which more white-space and comments are allowed.
   [
      1, // this comment not allowed in JSON
         // neither this one...
+  ]
+
+=item * literal ASCII TAB characters in strings
+
+Literal ASCII TAB characters are now allowed in strings (and treated as
+C<\t>).
+
+  [
+     "Hello\tWorld",
+     "Hello<TAB>World", # literal <TAB> would not normally be allowed
   ]
 
 =back
