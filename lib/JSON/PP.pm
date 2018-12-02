@@ -1492,7 +1492,7 @@ BEGIN {
 $JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::PP::Boolean" };
 $JSON::PP::false = do { bless \(my $dummy = 0), "JSON::PP::Boolean" };
 
-sub is_bool { blessed $_[0] and $_[0]->isa("JSON::PP::Boolean"); }
+sub is_bool { blessed $_[0] and ( $_[0]->isa("JSON::PP::Boolean") or $_[0]->isa("Types::Serialiser::BooleanBase") or $_[0]->isa("JSON::XS::Boolean") ); }
 
 sub true  { $JSON::PP::true  }
 sub false { $JSON::PP::false }
