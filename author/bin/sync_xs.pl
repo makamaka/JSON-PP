@@ -19,6 +19,7 @@ for my $xs_test ($xs_root->child('t')->children) {
         my $content = $xs_test->slurp;
 
         # common stuff
+        $content =~ s/(\015\012|\015|\012)/\n/gs;
         $content =~ s/JSON::XS/JSON::PP/g;
         $content =~ s/Types::Serialiser/JSON::PP/g;
         $content =~ s/use JSON::PP;\nuse JSON::PP;\n/use JSON::PP;\n/g;
@@ -32,6 +33,10 @@ for my $xs_test ($xs_root->child('t')->children) {
         $content =~ s/(# copied over from JSON::PC and modified to use JSON::PP\n)/$1# copied over from JSON::XS and modified to use JSON::PP\n/s or $content =~ s/\A/# copied over from JSON::XS and modified to use JSON::PP\n\n/s;
 
         # specific
+        if ($basename =~ /002_error/) {
+            $content =~ s!(eval \{ decode_json \("1\\x01"\) }; ok \$\@ =~ /garbage after/;)!{ #SKIP_UNLESS_XS4_COMPAT 4\n$1!;
+            $content =~ s!(eval \{ decode_json \("\[\]\\x00"\) }; ok \$\@ =~ /garbage after/;)!$1\n}!;
+        }
         if ($basename =~ /003_types/) {
             $content =~ s/for \$v /for my \$v /;
             $content =~ s/BEGIN \{ plan tests => (\d+) };\n/BEGIN \{ plan tests => $1 + 2 };\n/;
@@ -84,6 +89,10 @@ END
         if ($basename =~ /018_json_checker/) {
             $content =~ s/(binmode DATA;\n)/my \$vax_float = (pack("d",1) =~ \/^[\\x80\\x10]\\x40\/);\n\n$1/s;
             $content =~ s/(   my \$name = <DATA>;\n)/$1   if (\$vax_float && \$name =~ \/pass1.json\/) {\n       \$test =~ s\/\\b23456789012E66\\b\/23456789012E20\/;\n   }\n/s;
+        }
+
+        if ($basename =~ /019_incr/) {
+            $content =~ s!(splitter \+JSON::PP->new\s+, ' 0\.00E\+00 ';)!{ #SKIP_UNLESS_PP 3, 33\n$1\n}!;
         }
 
         if ($basename =~ /022_comment_at_eof/) {
