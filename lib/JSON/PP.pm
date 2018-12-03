@@ -2418,8 +2418,10 @@ and you need to know where the JSON text ends.
 The following flags and properties are for JSON::PP only. If you use
 any of these, you can't make your application run faster by replacing
 JSON::PP with JSON::XS. If you need these and also speed boost,
-try L<Cpanel::JSON::XS>, a fork of JSON::XS by Reini Urban, which
-supports some of these.
+you might want to try L<Cpanel::JSON::XS>, a fork of JSON::XS by
+Reini Urban, which supports some of these (with a different set of
+incompatibilities). Most of these historical flags are only kept
+for backward compatibility, and should not be used in a new application.
 
 =head2 allow_singlequote
 
