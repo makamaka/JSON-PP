@@ -1,5 +1,17 @@
 Revision history for Perl extension JSON::PP.
 
+3.99_01 2018-12-03
+    - BACKWARD INCOMPATIBILITY:
+      As JSON::XS 4.0 changed its policy and enabled allow_nonref
+      by default, JSON::PP also enabled allow_nonref by default
+
+    - implement allow_tags that was introduced by JSON::XS 3.0
+    - add boolean_values that was introduced by JSON::XS 4.0
+    - allow literal tags in strings in relaxed mode, as JSON::XS 3.02 does
+    - allow PERL_JSON_PP_USE_B environmental variable to restore
+      old number detection behavior for compatibility
+    - various doc updates
+
 2.97001 2017-12-21
     - tweak internal number detector to always considers a flagged
       value as a string (GH#35, haarg++)
