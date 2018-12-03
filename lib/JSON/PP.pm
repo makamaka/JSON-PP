@@ -3095,6 +3095,27 @@ proper subset of most 8-bit and multibyte encodings in use in the world.
 
 =back
 
+=head1 BUGS
+
+Please report bugs on a specific behavior of this module to RT or GitHub
+issues (preferred):
+
+=over 4
+
+=item https://github.com/makamaka/JSON-PP/issues
+
+=item https://rt.cpan.org/Public/Dist/Display.html?Queue=JSON-PP
+
+=back
+
+As for new features and requests to change common behaviors, please
+ask the author of JSON::XS (Marc Lehmann, E<lt>schmorp[at]schmorp.deE<gt>)
+first, by email (important!), to keep compatibility among JSON.pm backends.
+
+Generally speaking, if you need something special for you, you are advised
+to create a new module, maybe based on L<JSON::Tiny>, which is smaller and
+written in a much cleaner way than this module.
+
 =head1 SEE ALSO
 
 The F<json_pp> command line utility for quick experiments.
