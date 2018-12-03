@@ -3135,6 +3135,9 @@ RFC8259 (L<http://www.ietf.org/rfc/rfc8259.txt>)
 
 Makamaka Hannyaharamitu, E<lt>makamaka[at]cpan.orgE<gt>
 
+=head1 CURRENT MAINTAINER
+
+Kenichi Ishigaki, E<lt>ishigaki[at]cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
