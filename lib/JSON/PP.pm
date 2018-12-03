@@ -3143,6 +3143,8 @@ Kenichi Ishigaki, E<lt>ishigaki[at]cpan.orgE<gt>
 
 Copyright 2007-2016 by Makamaka Hannyaharamitu
 
+Most of the documentation is taken from JSON::XS by Marc Lehmann
+
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
 
