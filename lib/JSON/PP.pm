@@ -2142,7 +2142,7 @@ resulting in an error:
 
 =head2 allow_unknown
 
-    $json = $json->allow_unknown ([$enable])
+    $json = $json->allow_unknown([$enable])
     
     $enabled = $json->get_allow_unknown
 
@@ -2255,13 +2255,13 @@ the empty list when they are set to the default.
     $json = $json->filter_json_object([$coderef])
 
 When C<$coderef> is specified, it will be called from C<decode> each
-time it decodes a JSON object. The only argument is a reference to the
-newly-created hash. If the code references returns a single scalar (which
-need not be a reference), this value (i.e. a copy of that scalar to avoid
-aliasing) is inserted into the deserialised data structure. If it returns
-an empty list (NOTE: I<not> C<undef>, which is a valid scalar), the
-original deserialised hash will be inserted. This setting can slow down
-decoding considerably.
+time it decodes a JSON object. The only argument is a reference to
+the newly-created hash. If the code references returns a single scalar
+(which need not be a reference), this value (or rather a copy of it) is
+inserted into the deserialised data structure. If it returns an empty
+list (NOTE: I<not> C<undef>, which is a valid scalar), the original
+deserialised hash will be inserted. This setting can slow down decoding
+considerably.
 
 When C<$coderef> is omitted or undefined, any existing callback will
 be removed and C<decode> will not change the deserialised hash in any
@@ -2430,7 +2430,7 @@ for backward compatibility, and should not be used in a new application.
 
 If C<$enable> is true (or missing), then C<decode> will accept
 invalid JSON texts that contain strings that begin and end with
-single quotation marks. C<encode> will not be affected in anyway.
+single quotation marks. C<encode> will not be affected in any way.
 I<Be aware that this option makes you accept invalid JSON texts
 as if they were valid!>. I suggest only to use this option to
 parse application-specific files written by humans (configuration
@@ -2451,7 +2451,7 @@ valid JSON texts.
 If C<$enable> is true (or missing), then C<decode> will accept
 invalid JSON texts that contain JSON objects whose names don't
 begin and end with quotation marks. C<encode> will not be affected
-in anyway. I<Be aware that this option makes you accept invalid JSON
+in any way. I<Be aware that this option makes you accept invalid JSON
 texts as if they were valid!>. I suggest only to use this option to
 parse application-specific files written by humans (configuration
 files, resource files etc.)
@@ -2486,7 +2486,7 @@ See also L<MAPPING>.
 
 If C<$enable> is true (or missing), then C<decode> will accept
 invalid JSON texts that contain unescaped [\x00-\x1f\x22\x5c]
-characters. C<encode> will not be affected in anyway.
+characters. C<encode> will not be affected in any way.
 I<Be aware that this option makes you accept invalid JSON texts
 as if they were valid!>. I suggest only to use this option to
 parse application-specific files written by humans (configuration
@@ -2513,7 +2513,7 @@ arbitrary JSON in HTML (by some HTML template toolkit or by string
 interpolation) is risky in general. You must escape necessary
 characters in correct order, depending on the context.
 
-C<decode> will not be affected in anyway.
+C<decode> will not be affected in any way.
 
 =head2 indent_length
 
@@ -2835,7 +2835,7 @@ before encoding as JSON strings, and anything else as number value:
    # undef becomes null
    encode_json [undef]                  # yields [null]
 
-You can force the type to be a string by stringifying it:
+You can force the type to be a JSON string by stringifying it:
 
    my $x = 3.1; # some variable containing a number
    "$x";        # stringified
@@ -2843,13 +2843,13 @@ You can force the type to be a string by stringifying it:
    print $x;    # perl does it for you, too, quite often
                 # (but for older perls)
 
-You can force the type to be a number by numifying it:
+You can force the type to be a JSON number by numifying it:
 
    my $x = "3"; # some variable containing a string
    $x += 0;     # numify it, ensuring it will be dumped as a number
    $x *= 1;     # same thing, the choice is yours.
 
-You cannot currently force the type in other, less obscure, ways.
+You can not currently force the type in other, less obscure, ways.
 
 Since version 2.91_01, JSON::PP uses a different number detection logic
 that converts a scalar that is possible to turn into a number safely.
