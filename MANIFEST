@@ -1,3 +1,4 @@
+.travis.yml
 bin/json_pp
 Changes
 lib/JSON/PP.pm
@@ -9,6 +10,8 @@ t/000_load.t
 t/001_utf8.t
 t/002_error.t
 t/003_types.t
+t/004_dwiw_encode.t
+t/005_dwiw_decode.t
 t/006_pc_pretty.t
 t/007_pc_esc.t
 t/008_pc_base.t
@@ -23,9 +26,11 @@ t/016_tied.t
 t/017_relaxed.t
 t/018_json_checker.t
 t/019_incr.t
+t/020_faihu.t
 t/020_unknown.t
-t/021_evans_bugrep.t
+t/021_evans.t
 t/022_comment_at_eof.t
+t/052_object.t
 t/099_binary.t
 t/104_sortby.t
 t/105_esc_slash.t
@@ -40,7 +45,7 @@ t/114_decode_prefix.t
 t/115_tie_ixhash.t
 t/116_incr_parse_fixed.t
 t/117_numbers.t
-t/_unicode_handling.pm
+t/118_boolean_values.t
 t/gh_28_json_test_suite.t
 t/gh_29_trailing_false_value.t
 t/rt_116998_wrong_character_offset.t

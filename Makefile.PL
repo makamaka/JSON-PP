@@ -33,7 +33,8 @@ WriteMakefile(
     ( $ExtUtils::MakeMaker::VERSION >= 6.46 ? (
         'META_MERGE' => {
             resources => {
-                repository  =>  'http://github.com/makamaka/JSON-PP',
+                repository  =>  'https://github.com/makamaka/JSON-PP',
+                bugtracker  =>  'https://github.com/makamaka/JSON-PP/issues',
             },
         } ) : ()
     ),
