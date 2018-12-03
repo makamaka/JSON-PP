@@ -2219,6 +2219,26 @@ If C<$enable> is false (the default), then C<encode> will not consider
 this type of conversion, and tagged JSON values will cause a parse error
 in C<decode>, as if tags were not part of the grammar.
 
+=head2 boolean_values
+
+    $json->boolean_values([$false, $true])
+
+    ($false,  $true) = $json->get_boolean_values
+
+By default, JSON booleans will be decoded as overloaded
+C<$JSON::PP::false> and C<$JSON::PP::true> objects.
+
+With this method you can specify your own boolean values for decoding -
+on decode, JSON C<false> will be decoded as a copy of C<$false>, and JSON
+C<true> will be decoded as C<$true> ("copy" here is the same thing as
+assigning a value to another variable, i.e. C<$copy = $false>).
+
+Calling this method without any arguments will reset the booleans
+to their default values.
+
+C<get_boolean_values> will return both C<$false> and C<$true> values, or
+the empty list when they are set to the default.
+
 =head2 filter_json_object
 
     $json = $json->filter_json_object([$coderef])
