@@ -2849,6 +2849,16 @@ You can force the type to be a number by numifying it:
 
 You cannot currently force the type in other, less obscure, ways.
 
+Since version 2.91_01, JSON::PP uses a different number detection logic
+that converts a scalar that is possible to turn into a number safely.
+The new logic is slightly faster, and tends to help people who use older
+perl or who want to encode complicated data structure. However, this may
+results in a different JSON text from the one JSON::XS encodes (and
+thus may break tests that compare entire JSON texts). If you do
+need the previous behavior for compatibility or for finer control,
+set PERL_JSON_PP_USE_B environmental variable to true before you
+C<use> JSON::PP (or JSON.pm).
+
 Note that numerical precision has the same meaning as under Perl (so
 binary to decimal conversion follows the same rules as in Perl, which
 can differ to other languages). Also, your perl interpreter might expose
