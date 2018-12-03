@@ -354,20 +354,6 @@ sub allow_bigint {
 
                 return $self->value_to_json($obj) if ( $obj->isa('JSON::PP::Boolean') );
 
-                if ( $convert_blessed and $obj->can('TO_JSON') ) {
-                    my $result = $obj->TO_JSON();
-                    if ( defined $result and ref( $result ) ) {
-                        if ( refaddr( $obj ) eq refaddr( $result ) ) {
-                            encode_error( sprintf(
-                                "%s::TO_JSON method returned same object as was passed instead of a new one",
-                                ref $obj
-                            ) );
-                        }
-                    }
-
-                    return $self->object_to_json( $result );
-                }
-
                 if ( $allow_tags and $obj->can('FREEZE') ) {
                     my $obj_class = ref $obj || $obj;
                     $obj = bless $obj, $obj_class;
@@ -381,6 +367,20 @@ sub allow_bigint {
                         }
                     }
                     return '("'.$obj_class.'")['.join(',', @results).']';
+                }
+
+                if ( $convert_blessed and $obj->can('TO_JSON') ) {
+                    my $result = $obj->TO_JSON();
+                    if ( defined $result and ref( $result ) ) {
+                        if ( refaddr( $obj ) eq refaddr( $result ) ) {
+                            encode_error( sprintf(
+                                "%s::TO_JSON method returned same object as was passed instead of a new one",
+                                ref $obj
+                            ) );
+                        }
+                    }
+
+                    return $self->object_to_json( $result );
                 }
 
                 return "$obj" if ( $bignum and _is_bignum($obj) );
