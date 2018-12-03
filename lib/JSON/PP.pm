@@ -1777,16 +1777,14 @@ JSON::PP - JSON::XS compatible pure-Perl module.
 
 =head1 DESCRIPTION
 
-JSON::PP is a pure perl JSON decoder/encoder (as of RFC4627, which
-we know is obsolete but we still stick to; see below for an option
-to support part of RFC7159), and (almost) compatible to much
+JSON::PP is a pure perl JSON decoder/encoder, and (almost) compatible to much
 faster L<JSON::XS> written by Marc Lehmann in C. JSON::PP works as
 a fallback module when you use L<JSON> module without having
 installed JSON::XS.
 
 Because of this fallback feature of JSON.pm, JSON::PP tries not to
 be more JavaScript-friendly than JSON::XS (i.e. not to escape extra
-characters such as U+2028 and U+2029 nor support RFC7159/ECMA-404),
+characters such as U+2028 and U+2029, etc),
 in order for you not to lose such JavaScript-friendliness silently
 when you use JSON.pm and install JSON::XS for speed or by accident.
 If you need JavaScript-friendly RFC7159-compliant pure perl module,
@@ -1851,7 +1849,9 @@ decoding style, within the limits of supported formats.
     $json = JSON::PP->new
 
 Creates a new JSON::PP object that can be used to de/encode JSON
-strings. All boolean flags described below are by default I<disabled>.
+strings. All boolean flags described below are by default I<disabled>
+(with the exception of C<allow_nonref>, which defaults to I<enabled> since
+version C<4.0>).
 
 The mutators for flags all return the JSON::PP object again and thus calls can
 be chained:
@@ -2121,6 +2121,9 @@ This setting has currently no effect on tied hashes.
     
     $enabled = $json->get_allow_nonref
 
+Unlike other boolean options, this opotion is enabled by default beginning
+with version C<4.0>.
+
 If C<$enable> is true (or missing), then the C<encode> method can convert a
 non-reference into its corresponding string, number or null JSON value,
 which is an extension to RFC4627. Likewise, C<decode> will accept those JSON
@@ -2131,11 +2134,11 @@ passed an arrayref or hashref, as JSON texts must either be an object
 or array. Likewise, C<decode> will croak if given something that is not a
 JSON object or array.
 
-Example, encode a Perl scalar as JSON value with enabled C<allow_nonref>,
-resulting in an invalid JSON text:
+Example, encode a Perl scalar as JSON value without enabled C<allow_nonref>,
+resulting in an error:
 
-   JSON::PP->new->allow_nonref->encode ("Hello, World!")
-   => "Hello, World!"
+   JSON::PP->new->allow_nonref(0)->encode ("Hello, World!")
+   => hash- or arrayref expected...
 
 =head2 allow_unknown
 
@@ -2266,12 +2269,11 @@ way.
 
 Example, convert all JSON objects into the integer 5:
 
-   my $js = JSON::PP->new->filter_json_object (sub { 5 });
+   my $js = JSON::PP->new->filter_json_object(sub { 5 });
    # returns [5]
-   $js->decode ('[{}]'); # the given subroutine takes a hash reference.
-   # throw an exception because allow_nonref is not enabled
-   # so a lone 5 is not allowed.
-   $js->decode ('{"a":1, "b":2}');
+   $js->decode('[{}]');
+   # returns 5
+   $js->decode('{"a":1, "b":2}');
 
 =head2 filter_json_single_key_object
 
