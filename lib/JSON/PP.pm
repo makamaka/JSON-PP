@@ -2233,6 +2233,14 @@ on decode, JSON C<false> will be decoded as a copy of C<$false>, and JSON
 C<true> will be decoded as C<$true> ("copy" here is the same thing as
 assigning a value to another variable, i.e. C<$copy = $false>).
 
+This is useful when you want to pass a decoded data structure directly
+to other serialisers like YAML, Data::MessagePack and so on.
+
+Note that this works only when you C<decode>. You can set incompatible
+boolean objects (like L<boolean>), but when you C<encode> a data structure
+with such boolean objects, you still need to enable C<convert_blessed>
+(and add a C<TO_JSON> method if necessary).
+
 Calling this method without any arguments will reset the booleans
 to their default values.
 
