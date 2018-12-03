@@ -3127,6 +3127,10 @@ L<JSON::PP::Compat5005> and L<JSON::PP::Compat5006> for older perl users.
 
 RFC4627 (L<http://www.ietf.org/rfc/rfc4627.txt>)
 
+RFC7159 (L<http://www.ietf.org/rfc/rfc7159.txt>)
+
+RFC8259 (L<http://www.ietf.org/rfc/rfc8259.txt>)
+
 =head1 AUTHOR
 
 Makamaka Hannyaharamitu, E<lt>makamaka[at]cpan.orgE<gt>
