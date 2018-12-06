@@ -10,7 +10,7 @@ overload::import('overload',
     fallback => 1,
 );
 
-$JSON::PP::Boolean::VERSION = '3.99_01';
+$JSON::PP::Boolean::VERSION = '4.00';
 
 1;
 
