@@ -3100,13 +3100,9 @@ proper subset of most 8-bit and multibyte encodings in use in the world.
 Please report bugs on a specific behavior of this module to RT or GitHub
 issues (preferred):
 
-=over 4
+L<https://github.com/makamaka/JSON-PP/issues>
 
-=item https://github.com/makamaka/JSON-PP/issues
-
-=item https://rt.cpan.org/Public/Dist/Display.html?Queue=JSON-PP
-
-=back
+L<https://rt.cpan.org/Public/Dist/Display.html?Queue=JSON-PP>
 
 As for new features and requests to change common behaviors, please
 ask the author of JSON::XS (Marc Lehmann, E<lt>schmorp[at]schmorp.deE<gt>)
