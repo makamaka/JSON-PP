@@ -1,5 +1,8 @@
 Revision history for Perl extension JSON::PP.
 
+4.01 2019-02-22
+    - allow to pass indent_length to json_pp (GH#46)
+
 4.00 2018-12-07
     - production release
 
