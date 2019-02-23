@@ -46,6 +46,7 @@ for my $xs_test ($xs_root->child('t')->children) {
         if ($basename =~ /011_pc_expo/) {
             $content =~ s/BEGIN \{ plan tests => (\d+) };\n/BEGIN \{ plan tests => $1 + 2 };\n/;
             $content =~ s/(\$js = \$pc->encode\(\$obj\);\nis\(\$js,'\[\-123400\]', 'digit -1.234e5'\);\n)/{ #SKIP_IF_CPANEL\n$1}\n/;
+            $content =~ s!like\(\$js,qr/\\\[1\.01\[Ee\]\\\+0\?30\\\]/, 'digit 1\.01e\+30'\);\n!like(\$js,qr/\\[(?:1\.01\[Ee\]\\+0\?30|1010000000000000000000000000000\)\]/, 'digit 1.01e+30'); # RT-128589 (-Duselongdouble or -Dquadmath) \n!;
 
             $content .= <<'END';
 my $vax_float = (pack("d",1) =~ /^[\x80\x10]\x40/);
