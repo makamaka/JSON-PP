@@ -94,6 +94,7 @@ $T{$opt_to}
 
 {
   local $/;
+  binmode STDIN;
   $_ = <STDIN>;
 }
 
