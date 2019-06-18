@@ -92,8 +92,10 @@ $F{$opt_from}
 $T{$opt_to}
    or die "$opt_from: not a valid toformat\n";
 
-local $/;
-$_ = <STDIN>;
+{
+  local $/;
+  $_ = <STDIN>;
+}
 
 $_ = $F{$opt_from}->();
 $_ = $T{$opt_to}->();
