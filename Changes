@@ -1,5 +1,9 @@
 Revision history for Perl extension JSON::PP.
 
+4.03 2019-06-19
+    - (Encode::)decode json_pp input properly by default
+      (GH#47)
+
 4.02 2019-02-23
     - fix a test that breaks if perl is compiled with
       -Dquadmath (RT-128589)
