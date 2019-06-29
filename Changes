@@ -1,5 +1,8 @@
 Revision history for Perl extension JSON::PP.
 
+4.04 2019-06-29
+    - document indent_length option (GH#48)
+
 4.03 2019-06-19
     - (Encode::)decode json_pp input properly by default
       (GH#47)
