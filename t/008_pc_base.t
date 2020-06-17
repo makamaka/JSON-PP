@@ -4,6 +4,7 @@ use Test::More;
 # copied over from JSON::XS and modified to use JSON::PP
 
 use strict;
+use warnings;
 BEGIN { plan tests => 20 };
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
