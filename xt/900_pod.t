@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 $^W = 1;
 
 use Test::More;

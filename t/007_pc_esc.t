@@ -7,6 +7,7 @@
 
 use Test::More;
 use strict;
+use warnings;
 use utf8;
 BEGIN { plan tests => 17 };
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
