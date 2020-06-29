@@ -21,6 +21,7 @@ for my $xs_test ($xs_root->child('t')->children) {
         # common stuff
         $content =~ s/(\015\012|\015|\012)/\n/gs;
         $content =~ s/JSON::XS/JSON::PP/g;
+        $content =~ s/new JSON::PP/JSON::PP->new/g;
         $content =~ s/Types::Serialiser/JSON::PP/g;
         $content =~ s/use JSON::PP;\nuse JSON::PP;\n/use JSON::PP;\n/g;
         $content =~ s/our \$test;\nsub ok\(\$(;\$)?\) \{\n   print \$_\[0\] \? "" : "not ", "ok ", \+\+\$test, ".*?\\n";\n}\n//s;
@@ -32,7 +33,15 @@ for my $xs_test ($xs_root->child('t')->children) {
 
         $content =~ s/(# copied over from JSON::PC and modified to use JSON::PP\n)/$1# copied over from JSON::XS and modified to use JSON::PP\n/s or $content =~ s/\A/# copied over from JSON::XS and modified to use JSON::PP\n\n/s;
 
+        if ($content !~ /use strict;\n(?:use|no) warnings/) {
+            $content =~ s/(use strict;\n)/$1use warnings;\n/;
+        }
+
         # specific
+        if ($basename =~ /000_load/) {
+            $content =~ s/(# copied over from JSON::XS and modified to use JSON::PP\n\n)/$1use strict;\nuse warnings;\n\nmy \$loaded;\n/;
+        }
+
         if ($basename =~ /002_error/) {
             $content =~ s!(eval \{ decode_json \("1\\x01"\) }; ok \$\@ =~ /garbage after/;)!{ #SKIP_UNLESS_XS4_COMPAT 4\n$1!;
             $content =~ s!(eval \{ decode_json \("\[\]\\x00"\) }; ok \$\@ =~ /garbage after/;)!$1\n}!;
@@ -105,9 +114,11 @@ END
         }
 
         if ($basename =~ /052_object/) {
-            $content =~ s/\$(json|obj|enc|dec) = /my \$$1 = /g;
+            my %seen;
+            $content =~ s/\$(json|obj|enc|dec) = /(!$seen{$1}++ ? "my " : "" ) . "\$$1 = "/ge;
             $content =~ s/print (.+?)\s+\?.*\\n";/ok ($1);/g;
             $content =~ s/print "ok \d+\\n";/ok (1);/g;
+            $content =~ s/(use strict;)/package JSON::PP::freeze;\n\n1;\n\npackage JSON::tojson;\n\n1;\n\npackage main;\n\n$1//;
         }
 
         if ($basename =~ /099_binary/) {
