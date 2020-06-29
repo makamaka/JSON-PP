@@ -12,7 +12,7 @@ use JSON::PP;
 
 my ($js,$obj);
 
-my $pc = new JSON::PP;
+my $pc = JSON::PP->new;
 
 $js  = q|{}|;
 
