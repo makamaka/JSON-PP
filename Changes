@@ -1,5 +1,9 @@
 Revision history for Perl extension JSON::PP.
 
+4.05 2020-07-09
+    - no code changes
+    - modify tests for perl 7 (Nicolas R)
+
 4.04 2019-06-29
     - document indent_length option (GH#48)
 
