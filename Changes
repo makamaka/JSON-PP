@@ -1,5 +1,9 @@
 Revision history for Perl extension JSON::PP.
 
+4.06 2021-01-24
+    - fix return values of boolean_values for compatibility
+      (yahermann++)
+
 4.05 2020-07-09
     - no code changes
     - modify tests for perl 7 (Nicolas R)
