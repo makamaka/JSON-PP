@@ -118,7 +118,7 @@ END
             $content =~ s/\$(json|obj|enc|dec) = /(!$seen{$1}++ ? "my " : "" ) . "\$$1 = "/ge;
             $content =~ s/print (.+?)\s+\?.*\\n";/ok ($1);/g;
             $content =~ s/print "ok \d+\\n";/ok (1);/g;
-            $content =~ s/(use strict;)/package JSON::PP::freeze;\n\n1;\n\npackage JSON::tojson;\n\n1;\n\npackage main;\n\n$1//;
+            $content =~ s/(use strict;)/package JSON::PP::freeze;\n\n1;\n\npackage JSON::PP::tojson;\n\n1;\n\npackage main;\n\n$1/;
         }
 
         if ($basename =~ /099_binary/) {
