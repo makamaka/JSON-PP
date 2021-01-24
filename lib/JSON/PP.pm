@@ -1770,10 +1770,6 @@ JSON::PP - JSON::XS compatible pure-Perl module.
  use JSON;
 
 
-=head1 VERSION
-
-    4.05
-
 =head1 DESCRIPTION
 
 JSON::PP is a pure perl JSON decoder/encoder, and (almost) compatible to much
