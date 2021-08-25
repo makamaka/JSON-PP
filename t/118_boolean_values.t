@@ -28,7 +28,8 @@ if (eval "require boolean; 1") {
     push @tests, [boolean::true(), boolean::false(), 'boolean', 'boolean', 1];
 }
 if (eval "require JSON::PP; 1") {
-    push @tests, [JSON::PP::true(), JSON::PP::false(), 'JSON::PP::Boolean', 'JSON::PP::Boolean'];
+    # values from JSON::PP may not be the boolean objects, so reconstruct them
+    push @tests, [bless(\(my $jpbt = 1), 'JSON::PP::Boolean'), bless(\(my $jpbf = 0), 'JSON::PP::Boolean'), 'JSON::PP::Boolean', 'JSON::PP::Boolean'];
 }
 if (eval "require Data::Bool; 1") {
     push @tests, [Data::Bool::true(), Data::Bool::false(), 'Data::Bool::Impl', 'Data::Bool::Impl'];
