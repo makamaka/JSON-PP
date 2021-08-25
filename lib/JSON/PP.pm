@@ -1492,11 +1492,14 @@ BEGIN {
     }
 }
 
-
-# shamelessly copied and modified from JSON::XS code.
-
-$JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::PP::Boolean" };
-$JSON::PP::false = do { bless \(my $dummy = 0), "JSON::PP::Boolean" };
+if (CORE_BOOL) {
+  $JSON::PP::true = !!1;
+  $JSON::PP::false = !!0;
+}
+else {
+  $JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::PP::Boolean" };
+  $JSON::PP::false = do { bless \(my $dummy = 0), "JSON::PP::Boolean" };
+}
 
 sub is_bool {
   if (blessed $_[0]) {

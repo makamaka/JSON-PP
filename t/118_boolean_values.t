@@ -38,7 +38,7 @@ if (eval "require Types::Serialiser; 1") {
     push @tests, [Types::Serialiser::true(), Types::Serialiser::false(), 'Types::Serialiser::BooleanBase', 'Types::Serialiser::BooleanBase'];
 }
 
-plan tests => 15 * @tests;
+plan tests => 17 * @tests;
 
 my $json = JSON::PP->new;
 for my $test (@tests) {
@@ -77,8 +77,20 @@ for my $test (@tests) {
     ok !$json->get_boolean_values, "reset boolean values";
 
     $should_true = $json->allow_nonref(1)->decode('true');
-    ok $should_true->isa('JSON::PP::Boolean'), "JSON true turns into a JSON::PP::Boolean object";
+    ok +JSON::PP::is_bool($should_true), "JSON true decoded into boolean";
+    if (JSON::PP::CORE_BOOL) {
+      ok !ref $should_true && $should_true eq 1, "JSON true decoded into normal perl boolean";
+    }
+    else {
+      ok $should_true->isa("JSON::PP::Boolean"), "JSON true decoded into a JSON::PP::Boolean object";
+    }
 
     $should_false = $json->allow_nonref(1)->decode('false');
-    ok $should_false->isa('JSON::PP::Boolean'), "JSON false turns into a JSON::PP::Boolean object";
+    ok +JSON::PP::is_bool($should_false), "JSON false decoded into boolean";
+    if (JSON::PP::CORE_BOOL) {
+      ok !ref $should_false && $should_false eq '', "JSON false decoded into normal perl boolean";
+    }
+    else {
+      ok $should_false->isa("JSON::PP::Boolean"), "JSON false decoded into a JSON::PP::Boolean object";
+    }
 }
