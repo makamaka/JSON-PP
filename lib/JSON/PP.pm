@@ -46,6 +46,7 @@ use constant P_ALLOW_TAGS           => 19;
 
 use constant OLD_PERL => $] < 5.008 ? 1 : 0;
 use constant USE_B => $ENV{PERL_JSON_PP_USE_B} || 0;
+use constant CORE_BOOL => defined &builtin::is_bool;
 
 my $invalid_char_re;
 
@@ -479,7 +480,11 @@ sub allow_bigint {
         my $type = ref($value);
 
         if (!$type) {
-            if (_looks_like_number($value)) {
+            BEGIN { CORE_BOOL and warnings->unimport('experimental::builtin') }
+            if (CORE_BOOL && builtin::is_bool($value)) {
+                return $value ? 'true' : 'false';
+            }
+            elsif (_looks_like_number($value)) {
                 return $value;
             }
             return $self->string_to_json($value);
@@ -1524,7 +1529,20 @@ BEGIN {
 $JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::PP::Boolean" };
 $JSON::PP::false = do { bless \(my $dummy = 0), "JSON::PP::Boolean" };
 
-sub is_bool { blessed $_[0] and ( $_[0]->isa("JSON::PP::Boolean") or $_[0]->isa("Types::Serialiser::BooleanBase") or $_[0]->isa("JSON::XS::Boolean") ); }
+sub is_bool {
+  if (blessed $_[0]) {
+    return (
+      $_[0]->isa("JSON::PP::Boolean")
+      or $_[0]->isa("Types::Serialiser::BooleanBase")
+      or $_[0]->isa("JSON::XS::Boolean")
+    );
+  }
+  elsif (CORE_BOOL) {
+    BEGIN { CORE_BOOL and warnings->unimport('experimental::builtin') }
+    return builtin::is_bool($_[0]);
+  }
+  return !!0;
+}
 
 sub true  { $JSON::PP::true  }
 sub false { $JSON::PP::false }
@@ -1861,6 +1879,9 @@ Except being faster.
 Returns true if the passed scalar represents either JSON::PP::true or
 JSON::PP::false, two constants that act like C<1> and C<0> respectively
 and are also used to represent JSON C<true> and C<false> in Perl strings.
+
+On perl 5.36 and above, will also return true when given one of perl's
+standard boolean values, such as the result of a comparison.
 
 See L<MAPPING>, below, for more information on how JSON values are mapped to
 Perl.
