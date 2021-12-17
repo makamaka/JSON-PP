@@ -1563,6 +1563,11 @@ sub incr_parse {
                     }
                 }
 
+                unless ( $coder->get_utf8 ) {
+                    utf8::upgrade( $self->{incr_text} );
+                    utf8::decode( $self->{incr_text} );
+                }
+
                 my ($obj, $offset) = $coder->PP_decode_json( $self->{incr_text}, 0x00000001 );
                 push @ret, $obj;
                 use bytes;
