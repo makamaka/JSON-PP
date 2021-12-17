@@ -1,5 +1,8 @@
 Revision history for Perl extension JSON::PP.
 
+4.07 2021-12-17
+    - fix incr_parse($unicode_str) bug (GH#56, DabeDotCom++)
+
 4.06 2021-01-24
     - fix return values of boolean_values for compatibility
       (yahermann++)
