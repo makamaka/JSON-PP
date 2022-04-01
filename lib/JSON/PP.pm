@@ -209,6 +209,30 @@ sub boolean_values {
     return $self;
 }
 
+sub core_bools {
+    my $self = shift;
+    my $core_bools = defined $_[0] ? $_[0] : 1;
+    if ($core_bools) {
+        $self->{true} = !!1;
+        $self->{false} = !!0;
+    }
+    else {
+        $self->{true} = $JSON::PP::true;
+        $self->{false} = $JSON::PP::false;
+    }
+    return $self;
+}
+
+sub get_core_bools {
+    return !!0
+        if !CORE_BOOL;
+
+    my $self = shift;
+    my ($true, $false) = @{$self}{qw(true false)};
+    BEGIN { CORE_BOOL and warnings->unimport(qw(experimental::builtin)) }
+    return builtin::is_bool($true) && builtin::is_bool($false) && $true && !$false;
+}
+
 sub get_boolean_values {
     my $self = shift;
     if (exists $self->{true} and exists $self->{false}) {
