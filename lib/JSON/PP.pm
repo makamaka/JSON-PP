@@ -213,11 +213,42 @@ sub boolean_values {
         my ($false, $true) = @_;
         $self->{false} = $false;
         $self->{true} = $true;
+        if (CORE_BOOL) {
+            BEGIN { CORE_BOOL and warnings->unimport(qw(experimental::builtin)) }
+            if (builtin::is_bool($true) && builtin::is_bool($false) && $true && !$false) {
+                $self->{core_bools} = !!1;
+            }
+            else {
+                delete $self->{core_bools};
+            }
+        }
     } else {
         delete $self->{false};
         delete $self->{true};
+        delete $self->{core_bools};
     }
     return $self;
+}
+
+sub core_bools {
+    my $self = shift;
+    my $core_bools = defined $_[0] ? $_[0] : 1;
+    if ($core_bools) {
+        $self->{true} = !!1;
+        $self->{false} = !!0;
+        $self->{core_bools} = !!1;
+    }
+    else {
+        $self->{true} = $JSON::PP::true;
+        $self->{false} = $JSON::PP::false;
+        $self->{core_bools} = !!0;
+    }
+    return $self;
+}
+
+sub get_core_bools {
+    my $self = shift;
+    return !!$self->{core_bools};
 }
 
 sub get_boolean_values {
@@ -2298,6 +2329,19 @@ to their default values.
 
 C<get_boolean_values> will return both C<$false> and C<$true> values, or
 the empty list when they are set to the default.
+
+=head2 core_bools
+
+    $json->core_bools([$enable]);
+
+If C<$enable> is true (or missing), then C<decode>, will produce standard
+perl boolean values. Equivalent to calling:
+
+    $json->boolean_values(!!1, !!0)
+
+C<get_core_bools> will return true if this has been set. On perl 5.36, it will
+also return true if the boolean values have been set to perl's core booleans
+using the C<boolean_values> method.
 
 =head2 filter_json_object
 
