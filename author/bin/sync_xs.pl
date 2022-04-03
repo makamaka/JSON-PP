@@ -42,6 +42,32 @@ for my $xs_test ($xs_root->child('t')->children) {
             $content =~ s/(# copied over from JSON::XS and modified to use JSON::PP\n\n)/$1use strict;\nuse warnings;\n\nmy \$loaded;\n/;
         }
 
+        if ($basename =~ /001_utf8/) {
+            $content =~ s/(use JSON::PP;\n\n).+/$1/s;
+            $content .=<< 'TEST';
+my $pilcrow_utf8 = (ord "^" == 0x5E) ? "\xc2\xb6"  # 8859-1
+                 : (ord "^" == 0x5F) ? "\x80\x65"  # CP 1024
+                 :                     "\x78\x64"; # assume CP 037
+is (JSON::PP->new->allow_nonref (1)->utf8 (1)->encode ("¶"), "\"$pilcrow_utf8\"");
+is (JSON::PP->new->allow_nonref (1)->encode ("¶"), "\"¶\"");
+is (JSON::PP->new->allow_nonref (1)->ascii (1)->utf8 (1)->encode (chr 0x8000), '"\u8000"');
+is (JSON::PP->new->allow_nonref (1)->ascii (1)->utf8 (1)->pretty (1)->encode (chr 0x10402), "\"\\ud801\\udc02\"\n");
+
+eval { JSON::PP->new->allow_nonref (1)->utf8 (1)->decode ('"¶"') };
+ok $@ =~ /malformed UTF-8/;
+
+is (JSON::PP->new->allow_nonref (1)->decode ('"¶"'), "¶");
+is (JSON::PP->new->allow_nonref (1)->decode ('"\u00b6"'), "¶");
+is (JSON::PP->new->allow_nonref (1)->decode ('"\ud801\udc02' . "\x{10204}\""), "\x{10402}\x{10204}");
+
+my $controls = (ord "^" == 0x5E) ? "\012\\\015\011\014\010"
+             : (ord "^" == 0x5F) ? "\025\\\015\005\014\026"  # CP 1024
+             :                     "\045\\\015\005\014\026"; # assume CP 037
+is (JSON::PP->new->allow_nonref (1)->decode ('"\"\n\\\\\r\t\f\b"'), "\"$controls");
+
+TEST
+        }
+
         if ($basename =~ /002_error/) {
             $content =~ s!(eval \{ decode_json \("1\\x01"\) }; ok \$\@ =~ /garbage after/;)!{ #SKIP_UNLESS_XS4_COMPAT 4\n$1!;
             $content =~ s!(eval \{ decode_json \("\[\]\\x00"\) }; ok \$\@ =~ /garbage after/;)!$1\n}!;
@@ -50,6 +76,10 @@ for my $xs_test ($xs_root->child('t')->children) {
             $content =~ s/for \$v /for my \$v /;
             $content =~ s/BEGIN \{ plan tests => (\d+) };\n/BEGIN \{ plan tests => $1 + 2 };\n/;
             $content =~ s/(ok \(!JSON::PP::is_bool \$false\);\n)/$1ok \(!JSON::PP::is_bool "JSON::PP::Boolean"\);\nok \(!JSON::PP::is_bool \{}\); # GH-34\n/s;
+        }
+
+        if ($basename =~ /008_pc_base/) {
+            $content =~ s!'\["\\\\u001b"\]'! \(ord\("A"\) == 65\) \? '\["\\\\u001b"\]' : '\["\\\\u0027"\]'!;
         }
 
         if ($basename =~ /011_pc_expo/) {
@@ -89,6 +119,7 @@ END
 
         if ($basename =~ /014_latin1/) {
             $content =~ s/print (.+?)\s+\?.*\\n";/ok ($1);/g;
+            $content =~ s!\\x\{89\}!\\x\{b6\}!g;
         }
 
         if ($basename =~ /015_prefix/) {
