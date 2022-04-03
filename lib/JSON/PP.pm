@@ -326,14 +326,6 @@ sub allow_bigint {
 
         $str .= "\n" if ( $indent ); # JSON::XS 2.26 compatible
 
-        unless ($ascii or $latin1 or $utf8) {
-            utf8::upgrade($str);
-        }
-
-        if ($props->[ P_SHRINK ]) {
-            utf8::downgrade($str, 1);
-        }
-
         return $str;
     }
 
@@ -736,7 +728,6 @@ BEGIN {
             }
         }
         else {
-            utf8::upgrade( $text );
             utf8::encode( $text );
         }
 
@@ -1534,10 +1525,6 @@ sub incr_parse {
     $self->{incr_text} = '' unless ( defined $self->{incr_text} );
 
     if ( defined $text ) {
-        if ( utf8::is_utf8( $text ) and !utf8::is_utf8( $self->{incr_text} ) ) {
-            utf8::upgrade( $self->{incr_text} ) ;
-            utf8::decode( $self->{incr_text} ) ;
-        }
         $self->{incr_text} .= $text;
     }
 
@@ -1564,7 +1551,6 @@ sub incr_parse {
                 }
 
                 unless ( $coder->get_utf8 ) {
-                    utf8::upgrade( $self->{incr_text} );
                     utf8::decode( $self->{incr_text} );
                 }
 
