@@ -47,9 +47,10 @@ t/116_incr_parse_fixed.t
 t/117_numbers.t
 t/118_boolean_values.t
 t/119_incr_parse_utf8.t
+t/core_bools.t
 t/gh_28_json_test_suite.t
 t/gh_29_trailing_false_value.t
 t/rt_116998_wrong_character_offset.t
-t/rt_122270_is_bool_for_obsolete_xs_boolean.t
+t/rt_122270_old_xs_boolean.t
 t/rt_90071_incr_parse.t
 t/zero-mojibake.t
