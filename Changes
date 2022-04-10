@@ -1,5 +1,11 @@
 Revision history for Perl extension JSON::PP.
 
+4.08 2022-04-10
+    - remove unneeded utf8::upgrade and downgrade (GH#59, FGasper++)
+    - core boolean support (GH#62, 63, haarg++)
+    - EBCDIC support (GH#64, khwilliamson++)
+    - shorten a test name (GH#65, khwilliamson)
+
 4.07 2021-12-17
     - fix incr_parse($unicode_str) bug (GH#56, DabeDotCom++)
 
