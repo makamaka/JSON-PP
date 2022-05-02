@@ -1697,6 +1697,7 @@ INCR_PARSE:
             }
             next;
         } elsif ( $mode == INCR_M_TFN ) {
+            last INCR_PARSE if $p >= $len && $self->{incr_nest};
             while ( $len > $p ) {
                 $s = substr( $text, $p++, 1 );
                 next if defined $s and $s =~ /[rueals]/;
@@ -1708,6 +1709,7 @@ INCR_PARSE:
             last INCR_PARSE unless $self->{incr_nest};
             redo INCR_PARSE;
         } elsif ( $mode == INCR_M_NUM ) {
+            last INCR_PARSE if $p >= $len && $self->{incr_nest};
             while ( $len > $p ) {
                 $s = substr( $text, $p++, 1 );
                 next if defined $s and $s =~ /[0-9eE.+\-]/;
