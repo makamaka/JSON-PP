@@ -22,6 +22,7 @@ WriteMakefile(
     'VERSION_FROM'  => 'lib/JSON/PP.pm', # finds $VERSION
     'PREREQ_PM'     => {
               'Test::More'  => 0,
+              'Test::Fork'  => 0,
               %prereq,
     },
     'EXE_FILES' => [ 'bin/json_pp' ],
