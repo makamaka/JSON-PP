@@ -1,29 +1,15 @@
 use strict;
 no warnings;
 use Test::More;
-BEGIN { plan tests => 19 * (6 + 2) + 1 * (12 + 2) };
+BEGIN { plan tests => 19 * (6) + 1 * (12) };
 
 BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
 
 use JSON::PP;
 
-################################################################
-###  Warning: Some inputs may get stuck in an infinite loop  ###
-###      so we're going to run each test under `Test::Fork`  ###
-################################################################
-
-use Test::Fork;
 sub run_test {
     my ($num_tests, $input, $sub) = @_;
-    my $pid = fork_ok($num_tests => sub {
-        setpgrp 0, 0;
-        $sub->($input);
-    });
-
-    local $SIG{ALRM} = sub { warn "\e[31mnot ok - '$input' hung; killing $pid...\e[m\n"; kill -9, $pid };
-    alarm 10;
-    waitpid $pid, 0;
-    alarm 0;
+    $sub->($input);
 }
 
 #################################################################
