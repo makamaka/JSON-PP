@@ -1,25 +1,14 @@
 use strict;
-no warnings;
+use warnings;
 use Test::More;
-BEGIN { plan tests => 19 * 3 + 1 * 6 };
-
-BEGIN { $ENV{PERL_JSON_BACKEND} = 0; }
-
 use JSON::PP;
 
 sub run_test {
-    my ($num_tests, $input, $sub) = @_;
+    my ($input, $sub) = @_;
     $sub->($input);
 }
 
-#################################################################
-
-unless ( eval "use JSON::PP(); 1" ) {
-    diag "JSON::PP not found; skipping...";
-    next;
-}
-
-run_test(3, '{"one": 1}', sub {
+run_test('{"one": 1}', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -29,7 +18,7 @@ run_test(3, '{"one": 1}', sub {
     unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error");
 });
 
-run_test(3, '{"one": 1]', sub {
+run_test('{"one": 1]', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -39,7 +28,7 @@ run_test(3, '{"one": 1]', sub {
     like ($e, qr/, or \} expected while parsing object\/hash/, "'} expected' json string error");
 });
 
-run_test(3, '"', sub {
+run_test('"', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -49,7 +38,7 @@ run_test(3, '"', sub {
     unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input'");
 });
 
-run_test(3, '{', sub {
+run_test('{', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -59,7 +48,7 @@ run_test(3, '{', sub {
     unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input'");
 });
 
-run_test(3, '[', sub {
+run_test('[', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -69,7 +58,7 @@ run_test(3, '[', sub {
     unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input'");
 });
 
-run_test(3, '}', sub {
+run_test('}', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -79,7 +68,7 @@ run_test(3, '}', sub {
     like ($e, qr/malformed JSON string/, "'malformed JSON string' json string error for input='$input'");
 });
 
-run_test(3, ']', sub {
+run_test(']', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -89,7 +78,7 @@ run_test(3, ']', sub {
     like ($e, qr/malformed JSON string/, "'malformed JSON string' json string error for input='$input'");
 });
 
-run_test(3, '1', sub {
+run_test('1', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -99,7 +88,7 @@ run_test(3, '1', sub {
     unlike ($e, qr/malformed JSON string/, "'malformed JSON string' json string error for input='$input'");
 });
 
-run_test(3, '1', sub {
+run_test('1', sub {
     my $input = shift;
     my $coder = JSON::PP->new->allow_nonref(0);
     my $res = eval { $coder->incr_parse($input) };
@@ -109,7 +98,7 @@ run_test(3, '1', sub {
     like ($e, qr/JSON text must be an object or array/, "'JSON text must be an object or array' json string error for input='$input'");
 });
 
-run_test(3, '"1', sub {
+run_test('"1', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -119,7 +108,7 @@ run_test(3, '"1', sub {
     unlike ($e, qr/malformed JSON string/, "'malformed JSON string' json string error for input='$input'");
 });
 
-run_test(3, '\\', sub {
+run_test('\\', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -129,7 +118,7 @@ run_test(3, '\\', sub {
     like ($e, qr/malformed JSON string/, "'malformed JSON string' json string error for input='$input'");
 });
 
-run_test(3, '{"one": "', sub {
+run_test('{"one": "', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -139,7 +128,7 @@ run_test(3, '{"one": "', sub {
     unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input'");
 });
 
-run_test(3, '{"one": {', sub {
+run_test('{"one": {', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -149,7 +138,7 @@ run_test(3, '{"one": {', sub {
     unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input'");
 });
 
-run_test(3, '{"one": [', sub {
+run_test('{"one": [', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -159,7 +148,7 @@ run_test(3, '{"one": [', sub {
     unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input'");
 });
 
-run_test(3, '{"one": t', sub {
+run_test('{"one": t', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -169,7 +158,7 @@ run_test(3, '{"one": t', sub {
     unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input'");
 });
 
-run_test(3, '{"one": \\', sub {
+run_test('{"one": \\', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -179,7 +168,7 @@ run_test(3, '{"one": \\', sub {
     unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input'");
 });
 
-run_test(3, '{"one": ', sub {
+run_test('{"one": ', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -189,7 +178,7 @@ run_test(3, '{"one": ', sub {
     unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input'");
 });
 
-run_test(3, '{"one": 1', sub {
+run_test('{"one": 1', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -199,7 +188,7 @@ run_test(3, '{"one": 1', sub {
     unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input'");
 });
 
-run_test(3, '{"one": {"two": 2', sub {
+run_test('{"one": {"two": 2', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
     my $res = eval { $coder->incr_parse($input) };
@@ -210,20 +199,20 @@ run_test(3, '{"one": {"two": 2', sub {
 });
 
 # Test Appending Closing '}' Curly Bracket
-run_test(6, '{"one": 1', sub {
+run_test('{"one": 1', sub {
     my $input = shift;
     my $coder = JSON::PP->new;
-    {
-      my $res = eval { $coder->incr_parse($input) };
-      my $e = $@; # test more clobbers $@, we need it twice
-      ok (!$res, "truncated input='$input'");
-      ok (!$e, "no error for input='$input'");
-      unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input'");
+    my $res = eval { $coder->incr_parse($input) };
+    my $e = $@; # test more clobbers $@, we need it twice
+    ok (!$res, "truncated input='$input'");
+    ok (!$e, "no error for input='$input'");
+    unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input'");
 
-      $res = eval { $coder->incr_parse('}') };
-      $e = $@; # test more clobbers $@, we need it twice
-      ok ($res, "truncated input='$input' . '}'");
-      ok (!$e, "no error for input='$input' . '}'");
-      unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input' . '}'");
-    }
+    $res = eval { $coder->incr_parse('}') };
+    $e = $@; # test more clobbers $@, we need it twice
+    ok ($res, "truncated input='$input' . '}'");
+    ok (!$e, "no error for input='$input' . '}'");
+    unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input' . '}'");
 });
+
+done_testing;
