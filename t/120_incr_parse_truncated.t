@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use JSON::PP;
 
+plan tests => 19 * 3 + 1 * 6;
+
 sub run_test {
     my ($input, $sub) = @_;
     $sub->($input);
@@ -214,5 +216,3 @@ run_test('{"one": 1', sub {
     ok (!$e, "no error for input='$input' . '}'");
     unlike ($e, qr/, or \} expected while parsing object\/hash/, "No '} expected' json string error for input='$input' . '}'");
 });
-
-done_testing;
