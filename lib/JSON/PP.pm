@@ -1273,7 +1273,10 @@ BEGIN {
 
     # Compute how many bytes are in the longest legal official Unicode
     # character
-    my $max_unicode_length = chr 0x10FFFF;
+    my $max_unicode_length = do {
+      BEGIN { $] >= 5.006 and require warnings and warnings->unimport('utf8') }
+      chr 0x10FFFF;
+    };
     utf8::encode($max_unicode_length);
     $max_unicode_length = length $max_unicode_length;
 
