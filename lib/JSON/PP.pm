@@ -47,7 +47,6 @@ use constant P_ALLOW_TAGS           => 19;
 use constant OLD_PERL => $] < 5.008 ? 1 : 0;
 use constant USE_B => $ENV{PERL_JSON_PP_USE_B} || 0;
 use constant CORE_BOOL => defined &builtin::is_bool;
-use constant CAN_TRACK_NUMBERS => defined &builtin::created_as_number;
 
 my $invalid_char_re;
 
@@ -477,11 +476,7 @@ sub allow_bigint {
 
     sub _looks_like_number {
         my $value = shift;
-        if (CAN_TRACK_NUMBERS) {
-            BEGIN { CAN_TRACK_NUMBERS and warnings->unimport('builtin') }
-            return builtin::created_as_number($value);
-        }
-        elsif (USE_B) {
+        if (USE_B) {
             my $b_obj = B::svref_2object(\$value);
             my $flags = $b_obj->FLAGS;
             return 1 if $flags & ( B::SVp_IOK() | B::SVp_NOK() ) and !( $flags & B::SVp_POK() );
