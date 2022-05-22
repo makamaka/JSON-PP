@@ -1,7 +1,9 @@
 Revision history for Perl extension JSON::PP.
 
-4.09 to be released
+4.09 2022-05-22
+    - reverted core boolean support for now (GH#72)
     - incr_parse() Hangs on Certain Inputs (GH#67, DabeDotCom++)
+    - silence warnings about non-characters on older perls (GH#68, haarg++)
 
 4.08 2022-04-10
     - remove unneeded utf8::upgrade and downgrade (GH#59, FGasper++)
