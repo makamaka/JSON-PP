@@ -251,6 +251,16 @@ sub get_core_bools {
     return !!$self->{core_bools};
 }
 
+sub unblessed_bool {
+    my $self = shift;
+    return $self->core_bools(@_);
+}
+
+sub get_unblessed_bool {
+    my $self = shift;
+    return $self->get_core_bools(@_);
+}
+
 sub get_boolean_values {
     my $self = shift;
     if (exists $self->{true} and exists $self->{false}) {
@@ -2342,6 +2352,9 @@ perl boolean values. Equivalent to calling:
 C<get_core_bools> will return true if this has been set. On perl 5.36, it will
 also return true if the boolean values have been set to perl's core booleans
 using the C<boolean_values> method.
+
+The methods C<unblessed_bool> and C<get_unblessed_bool> are provided as aliases
+for compatibility with L<Cpanel::JSON::XS>.
 
 =head2 filter_json_object
 
