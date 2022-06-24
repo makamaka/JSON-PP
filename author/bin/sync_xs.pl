@@ -78,6 +78,16 @@ TEST
             $content =~ s/(ok \(!JSON::PP::is_bool \$false\);\n)/$1ok \(!JSON::PP::is_bool "JSON::PP::Boolean"\);\nok \(!JSON::PP::is_bool \{}\); # GH-34\n/s;
         }
 
+        if ($basename =~ /004_dwiw_encode/) {
+            $content =~ s!use Test;!use Test::More tests => 5;!;
+            $content =~ s!BEGIN \{ plan tests => 5 \}\s+BEGIN!BEGIN!s;
+        }
+
+        if ($basename =~ /005_dwiw_decode/) {
+            $content =~ s!use Test;!use Test::More tests => 7;!;
+            $content =~ s!BEGIN \{ plan tests => 7 \}\s+BEGIN!BEGIN!s;
+        }
+
         if ($basename =~ /008_pc_base/) {
             $content =~ s!'\["\\\\u001b"\]'! \(ord\("A"\) == 65\) \? '\["\\\\u001b"\]' : '\["\\\\u0027"\]'!;
         }
