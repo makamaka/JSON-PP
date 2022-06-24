@@ -1,5 +1,9 @@
 Revision history for Perl extension JSON::PP.
 
+4.10 2022-06-24
+    - fix a regression of decode_error introduced at 4.08 (GH#75, reported by andk++)
+    - convert all tests to use Test::More (GH#70, haarg++)
+
 4.09 2022-05-22
     - reverted core boolean support for now (GH#72)
     - incr_parse() Hangs on Certain Inputs (GH#67, DabeDotCom++)
