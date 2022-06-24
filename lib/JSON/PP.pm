@@ -1309,7 +1309,7 @@ BEGIN {
         }
 
         for my $c ( unpack( $type, $str ) ) { # emulate pv_uni_display() ?
-            my $chr_c = $c;
+            my $chr_c = chr($c);
             $mess .=  $chr_c eq '\\' ? '\\\\'
                     : $chr_c =~ /[[:print:]]/ ? $chr_c
                     : $chr_c eq '\a' ? '\a'
