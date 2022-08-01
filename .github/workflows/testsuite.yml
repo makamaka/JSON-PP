@@ -46,6 +46,7 @@ jobs:
       matrix:
         perl-version:
           [
+            "latest",
             "5.30",
             "5.28",
             "5.26",
