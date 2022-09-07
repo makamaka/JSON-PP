@@ -48,6 +48,10 @@ use constant OLD_PERL => $] < 5.008 ? 1 : 0;
 use constant USE_B => $ENV{PERL_JSON_PP_USE_B} || 0;
 use constant CORE_BOOL => defined &builtin::is_bool;
 
+use constant UTF8_CHARS => 0;
+use constant UTF8_STANDARD => 1;
+use constant UTF8_BYTES => 2;
+
 my $invalid_char_re;
 
 BEGIN {
@@ -67,7 +71,7 @@ BEGIN {
 
 BEGIN {
     my @xs_compati_bit_properties = qw(
-            latin1 ascii utf8 indent canonical space_before space_after allow_nonref shrink
+            latin1 ascii indent canonical space_before space_after allow_nonref shrink
             allow_blessed convert_blessed relaxed allow_unknown
             allow_tags
     );
@@ -109,7 +113,22 @@ BEGIN {
 
 }
 
+sub utf8 {
+    my $value = defined $_[1] ? $_[1] : 1;
 
+    if ($value) {
+        $_[0]->{PROPS}->[P_UTF8] = ($value eq UTF8_BYTES) ? $value : UTF8_STANDARD;
+    }
+    else {
+        $_[0]->{PROPS}->[P_UTF8] = UTF8_CHARS;
+    }
+
+    $_[0];
+}
+
+sub get_utf8 {
+    $_[0]->{PROPS}->[P_UTF8] || UTF8_CHARS;
+}
 
 # Functions
 
@@ -590,7 +609,7 @@ sub allow_bigint {
             $arg = JSON_PP_encode_latin1($arg);
         }
 
-        if ($utf8) {
+        if ($utf8 && $utf8 ne UTF8_BYTES) {
             utf8::encode($arg);
         }
 
@@ -777,7 +796,7 @@ BEGIN {
 
         ($alt_true, $alt_false) = @$self{qw/true false/};
 
-        if ( $utf8 ) {
+        if ( $utf8 && $utf8 ne UTF8_BYTES ) {
             $encoding = _detect_utf_encoding($text);
             if ($encoding ne 'UTF-8' and $encoding ne 'unknown') {
                 require Encode;
@@ -906,7 +925,11 @@ BEGIN {
                             my $hex = hex( $u );
                             if ( chr $u =~ /[[:^ascii:]]/ ) {
                                 $is_utf8 = 1;
-                                $s .= JSON_PP_decode_unicode($u) || next;
+
+                                my $char = JSON_PP_decode_unicode($u) || next;
+
+                                utf8::encode($char) if $utf8 eq UTF8_BYTES;
+                                $s .= $char;
                             }
                             else {
                                 $s .= chr $hex;
