@@ -72,6 +72,13 @@ jobs:
         run: perl -I$(pwd) Makefile.PL
       - name: make test
         run: make test
+      - name: load JSON::PP before Cpanel
+        if: ${{ matrix.perl-version == 'latest' }}
+        run: cpanm -n Cpanel::JSON::XS Test::Warnings && perl -Ilib -we 'use Test::More; use Test::Warnings qw(:report_warnings); use JSON::PP (); use Cpanel::JSON::XS (); done_testing'
+      - name: load JSON::PP after Cpanel
+        if: ${{ matrix.perl-version == 'latest' }}
+        run: cpanm -n Cpanel::JSON::XS Test::Warnings && perl -Ilib -we 'use Test::More; use Test::Warnings qw(:report_warnings); use Cpanel::JSON::XS (); use JSON::PP (); done_testing'
+
 
   macOS:
     needs: [ubuntu]
