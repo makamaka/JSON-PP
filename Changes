@@ -1,5 +1,8 @@
 Revision history for Perl extension JSON::PP.
 
+4.12 2022-10-09
+    - call unimport overload first to silence warnings (GH#76, haarg++)
+
 4.11 2022-07-31
     - restored cre boolean support (GH#73, #74, haarg++)
 

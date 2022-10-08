@@ -11,7 +11,7 @@ overload::import('overload',
     fallback => 1,
 );
 
-$JSON::PP::Boolean::VERSION = '4.11';
+$JSON::PP::Boolean::VERSION = '4.12';
 
 1;
 
