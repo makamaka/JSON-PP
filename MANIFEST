@@ -64,6 +64,7 @@ t/117_numbers.t
 t/118_boolean_values.t
 t/119_incr_parse_utf8.t
 t/120_incr_parse_truncated.t
+t/core_bools.t
 t/gh_28_json_test_suite.t
 t/gh_29_trailing_false_value.t
 t/rt_116998_wrong_character_offset.t
