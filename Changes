@@ -1,5 +1,8 @@
 Revision history for Perl extension JSON::PP.
 
+4.14 2022-12-26
+    - updated manifest (GH#81, demerphq++)
+
 4.13 2022-12-26
     - Break up 099_binary.t into 16 pieces that can be tested in parallel (GH#80, demerphq++)
 
