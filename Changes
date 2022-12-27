@@ -1,5 +1,8 @@
 Revision history for Perl extension JSON::PP.
 
+4.15 2022-12-27
+    - fix core bool test to not ignore errors (GH#82, haarg++)
+
 4.14 2022-12-26
     - updated manifest (GH#81, demerphq++)
 
