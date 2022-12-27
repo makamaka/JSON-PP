@@ -59,15 +59,13 @@ ok !ref $new_false, "core falase value is not blessed";
 
 SKIP: {
     skip "core boolean support needed to detect core booleans", 4
-        unless 0; #JSON::PP::CORE_BOOL;
-    eval <<'EOF_TEST';
-    no warnings 'experimental';
+        unless JSON::PP::CORE_BOOL;
+    BEGIN { JSON::PP::CORE_BOOL and warnings->unimport(qw(experimental::builtin)) }
     ok JSON::PP::is_bool($new_true), 'core true is a boolean';
     ok JSON::PP::is_bool($new_false), 'core false is a boolean';
 
     ok builtin::is_bool($new_true), 'core true is a core boolean';
     ok builtin::is_bool($new_false), 'core false is a core boolean';
-EOF_TEST
 }
 
 my $should_true = $json->allow_nonref(1)->decode('true');
