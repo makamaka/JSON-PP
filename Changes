@@ -1,5 +1,8 @@
 Revision history for Perl extension JSON::PP.
 
+4.16 2022-12-30
+    - drop support for perls < 5.8 (GH#84, haarg++)
+
 4.15 2022-12-27
     - fix core bool test to not ignore errors (GH#82, haarg++)
 
