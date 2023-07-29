@@ -15,7 +15,7 @@ use Carp ();
 use Scalar::Util qw(blessed reftype refaddr);
 #use Devel::Peek;
 
-our $VERSION = '4.16';
+our $VERSION = '4.17_01';
 
 our @EXPORT = qw(encode_json decode_json from_json to_json);
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension JSON::PP.
 
+4.17_01 2023-7-29
+    - fix a reentrant issue (experimental) (GH#61, 87)
+
 4.16 2022-12-30
     - drop support for perls < 5.8 (GH#84, haarg++)
 
