@@ -795,11 +795,11 @@ BEGIN {
             ) if ($bytes > $max_size);
         }
 
-        white(); # remove head white space
+        $self->_white(); # remove head white space
 
         decode_error("malformed JSON string, neither array, object, number, string or atom") unless defined $ch; # Is there a first character for JSON structure?
 
-        my $result = value();
+        my $result = $self->_value();
 
         if ( !$props->[ P_ALLOW_NONREF ] and !ref $result ) {
                 decode_error(
@@ -811,7 +811,7 @@ BEGIN {
 
         my $consumed = defined $ch ? $at - 1 : $at; # consumed JSON text length
 
-        white(); # remove tail white space
+        $self->_white(); # remove tail white space
 
         return ( $result, $consumed ) if $want_offset; # all right if decode_prefix
 
@@ -821,24 +821,27 @@ BEGIN {
     }
 
 
-    sub next_chr {
+    sub _next_chr {
+        my $self = shift;
         return $ch = undef if($at >= $len);
         $ch = substr($text, $at++, 1);
     }
 
 
-    sub value {
-        white();
+    sub _value {
+        my $self = shift;
+        $self->_white();
         return          if(!defined $ch);
-        return object() if($ch eq '{');
-        return array()  if($ch eq '[');
-        return tag()    if($ch eq '(');
-        return string() if($ch eq '"' or ($singlequote and $ch eq "'"));
-        return number() if($ch =~ /[0-9]/ or $ch eq '-');
-        return word();
+        return $self->_object() if($ch eq '{');
+        return $self->_array()  if($ch eq '[');
+        return $self->_tag()    if($ch eq '(');
+        return $self->_string() if($ch eq '"' or ($singlequote and $ch eq "'"));
+        return $self->_number() if($ch =~ /[0-9]/ or $ch eq '-');
+        return $self->_word();
     }
 
-    sub string {
+    sub _string {
+        my $self = shift;
         my $utf16;
         my $is_utf8;
 
@@ -849,10 +852,10 @@ BEGIN {
         if($ch eq '"' or ($singlequote and $ch eq "'")){
             my $boundChar = $ch;
 
-            OUTER: while( defined(next_chr()) ){
+            OUTER: while( defined($self->_next_chr()) ){
 
                 if($ch eq $boundChar){
-                    next_chr();
+                    $self->_next_chr();
 
                     if ($utf16) {
                         decode_error("missing low surrogate character in surrogate pair");
@@ -863,7 +866,7 @@ BEGIN {
                     return $s;
                 }
                 elsif($ch eq '\\'){
-                    next_chr();
+                    $self->_next_chr();
                     if(exists $escapes{$ch}){
                         $s .= $escapes{$ch};
                     }
@@ -871,7 +874,7 @@ BEGIN {
                         my $u = '';
 
                         for(1..4){
-                            $ch = next_chr();
+                            $ch = $self->_next_chr();
                             last OUTER if($ch !~ /[0-9a-fA-F]/);
                             $u .= $ch;
                         }
@@ -947,28 +950,29 @@ BEGIN {
     }
 
 
-    sub white {
+    sub _white {
+        my $self = shift;
         while( defined $ch  ){
             if($ch eq '' or $ch =~ /\A[ \t\r\n]\z/){
-                next_chr();
+                $self->_next_chr();
             }
             elsif($relaxed and $ch eq '/'){
-                next_chr();
+                $self->_next_chr();
                 if(defined $ch and $ch eq '/'){
-                    1 while(defined(next_chr()) and $ch ne "\n" and $ch ne "\r");
+                    1 while(defined($self->_next_chr()) and $ch ne "\n" and $ch ne "\r");
                 }
                 elsif(defined $ch and $ch eq '*'){
-                    next_chr();
+                    $self->_next_chr();
                     while(1){
                         if(defined $ch){
                             if($ch eq '*'){
-                                if(defined(next_chr()) and $ch eq '/'){
-                                    next_chr();
+                                if(defined($self->_next_chr()) and $ch eq '/'){
+                                    $self->_next_chr();
                                     last;
                                 }
                             }
                             else{
-                                next_chr();
+                                $self->_next_chr();
                             }
                         }
                         else{
@@ -987,7 +991,7 @@ BEGIN {
                     pos($text) = $at;
                     $text =~ /\G([^\n]*(?:\r\n|\r|\n|$))/g;
                     $at = pos($text);
-                    next_chr;
+                    $self->_next_chr;
                     next;
                 }
 
@@ -997,25 +1001,26 @@ BEGIN {
     }
 
 
-    sub array {
+    sub _array {
+        my $self = shift;
         my $a  = $_[0] || []; # you can use this code to use another array ref object.
 
         decode_error('json text or perl structure exceeds maximum nesting level (max_depth set too low?)')
                                                     if (++$depth > $max_depth);
 
-        next_chr();
-        white();
+        $self->_next_chr();
+        $self->_white();
 
         if(defined $ch and $ch eq ']'){
             --$depth;
-            next_chr();
+            $self->_next_chr();
             return $a;
         }
         else {
             while(defined($ch)){
-                push @$a, value();
+                push @$a, $self->_value();
 
-                white();
+                $self->_white();
 
                 if (!defined $ch) {
                     last;
@@ -1023,7 +1028,7 @@ BEGIN {
 
                 if($ch eq ']'){
                     --$depth;
-                    next_chr();
+                    $self->_next_chr();
                     return $a;
                 }
 
@@ -1031,12 +1036,12 @@ BEGIN {
                     last;
                 }
 
-                next_chr();
-                white();
+                $self->_next_chr();
+                $self->_white();
 
                 if ($relaxed and $ch eq ']') {
                     --$depth;
-                    next_chr();
+                    $self->_next_chr();
                     return $a;
                 }
 
@@ -1047,26 +1052,27 @@ BEGIN {
         decode_error(", or ] expected while parsing array");
     }
 
-    sub tag {
+    sub _tag {
+        my $self = shift;
         decode_error('malformed JSON string, neither array, object, number, string or atom') unless $allow_tags;
 
-        next_chr();
-        white();
+        $self->_next_chr();
+        $self->_white();
 
-        my $tag = value();
+        my $tag = $self->_value();
         return unless defined $tag;
         decode_error('malformed JSON string, (tag) must be a string') if ref $tag;
 
-        white();
+        $self->_white();
 
         if (!defined $ch or $ch ne ')') {
             decode_error(') expected after tag');
         }
 
-        next_chr();
-        white();
+        $self->_next_chr();
+        $self->_white();
 
-        my $val = value();
+        my $val = $self->_value();
         return unless defined $val;
         decode_error('malformed JSON string, tag value must be an array') unless ref $val eq 'ARRAY';
 
@@ -1077,18 +1083,19 @@ BEGIN {
         $tag->THAW('JSON', @$val);
     }
 
-    sub object {
+    sub _object {
+        my $self = shift;
         my $o = $_[0] || {}; # you can use this code to use another hash ref object.
         my $k;
 
         decode_error('json text or perl structure exceeds maximum nesting level (max_depth set too low?)')
                                                 if (++$depth > $max_depth);
-        next_chr();
-        white();
+        $self->_next_chr();
+        $self->_white();
 
         if(defined $ch and $ch eq '}'){
             --$depth;
-            next_chr();
+            $self->_next_chr();
             if ($F_HOOK) {
                 return _json_object_hook($o);
             }
@@ -1096,23 +1103,23 @@ BEGIN {
         }
         else {
             while (defined $ch) {
-                $k = ($allow_barekey and $ch ne '"' and $ch ne "'") ? bareKey() : string();
-                white();
+                $k = ($allow_barekey and $ch ne '"' and $ch ne "'") ? $self->_bareKey() : $self->_string();
+                $self->_white();
 
                 if(!defined $ch or $ch ne ':'){
                     $at--;
                     decode_error("':' expected");
                 }
 
-                next_chr();
-                $o->{$k} = value();
-                white();
+                $self->_next_chr();
+                $o->{$k} = $self->_value();
+                $self->_white();
 
                 last if (!defined $ch);
 
                 if($ch eq '}'){
                     --$depth;
-                    next_chr();
+                    $self->_next_chr();
                     if ($F_HOOK) {
                         return _json_object_hook($o);
                     }
@@ -1123,12 +1130,12 @@ BEGIN {
                     last;
                 }
 
-                next_chr();
-                white();
+                $self->_next_chr();
+                $self->_white();
 
                 if ($relaxed and $ch eq '}') {
                     --$depth;
-                    next_chr();
+                    $self->_next_chr();
                     if ($F_HOOK) {
                         return _json_object_hook($o);
                     }
@@ -1144,34 +1151,36 @@ BEGIN {
     }
 
 
-    sub bareKey { # doesn't strictly follow Standard ECMA-262 3rd Edition
+    sub _bareKey { # doesn't strictly follow Standard ECMA-262 3rd Edition
+        my $self = shift;
         my $key;
         while($ch =~ /[\$\w[:^ascii:]]/){
             $key .= $ch;
-            next_chr();
+            $self->_next_chr();
         }
         return $key;
     }
 
 
-    sub word {
+    sub _word {
+        my $self = shift;
         my $word =  substr($text,$at-1,4);
 
         if($word eq 'true'){
             $at += 3;
-            next_chr;
+            $self->_next_chr;
             return defined $alt_true ? $alt_true : $JSON::PP::true;
         }
         elsif($word eq 'null'){
             $at += 3;
-            next_chr;
+            $self->_next_chr;
             return undef;
         }
         elsif($word eq 'fals'){
             $at += 3;
             if(substr($text,$at,1) eq 'e'){
                 $at++;
-                next_chr;
+                $self->_next_chr;
                 return defined $alt_false ? $alt_false : $JSON::PP::false;
             }
         }
@@ -1185,7 +1194,8 @@ BEGIN {
     }
 
 
-    sub number {
+    sub _number {
+        my $self = shift;
         my $n    = '';
         my $v;
         my $is_dec;
@@ -1193,7 +1203,7 @@ BEGIN {
 
         if($ch eq '-'){
             $n = '-';
-            next_chr;
+            $self->_next_chr;
             if (!defined $ch or $ch !~ /\d/) {
                 decode_error("malformed number (no digits after initial minus)");
             }
@@ -1206,19 +1216,19 @@ BEGIN {
                 decode_error("malformed number (leading zero must not be followed by another digit)");
             }
             $n .= $ch;
-            next_chr;
+            $self->_next_chr;
         }
 
         while(defined $ch and $ch =~ /\d/){
             $n .= $ch;
-            next_chr;
+            $self->_next_chr;
         }
 
         if(defined $ch and $ch eq '.'){
             $n .= '.';
             $is_dec = 1;
 
-            next_chr;
+            $self->_next_chr;
             if (!defined $ch or $ch !~ /\d/) {
                 decode_error("malformed number (no digits after decimal point)");
             }
@@ -1226,7 +1236,7 @@ BEGIN {
                 $n .= $ch;
             }
 
-            while(defined(next_chr) and $ch =~ /\d/){
+            while(defined($self->_next_chr) and $ch =~ /\d/){
                 $n .= $ch;
             }
         }
@@ -1234,11 +1244,11 @@ BEGIN {
         if(defined $ch and ($ch eq 'e' or $ch eq 'E')){
             $n .= $ch;
             $is_exp = 1;
-            next_chr;
+            $self->_next_chr;
 
             if(defined($ch) and ($ch eq '+' or $ch eq '-')){
                 $n .= $ch;
-                next_chr;
+                $self->_next_chr;
                 if (!defined $ch or $ch =~ /\D/) {
                     decode_error("malformed number (no digits after exp sign)");
                 }
@@ -1251,7 +1261,7 @@ BEGIN {
                 decode_error("malformed number (no digits after exp sign)");
             }
 
-            while(defined(next_chr) and $ch =~ /\d/){
+            while(defined($self->_next_chr) and $ch =~ /\d/){
                 $n .= $ch;
             }
 
