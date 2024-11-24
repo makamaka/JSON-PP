@@ -2041,7 +2041,7 @@ This setting has currently no effect on tied hashes.
     
     $enabled = $json->get_allow_nonref
 
-Unlike other boolean options, this opotion is enabled by default beginning
+Unlike other boolean options, this option is enabled by default beginning
 with version C<4.0>.
 
 If C<$enable> is true (or missing), then the C<encode> method can convert a
@@ -2480,7 +2480,7 @@ then the argument will be passed to Perl's C<sort> built-in function.
 
 As the sorting is done in the JSON::PP scope, you usually need to
 prepend C<JSON::PP::> to the subroutine name, and the special variables
-C<$a> and C<$b> used in the subrontine used by C<sort> function.
+C<$a> and C<$b> used in the subroutine used by C<sort> function.
 
 Example:
 
@@ -2845,7 +2845,7 @@ argument being the object to serialise, and the second argument being the
 constant string C<JSON> to distinguish it from other serialisers.
 
 The C<FREEZE> method can return any number of values (i.e. zero or
-more). These values and the paclkage/classname of the object will then be
+more). These values and the package/classname of the object will then be
 encoded as a tagged JSON value in the following format:
 
    ("classname")[FREEZE return values...]
