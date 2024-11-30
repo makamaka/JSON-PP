@@ -11,9 +11,9 @@ use JSON::PP;
 
 my $pp = JSON::PP->new->latin1->allow_nonref;
 
-ok ($pp->encode ("\x{12}\x{b6}       ") eq "\"\\u0012\x{b6}       \"");
-ok ($pp->encode ("\x{12}\x{b6}\x{abc}") eq "\"\\u0012\x{b6}\\u0abc\"");
+is($pp->encode ("\x{12}\x{b6}       "), "\"\\u0012\x{b6}       \"");
+is($pp->encode ("\x{12}\x{b6}\x{abc}"), "\"\\u0012\x{b6}\\u0abc\"");
 
-ok ($pp->decode ("\"\\u0012\x{b6}\""       ) eq "\x{12}\x{b6}");
-ok ($pp->decode ("\"\\u0012\x{b6}\\u0abc\"") eq "\x{12}\x{b6}\x{abc}");
+is($pp->decode ("\"\\u0012\x{b6}\""       ), "\x{12}\x{b6}");
+is($pp->decode ("\"\\u0012\x{b6}\\u0abc\""), "\x{12}\x{b6}\x{abc}");
 
