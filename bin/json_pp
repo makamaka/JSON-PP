@@ -2,7 +2,7 @@
 
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use strict;
-use Getopt::Long qw( :config no_ignore_case );
+use Getopt::Long;
 use Encode ();
 
 use JSON::PP ();
@@ -16,7 +16,6 @@ my %allow_json_opt = map { $_ => 1 } qw(
 
 
 GetOptions(
-   'v'   => \( my $opt_verbose ),
    'f=s' => \( my $opt_from = 'json' ),
    't=s' => \( my $opt_to = 'json' ),
    'json_opt=s' => \( my $json_opt = 'pretty' ),
