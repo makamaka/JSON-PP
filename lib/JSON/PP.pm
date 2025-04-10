@@ -1754,7 +1754,7 @@ and are also used to represent JSON C<true> and C<false> in Perl strings.
 On perl 5.36 and above, will also return true when given one of perl's
 standard boolean values, such as the result of a comparison.
 
-See L<MAPPING>, below, for more information on how JSON values are mapped to
+See L</MAPPING>, below, for more information on how JSON values are mapped to
 Perl.
 
 =head1 OBJECT-ORIENTED INTERFACE
@@ -2413,7 +2413,7 @@ objects into JSON numbers.
    print $json->encode($bigfloat);
    # => 2.000000000000000000000000001
 
-See also L<MAPPING>.
+See also L</MAPPING>.
 
 =head2 loose
 
