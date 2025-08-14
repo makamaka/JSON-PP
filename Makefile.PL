@@ -22,6 +22,7 @@ WriteMakefile(
     'EXE_FILES' => [ 'bin/json_pp' ],
     'ABSTRACT_FROM' => 'lib/JSON/PP.pm', # retrieve abstract from module
     'AUTHOR'        => 'Makamaka Hannyaharamitu, E<lt>makamaka[at]cpan.orgE<gt>',
+    'INSTALLDIRS'   => ($] < 5.011 ? 'perl' : 'site'),
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ('LICENSE' => 'perl', ) : () ),
 
     ( $ExtUtils::MakeMaker::VERSION >= 6.46 ? (
