@@ -112,7 +112,7 @@ sub encode_json ($) { # encode
 }
 
 
-sub decode_json { # decode
+sub decode_json ($) { # decode
     ($JSON ||= __PACKAGE__->new->utf8)->decode(@_);
 }
 
