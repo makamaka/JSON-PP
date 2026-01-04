@@ -450,7 +450,8 @@ sub allow_bigint {
         $self->_down_indent() if ($self->{PROPS}[P_INDENT]);
 
         return '[]' unless @res;
-        return '[' . $pre . join( ",$pre", @res ) . $post . ']';
+        my $space = $self->{PROPS}[P_SPACE_AFTER] ? ' ' : '';
+        return '[' . $pre . join( ",$space$pre", @res ) . $post . ']';
     }
 
     sub _looks_like_number {
