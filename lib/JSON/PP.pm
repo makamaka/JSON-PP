@@ -450,7 +450,7 @@ sub allow_bigint {
         $self->_down_indent() if ($self->{PROPS}[P_INDENT]);
 
         return '[]' unless @res;
-        my $space = $self->{PROPS}[P_SPACE_AFTER] ? ' ' : '';
+        my $space = $pre eq '' && $self->{PROPS}[P_SPACE_AFTER] ? ' ' : '';
         return '[' . $pre . join( ",$space$pre", @res ) . $post . ']';
     }
 
