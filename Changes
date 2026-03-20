@@ -1,6 +1,12 @@
 Revision history for Perl extension JSON::PP.
 
-4.17_01 2023-7-29
+4.18 2026-03-20
+    - fix duplicate specification warning (GH#93, 88; Heiko Jansen++)
+    - fix typo (GH#92, sobrado8086++; GH#96, Grinnz++)
+    - fix decode_json prototype (reported by bdfoy++)
+    - fix space_after (GH#89, haukex++)
+
+4.17_01 2023-07-29
     - fix a reentrant issue (experimental) (GH#61, 87)
 
 4.16 2022-12-30
