@@ -16,7 +16,7 @@ WriteMakefile(
     'NAME'          => 'JSON::PP',
     'VERSION_FROM'  => 'lib/JSON/PP.pm', # finds $VERSION
     'PREREQ_PM'     => {
-              'Test::More'  => 0,
+              'Test::More'  => 0.88,
               'Scalar::Util' => '1.08'
     },
     'EXE_FILES' => [ 'bin/json_pp' ],
