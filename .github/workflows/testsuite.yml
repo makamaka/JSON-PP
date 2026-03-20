@@ -68,6 +68,8 @@ jobs:
       - uses: actions/checkout@v1
       - name: perl -V
         run: perl -V
+      - name: Install dependencies
+        run: curl -sL https://git.io/cpm | perl - install -g --with-recommends --with-test --with-configure --show-build-log-on-failure
       - name: Makefile.PL
         run: perl -I$(pwd) Makefile.PL
       - name: make test
