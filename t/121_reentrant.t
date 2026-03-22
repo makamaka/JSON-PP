@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use JSON::PP;
 
+#SKIP_ALL_UNLESS_PP 4.18
+
 plan tests => 3;
 
 # from GH#61
