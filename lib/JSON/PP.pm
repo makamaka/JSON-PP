@@ -829,7 +829,8 @@ BEGIN {
                             }
 
                             my $hex = hex( $u );
-                            if ( chr $u =~ /[[:^ascii:]]/ ) {
+
+                            if ($hex > 0x7f) {
                                 $is_utf8 = 1;
                                 $s .= _decode_unicode($u) || next;
                             }
