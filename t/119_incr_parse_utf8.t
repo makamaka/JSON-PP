@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 24;
+use Test::More;
 
 use utf8;
 use JSON::PP;
@@ -8,6 +8,13 @@ use Encode;
 use charnames qw< :full >;
 
 use vars qw< @vs >;
+
+if (ord "A" == 65) {
+    plan tests => 24;
+}
+else {
+    plan skip_all => "Hard-coded ASCII UTF-8 doesn't play well on EBCDIC";
+}
 
 ############################################################
 ###  These first tests mimic the ones in `t/001_utf8.t`  ###

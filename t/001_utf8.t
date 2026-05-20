@@ -11,7 +11,7 @@ use utf8;
 use JSON::PP;
 
 my $pilcrow_utf8 = (ord "^" == 0x5E) ? "\xc2\xb6"  # 8859-1
-                 : (ord "^" == 0x5F) ? "\x80\x65"  # CP 1024
+                 : (ord "^" == 0x5F) ? "\x80\x65"  # CP 1047
                  :                     "\x78\x64"; # assume CP 037
 is (JSON::PP->new->allow_nonref (1)->utf8 (1)->encode ("¶"), "\"$pilcrow_utf8\"");
 is (JSON::PP->new->allow_nonref (1)->encode ("¶"), "\"¶\"");
@@ -26,7 +26,6 @@ is (JSON::PP->new->allow_nonref (1)->decode ('"\u00b6"'), "¶");
 is (JSON::PP->new->allow_nonref (1)->decode ('"\ud801\udc02' . "\x{10204}\""), "\x{10402}\x{10204}");
 
 my $controls = (ord "^" == 0x5E) ? "\012\\\015\011\014\010"
-             : (ord "^" == 0x5F) ? "\025\\\015\005\014\026"  # CP 1024
+             : (ord "^" == 0x5F) ? "\025\\\015\005\014\026"  # CP 1047
              :                     "\045\\\015\005\014\026"; # assume CP 037
 is (JSON::PP->new->allow_nonref (1)->decode ('"\"\n\\\\\r\t\f\b"'), "\"$controls");
-
